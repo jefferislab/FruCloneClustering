@@ -1,4 +1,4 @@
-function [dots,dim,Prob,lam,coords]=image_dimension_redcution(file_name)
+function [dots,dim,Prob,lam,coords]=image_dimension_reduction(file_name)
 
 
 load(file_name)
