@@ -1,6 +1,5 @@
 function [dots,dim,Prob,lam,coords]=image_dimension_reduction(file_name)
 
-
 load(file_name)
 
 n=find(file_name=='_',1,'first');
@@ -14,7 +13,6 @@ for j=1:NUM
 end
 
 connectedRegions=find(s>200);
-
 
 dots={};
 dim={};
@@ -31,10 +29,8 @@ for z1=1:length(connectedRegions);
 	x=zeros(size(L),'single');
 	ind=find(L==connectedRegions(z1));
 
-
 	x(ind)=1;
 	[n1 n2 n3]=size(x);
-
 
 	indX=find(x>0);
 	m=length(indX);
@@ -50,13 +46,13 @@ for z1=1:length(connectedRegions);
 
 	K=length(indX);
 
-% this is an implementation of the algorithm in
-% Optimal Manifold Representation of Data: An Information Theoretic Approach
-% Denis Chigirev and William Bialek
-% K is the number of points of the low dimensional manifold
-% x is the original data (should be between 0 and 1)
-% epsilon is the resolution
-% lamba determines the tradeoff F(M,Pm) = D + lambda*I
+	% this is an implementation of the algorithm in
+	% Optimal Manifold Representation of Data: An Information Theoretic Approach
+	% Denis Chigirev and William Bialek
+	% K is the number of points of the low dimensional manifold
+	% x is the original data (should be between 0 and 1)
+	% epsilon is the resolution
+	% lamba determines the tradeoff F(M,Pm) = D + lambda*I
 
 	[n,m]=size(xcoords);
 
@@ -78,7 +74,6 @@ for z1=1:length(connectedRegions);
 		if z>5
 			moveInd=[];
 			for i=1:K
-
 				indNN= find(sum((repmat(gamma(:,i),1,K)-gamma).^2)<=10^2);
 				if length(indNN)>=20
 					minDist=sort(sum((repmat(gamma(:,i),1,length(indNN))-gamma(:,indNN)).^2),'ascend');
@@ -91,13 +86,9 @@ for z1=1:length(connectedRegions);
 				if dimension(i)>maxDim
 					lambda(i)=lambda(i)+0;
 					moveInd=[moveInd i];
-
-
 				end
 			end
 		end
-
-
 
 		gammaNew=zeros(n,K,'single');
 		Pnew=zeros(1,K,'single');
@@ -110,43 +101,27 @@ for z1=1:length(connectedRegions);
 
 		x(indX)=x(indX)/sum(x(indX));
 
-
-
 		for i=1:m
-
-
 
 			u=i;
 			m1=1;
-
 
 			dist=sum((repmat(xcoords(:,u),1,K)-gamma).^2);
 
 			Px=P.*exp(-dist./(2*lambda.^2));
 
-
 			Px=Px/sum(Px);
 
-
-
 			if ~(Px(1)>=0 & Px(1)<=1)
-
 				x(indX(u))=0;
 				Px=zeros(1,K,'single');
 			end
 
 			Pnew=Pnew+x(indX(u))'*Px;
 
-
-
 			for i1=1:n
-
 				gammaNew(i1,:)=gammaNew(i1,:)+((xcoords(i1,u).*x(indX(u))')*Px);
-
-
-
 			end
-
 
 		end
 
@@ -154,16 +129,11 @@ for z1=1:length(connectedRegions);
 		Pnew=Pnew/sum(Pnew);
 
 		for i1=1:n
-
 			gammaNew(i1,:)=gammaNew(i1,:)./Pnew;
-
 		end
 
 		P(moveInd)=Pnew(moveInd);
 		gamma(:,moveInd)=gammaNew(:,moveInd);
-
-
-
 
 	end
 
@@ -173,9 +143,4 @@ for z1=1:length(connectedRegions);
 	lam{z1}=lambda;
 	dim{z1}=dimension;
 
-
 end
-
-
-
-
