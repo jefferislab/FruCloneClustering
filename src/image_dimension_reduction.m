@@ -1,21 +1,25 @@
-function [dots,dim,Prob,lam,coords]=image_dimension_reduction(file_name)
+function [dots,dim,Prob,lam,coords]=image_dimension_reduction(file_name,min_points_per_region)
 % This implements the algorithm described in
 % Optimal Manifold Representation of Data: An Information Theoretic Approach
 % Denis Chigirev and William Bialek
 % which attempts to reduce higher dimensional data onto a 1D manifold
 % For our images this means trying to reduce dot clouds to compact
 % representations of tubular structures
+%
+% min_points_per_region defaults to 200 points
+
+if nargin < 2
+	min_points_per_region = 200;
+end
 
 load(file_name)
 
-s=zeros(1,NUM,'single');
-
-for j=1:NUM
-	ind=find(L==j);
-	s(j)=length(ind);
-end
-
-connectedRegions=find(s>200);
+% find all label values
+labels=0:max(L(:));
+% Calculate histogram of 3D label volume
+labelhist = hist(L(:),labels);
+% keep non-zero regions that have at least min_points_per_region
+connectedRegions=labels(labels>0 & labelhist>min_points_per_region);
 
 dots={};
 dim={};
