@@ -97,14 +97,16 @@ for z1=1:length(connectedRegions);
 
 		x(indX)=x(indX)/sum(x(indX));
 
-		% Iterate over all points
+		% Precompute since it is unchanged inside the loop
+		lambda22=2*lambda.^2;
+		% Iterate over all points in current region
 		for u=1:K
 			% Calculate distance between this point and all other points
 			% NB this is distance squared in units of pixels
 			% TODO repmat here is probably suboptimal
 			dist=sum((repmat(xcoords(:,u),1,K)-gamma).^2);
 
-			Px=P.*exp(-dist./(2*lambda.^2));
+			Px=P.*exp(-dist./lambda22);
 
 			Px=Px/sum(Px);
 
