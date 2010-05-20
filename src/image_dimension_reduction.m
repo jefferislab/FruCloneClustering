@@ -8,9 +8,6 @@ function [dots,dim,Prob,lam,coords]=image_dimension_reduction(file_name)
 
 load(file_name)
 
-n=find(file_name=='_',1,'first');
-name=file_name(1:n-1);
-
 s=zeros(1,NUM,'single');
 
 for j=1:NUM
@@ -28,8 +25,6 @@ coords={};
 
 maxDim=1.2;
 
-x1=x;
-
 for z1=1:length(connectedRegions);
 
 	x=zeros(size(L),'single');
@@ -45,8 +40,6 @@ for z1=1:length(connectedRegions);
 	[xcoords(1,:) xcoords(2,:) xcoords(3,:)]=ind2sub([n1,n2,n3],indX);
 
 	x=x/sum(x(indX));
-
-	K=length(indX);
 
 	gamma=xcoords;
 
@@ -100,14 +93,11 @@ for z1=1:length(connectedRegions);
 
 		Px=zeros(1,K,'single');
 
-		m1=1;
-
 		x(indX)=x(indX)/sum(x(indX));
 
 		for i=1:m
 
 			u=i;
-			m1=1;
 
 			dist=sum((repmat(xcoords(:,u),1,K)-gamma).^2);
 
@@ -115,7 +105,7 @@ for z1=1:length(connectedRegions);
 
 			Px=Px/sum(Px);
 
-			if ~(Px(1)>=0 & Px(1)<=1)
+			if ~(Px(1)>=0 && Px(1)<=1)
 				x(indX(u))=0;
 				Px=zeros(1,K,'single');
 			end
