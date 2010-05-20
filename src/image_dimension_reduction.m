@@ -1,4 +1,10 @@
 function [dots,dim,Prob,lam,coords]=image_dimension_reduction(file_name)
+% This implements the algorithm described in
+% Optimal Manifold Representation of Data: An Information Theoretic Approach
+% Denis Chigirev and William Bialek
+% which attempts to reduce higher dimensional data onto a 1D manifold
+% For our images this means trying to reduce dot clouds to compact
+% representations of tubular structures
 
 load(file_name)
 
@@ -46,9 +52,6 @@ for z1=1:length(connectedRegions);
 
 	K=length(indX);
 
-	% this is an implementation of the algorithm in
-	% Optimal Manifold Representation of Data: An Information Theoretic Approach
-	% Denis Chigirev and William Bialek
 	% K is the number of points of the low dimensional manifold
 	% x is the original data (should be between 0 and 1)
 	% epsilon is the resolution
