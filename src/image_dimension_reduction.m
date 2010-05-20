@@ -16,6 +16,7 @@ if nargin < 2
 	min_points_per_region = 200;
 end
 
+
 load(file_name)
 
 % find all label values
@@ -35,32 +36,27 @@ maxDim=1.2;
 
 for z1=1:length(connectedRegions);
 
+	% Make a mask of points in current region
 	x=zeros(size(L),'single');
-	ind=find(L==connectedRegions(z1));
+	x(L==connectedRegions(z1))=1;
 
-	x(ind)=1;
-	[n1 n2 n3]=size(x);
-
+	% find indices of those points
 	indX=find(x>0);
-	m=length(indX);
+	% Normalise x by number of points (so sum(x)=1)
+	x=x/length(indX);
 
+	% Convert indices to coords
 	xcoords=zeros(3,length(indX),'single');
-	[xcoords(1,:) xcoords(2,:) xcoords(3,:)]=ind2sub([n1,n2,n3],indX);
-
-	x=x/sum(x(indX));
+	[xcoords(1,:) xcoords(2,:) xcoords(3,:)]=ind2sub(size(x),indX);
 
 	gamma=xcoords;
-
-	K=length(indX);
 
 	% K is the number of points of the low dimensional manifold
 	% x is the original data (should be between 0 and 1)
 	% epsilon is the resolution
 	% lamba determines the tradeoff F(M,Pm) = D + lambda*I
 
-	[n,m]=size(xcoords);
-
-	K=length(gamma(1,:));
+	[n,K]=size(xcoords);
 
 	P=ones(1,K,'single')/K;
 
@@ -101,16 +97,19 @@ for z1=1:length(connectedRegions);
 
 		x(indX)=x(indX)/sum(x(indX));
 
-		for i=1:m
-
-			u=i;
-
+		% Iterate over all points
+		for u=1:K
+			% Calculate distance between this point and all other points
+			% NB this is distance squared in units of pixels
+			% TODO repmat here is probably suboptimal
 			dist=sum((repmat(xcoords(:,u),1,K)-gamma).^2);
 
 			Px=P.*exp(-dist./(2*lambda.^2));
 
 			Px=Px/sum(Px);
 
+			% If first item in Px has gone out of range
+			% then zero corresponding point in mask
 			if ~(Px(1)>=0 && Px(1)<=1)
 				x(indX(u))=0;
 				Px=zeros(1,K,'single');
