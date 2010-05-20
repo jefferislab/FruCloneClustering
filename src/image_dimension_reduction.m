@@ -1,4 +1,4 @@
-function [dots,dim,Prob,lam,coords]=image_dimension_reduction(file_name,min_points_per_region)
+function [dots,dim,Prob,lam,coords]=image_dimension_reduction(file_name,min_points_per_region,no_iterations)
 % This implements the algorithm described in
 % Optimal Manifold Representation of Data: An Information Theoretic Approach
 % Denis Chigirev and William Bialek
@@ -7,6 +7,10 @@ function [dots,dim,Prob,lam,coords]=image_dimension_reduction(file_name,min_poin
 % representations of tubular structures
 %
 % min_points_per_region defaults to 200 points
+
+if nargin < 3
+	no_iterations=45;
+end
 
 if nargin < 2
 	min_points_per_region = 200;
@@ -62,8 +66,6 @@ for z1=1:length(connectedRegions);
 
 	lambda=2*ones(1,K,'single');
 	dimension=3*ones(1,K,'single');
-
-	no_iterations=45;
 
 	moveInd=[1:K];
 
