@@ -82,6 +82,8 @@ for z1=1:length(connectedRegions);
 				end
 
 				if dimension(i)>maxDim
+					% TODO: Ask Nick what this is doing?!  Looks like there
+					% is no change in lambda
 					lambda(i)=lambda(i)+0;
 					moveInd=[moveInd i];
 				end
@@ -101,13 +103,13 @@ for z1=1:length(connectedRegions);
 		lambda22=2*lambda.^2;
 		% Iterate over all points in current region
 		for u=1:K
-			% Calculate distance between this point and all other points
+			% Calculate distance between this point and all points in gamma
 			% NB this is distance squared in units of pixels
 			% TODO repmat here is probably suboptimal
 			dist=sum((repmat(xcoords(:,u),1,K)-gamma).^2);
-
+			% -ve exponential of distance/space constant
 			Px=P.*exp(-dist./lambda22);
-
+			% normalise so weight of all points is 0
 			Px=Px/sum(Px);
 
 			% If first item in Px has gone out of range
@@ -116,9 +118,10 @@ for z1=1:length(connectedRegions);
 				x(indX(u))=0;
 				Px=zeros(1,K,'single');
 			end
-
+			% Add to Pnew the xth fraction of Px
 			Pnew=Pnew+x(indX(u))'*Px;
-
+			% add to every point in gammaNew a fraction of
+			% the original coords of current point * Px weight
 			for i1=1:n
 				gammaNew(i1,:)=gammaNew(i1,:)+((xcoords(i1,u).*x(indX(u))')*Px);
 			end
