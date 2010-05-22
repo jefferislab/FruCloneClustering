@@ -127,22 +127,24 @@ for z1=1:length(connectedRegions);
 			% -ve exponential of distance/space constant
 			%Px=P.*ex2(u,:);
 			Px=zeros(1,K,'single');
-			Px(flannidx(:,u))=P(flannidx(:,u)).*ex3(:,u)';
+			nnidxsForThisPoint=flannidx(:,u);
+			Px(nnidxsForThisPoint)=P(nnidxsForThisPoint).*ex3(:,u)';
 			% normalise so weight of all points is 0
-			Px=Px/sum(Px);
+			Px(nnidxsForThisPoint)=Px(nnidxsForThisPoint)/sum(Px(nnidxsForThisPoint));
 
 			% If first item in Px has gone out of range 
 			% then zero corresponding point in mask 
-			if ~(Px(1)>=0 && Px(1)<=1)
+			if ~(Px(nnidxsForThisPoint(1))>=0 && Px(nnidxsForThisPoint(1))<=1)
 				x(indX(u))=0;
 				Px=zeros(1,K,'single');
 			end
 			% Add to Pnew the xth fraction of Px
-			Pnew=Pnew+x(indX(u))'*Px;
+			Pnew(nnidxsForThisPoint)=Pnew(nnidxsForThisPoint)+x(indX(u))'*Px(nnidxsForThisPoint);
 			% add to every point in gammaNew a fraction of 
 			% the original coords of current point * Px weight
 			for i1=1:n
-				gammaNew(i1,:)=gammaNew(i1,:)+((xcoords(i1,u).*x(indX(u))')*Px);
+				gammaNew(i1,nnidxsForThisPoint)=gammaNew(i1,nnidxsForThisPoint)...
+					+((xcoords(i1,u).*x(indX(u))')*Px(nnidxsForThisPoint));
 			end
 
 		end
