@@ -111,7 +111,7 @@ for z1=1:length(connectedRegions);
 		Px=zeros(1,kpoints,'single');
 
 		% find kpoints nearest neighbours and distances
-		[flannidx, di3] = flann_search(xcoords, gamma, kpoints, flannparams);
+		[flannidx, di3] = flann_search(flanntree, gamma, kpoints, flannparams);
 		
 		% Precompute since it is unchanged inside the loop
 		lambda22=2*lambda.^2;
