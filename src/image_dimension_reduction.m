@@ -103,12 +103,12 @@ for z1=1:length(connectedRegions);
 
 		dist=zeros(1,K,'single');
 
-		Px=zeros(1,K,'single');
 
 		x(indX)=x(indX)/sum(x(indX));
 
 		% number of nearest neighbours to consider
 		kpoints=min([K ceil(1.5*K^(1/3))]);
+		Px=zeros(1,kpoints,'single');
 
 		% Precompute since it is unchanged inside the loop
 		lambda22=2*lambda.^2;
@@ -126,25 +126,24 @@ for z1=1:length(connectedRegions);
 		for u=1:K
 			% -ve exponential of distance/space constant
 			%Px=P.*ex2(u,:);
-			Px=zeros(1,K,'single');
 			nnidxsForThisPoint=flannidx(:,u);
-			Px(nnidxsForThisPoint)=P(nnidxsForThisPoint).*ex3(:,u)';
+			Px=P(nnidxsForThisPoint).*ex3(:,u)';
 			% normalise so weight of all points is 0
-			Px(nnidxsForThisPoint)=Px(nnidxsForThisPoint)/sum(Px(nnidxsForThisPoint));
+			Px=Px/sum(Px);
 
 			% If first item in Px has gone out of range 
 			% then zero corresponding point in mask 
-			if ~(Px(nnidxsForThisPoint(1))>=0 && Px(nnidxsForThisPoint(1))<=1)
+			if ~(Px(1)>=0 && Px(1)<=1)
 				x(indX(u))=0;
-				Px=zeros(1,K,'single');
+				Px=zeros(1,kpoints,'single');
 			end
 			% Add to Pnew the xth fraction of Px
-			Pnew(nnidxsForThisPoint)=Pnew(nnidxsForThisPoint)+x(indX(u))'*Px(nnidxsForThisPoint);
+			Pnew(nnidxsForThisPoint)=Pnew(nnidxsForThisPoint)+x(indX(u))'*Px;
 			% add to every point in gammaNew a fraction of 
 			% the original coords of current point * Px weight
 			for i1=1:n
 				gammaNew(i1,nnidxsForThisPoint)=gammaNew(i1,nnidxsForThisPoint)...
-					+((xcoords(i1,u).*x(indX(u))')*Px(nnidxsForThisPoint));
+					+((xcoords(i1,u).*x(indX(u))')*Px);
 			end
 
 		end
