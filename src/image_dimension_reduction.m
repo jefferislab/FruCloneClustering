@@ -109,14 +109,12 @@ for z1=1:length(connectedRegions);
 		% compute all against all distance
 		% xcoords rows, against gamma cols
 		di2=ipdm(xcoords',gamma').^2;
+		% nb I think all elements of lambda are identical
+		ex2=exp(-di2/lambda22(1));
 		% Iterate over all points in current region
 		for u=1:K
-			% Calculate distance between this point and all points in gamma
-			% NB this is distance squared in units of pixels
-			% TODO repmat here is probably suboptimal
-			dist=di2(u,:);
 			% -ve exponential of distance/space constant
-			Px=P.*exp(-dist./lambda22);
+			Px=P.*ex2(u,:);
 			% normalise so weight of all points is 0
 			Px=Px/sum(Px);
 
