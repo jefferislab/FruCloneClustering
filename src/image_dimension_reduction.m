@@ -103,34 +103,25 @@ for z1=1:length(connectedRegions);
 		gammaNew=zeros(n,K,'single');
 		Pnew=zeros(1,K,'single');
 
-		dist=zeros(1,K,'single');
-
-
 		x(indX)=x(indX)/sum(x(indX));
 
 		% number of nearest neighbours to consider
 		kpoints=min([K ceil(1.5*K^(1/3))]);
 		Px=zeros(1,kpoints,'single');
 
+		% find kpoints nearest neighbours and distances
+		[flannidx, di3] = flann_search(xcoords, gamma, kpoints, flannparams);
+		
 		% Precompute since it is unchanged inside the loop
 		lambda22=2*lambda.^2;
-		% compute all against all distance
-		% xcoords rows, against gamma cols
-		% only return distances 
-		%di2=ipdm(xcoords',gamma','Subset','Maximum','Limit',10).^2;
-		% find kpoints nearest nieghbours and distances
-		[flannidx, di3] = flann_search(xcoords, gamma, kpoints, flannparams);
-		%sum(di2(:)<Inf)/numel(di2)
-		% nb I think all elements of lambda are identical
-		%ex2=exp(-di2/lambda22(1));
 		ex3=exp(-di3/lambda22(1));
 		% Iterate over all points in current region
 		for u=1:K
-			% -ve exponential of distance/space constant
-			%Px=P.*ex2(u,:);
 			nnidxsForThisPoint=flannidx(:,u);
+
+			% -ve exponential of distance/space constant
 			Px=P(nnidxsForThisPoint).*ex3(:,u)';
-			% normalise so weight of all points is 0
+			% normalise so weight of all points is 1
 			Px=Px/sum(Px);
 
 			% If first item in Px has gone out of range 
@@ -140,12 +131,12 @@ for z1=1:length(connectedRegions);
 				Px=zeros(1,kpoints,'single');
 			end
 			% Add to Pnew the xth fraction of Px
-			Pnew(nnidxsForThisPoint)=Pnew(nnidxsForThisPoint)+x(indX(u))'*Px;
+			Pnew(nnidxsForThisPoint)=Pnew(nnidxsForThisPoint)+x(indX(u))*Px;
 			% add to every point in gammaNew a fraction of 
 			% the original coords of current point * Px weight
 			for i1=1:n
 				gammaNew(i1,nnidxsForThisPoint)=gammaNew(i1,nnidxsForThisPoint)...
-					+((xcoords(i1,u).*x(indX(u))')*Px);
+					+((xcoords(i1,u)*x(indX(u)))*Px);
 			end
 
 		end
