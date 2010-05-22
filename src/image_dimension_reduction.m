@@ -107,19 +107,27 @@ for z1=1:length(connectedRegions);
 
 		x(indX)=x(indX)/sum(x(indX));
 
+		% number of nearest neighbours to consider
+		kpoints=min([K ceil(1.5*K^(1/3))]);
+
 		% Precompute since it is unchanged inside the loop
 		lambda22=2*lambda.^2;
 		% compute all against all distance
 		% xcoords rows, against gamma cols
 		% only return distances
 		di2=ipdm(xcoords',gamma','Subset','Maximum','Limit',10).^2;
+		[flannidx, di3] = flann_search(xcoords, gamma, kpoints, ...
+			struct('algorithm','kdtree','trees',8,'checks',64));
 		%sum(di2(:)<Inf)/numel(di2)
 		% nb I think all elements of lambda are identical
 		ex2=exp(-di2/lambda22(1));
+		ex3=exp(-di3/lambda22(1));
 		% Iterate over all points in current region
 		for u=1:K
 			% -ve exponential of distance/space constant
-			Px=P.*ex2(u,:);
+			%Px=P.*ex2(u,:);
+			Px=zeros(1,K,'single');
+			Px(flannidx(:,u))=P(flannidx(:,u)).*ex3(:,u)';
 			% normalise so weight of all points is 0
 			Px=Px/sum(Px);
 
