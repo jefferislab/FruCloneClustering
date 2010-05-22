@@ -42,7 +42,7 @@ for z1=1:length(connectedRegions);
 	s=RandStream.getDefaultStream;
 	reset(s);
 	% only take one point in 100 for large numbers
-	if(sum(L(:)==connectedRegions(z1))>1000)
+	if(sum(L(:)==connectedRegions(z1))>500000)
 		x(L==connectedRegions(z1) & randi(100,size(x))==10)=1;
 	else
 		x(L==connectedRegions(z1))=1;
@@ -115,12 +115,12 @@ for z1=1:length(connectedRegions);
 		% compute all against all distance
 		% xcoords rows, against gamma cols
 		% only return distances
-		di2=ipdm(xcoords',gamma','Subset','Maximum','Limit',10).^2;
+		%di2=ipdm(xcoords',gamma','Subset','Maximum','Limit',10).^2;
 		[flannidx, di3] = flann_search(xcoords, gamma, kpoints, ...
 			struct('algorithm','kdtree','trees',8,'checks',64));
 		%sum(di2(:)<Inf)/numel(di2)
 		% nb I think all elements of lambda are identical
-		ex2=exp(-di2/lambda22(1));
+		%ex2=exp(-di2/lambda22(1));
 		ex3=exp(-di3/lambda22(1));
 		% Iterate over all points in current region
 		for u=1:K
