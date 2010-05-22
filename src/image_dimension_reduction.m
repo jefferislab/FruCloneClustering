@@ -73,6 +73,8 @@ for z1=1:length(connectedRegions);
 
 	moveInd=[1:K];
 
+	% Construct nearest neighbour search tree
+	[flanntree flannparams speedup] = flann_build_index(xcoords,struct('algorithm','kdtree','trees',8,'checks',64));
 	for z=1:no_iterations
 
 		disp([file_name,' iteration ',num2str(z),' out of ',num2str(no_iterations)])
@@ -116,8 +118,8 @@ for z1=1:length(connectedRegions);
 		% xcoords rows, against gamma cols
 		% only return distances
 		%di2=ipdm(xcoords',gamma','Subset','Maximum','Limit',10).^2;
-		[flannidx, di3] = flann_search(xcoords, gamma, kpoints, ...
-			struct('algorithm','kdtree','trees',8,'checks',64));
+		% find kpoints nearest nieghbours and distances
+		[flannidx, di3] = flann_search(xcoords, gamma, kpoints, flannparams);
 		%sum(di2(:)<Inf)/numel(di2)
 		% nb I think all elements of lambda are identical
 		%ex2=exp(-di2/lambda22(1));
