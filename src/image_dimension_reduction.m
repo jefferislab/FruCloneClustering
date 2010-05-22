@@ -108,7 +108,9 @@ for z1=1:length(connectedRegions);
 		lambda22=2*lambda.^2;
 		% compute all against all distance
 		% xcoords rows, against gamma cols
-		di2=ipdm(xcoords',gamma').^2;
+		% only return distances
+		di2=ipdm(xcoords',gamma','Subset','Maximum','Limit',10).^2;
+		%sum(di2(:)<Inf)/numel(di2)
 		% nb I think all elements of lambda are identical
 		ex2=exp(-di2/lambda22(1));
 		% Iterate over all points in current region
