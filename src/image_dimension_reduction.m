@@ -34,6 +34,7 @@ coords={};
 
 maxDim=1.2;
 
+tic;
 for z1=1:length(connectedRegions);
 
 	% Make a mask of points in current region
@@ -76,7 +77,7 @@ for z1=1:length(connectedRegions);
 	% Construct nearest neighbour search tree
 	[flanntree flannparams speedup] = flann_build_index(xcoords,struct('algorithm','kdtree','trees',8,'checks',64));
 	for z=1:no_iterations
-
+		toc;
 		disp([file_name,' iteration ',num2str(z),' out of ',num2str(no_iterations)])
 
 		if z>5
