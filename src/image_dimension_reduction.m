@@ -38,7 +38,12 @@ for z1=1:length(connectedRegions);
 
 	% Make a mask of points in current region
 	x=zeros(size(L),'single');
-	x(L==connectedRegions(z1))=1;
+	% set random stream to default state to get same numbers
+	s=RandStream.getDefaultStream;
+	reset(s);
+	% only take one point in 100
+	x(L==connectedRegions(z1) & randi(100,size(x))==10)=1;
+	%x(L==connectedRegions(z1))=1;
 
 	% find indices of those points
 	indX=find(x>0);
