@@ -5,7 +5,7 @@ function process_images_for_dimension_reduction(input_dir,output_dir);
 
 % INPUT
 %input_dir='/lmb/home/nmasse/FruCloneClustering/preprocessed/';
-h=dir([input_dir,'*_tubed.mat']);
+h=dir(fullfile(input_dir,'*_tubed.mat'));
 
 
 % OUTPUT
@@ -21,7 +21,7 @@ for i=1:length(h)
      flag=1;
 
      % check whether file has already been processed
-     h1=dir([output_dir,'*dimension_reduced.mat']);
+     h1=dir(fullfile(output_dir,'*dimension_reduced.mat'));
 
      for j=1:length(h1)
 
@@ -38,7 +38,7 @@ for i=1:length(h)
      end
 
      % check whether file is currently being processed
-     h2=dir([output_dir,'*-in_progress.mat']);
+     h2=dir(fullfile(output_dir,'*-in_progress.mat'));
 
      for j=1:length(h2)
 
@@ -57,11 +57,13 @@ for i=1:length(h)
      % the dimension reduction
          if flag==1
 
-             save([output_dir,h(i).name,'-in_progress.mat'],'flag');
+             save(fullfile(output_dir,[h(i).name,'-in_progress.mat']),'flag');
 
-             [dots,dim,Prob,lam,coords,no_iterations]=image_dimension_reduction([input_dir,h(i).name]);
-             save([output_dir name,'_dimension_reduced.mat'],'dots','Prob','lam','dim','coords','no_iterations','-v7')
-             delete([output_dir h(i).name,'-in_progress.mat'])
+             [dots,dim,Prob,lam,coords]=image_dimension_reduction(...
+				 fullfile(input_dir,h(i).name));
+             save(fullfile(output_dir,[name,'_dimension_reduced.mat'])...
+				 ,'dots','Prob','lam','dim','coords','no_iterations','-v7')
+             delete(fullfile(output_dir,[h(i).name,'-in_progress.mat']))
            
 
           end
