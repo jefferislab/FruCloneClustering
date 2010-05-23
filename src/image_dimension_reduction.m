@@ -80,13 +80,20 @@ for z1=1:length(connectedRegions);
 		toc;
 		disp([file_name,' iteration ',num2str(z),' out of ',num2str(no_iterations)])
 
-		if z>5
+		% Must have at least 20 points 
+		if z>5 && K>=20
 			moveInd=[];
+			% find 20 nearest neighbours and distances 
+			% NB FLANN appears to return squared distance
+			[nnidx, nndist] = flann_search(gamma, gamma, 20, struct('algorithm','kdtree','trees',8,'checks',64));
+			
+			log2to20=log(2:20)';
 			for i=1:K
-				indNN= find(sum((repmat(gamma(:,i),1,K)-gamma).^2)<=10^2);
-				if length(indNN)>=20
-					minDist=sort(sum((repmat(gamma(:,i),1,length(indNN))-gamma(:,indNN)).^2),'ascend');
-					p1=polyfit(log([sqrt(minDist(2:20)) ]),log([2:20]),1);
+				if nndist(20,i)<=100
+					% Nick: I just wanted to double check this is the right
+					% way around ie nearest neighbour distances (x axis)
+					% against log2 to log20 on y axis
+					p1=polyfit(log(sqrt(nndist(2:20,i))),log2to20,1);
 					dimension(i)=p1(1);
 				else
 					dimension(i)=0;
