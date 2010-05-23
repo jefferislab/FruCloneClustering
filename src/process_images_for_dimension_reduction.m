@@ -62,7 +62,7 @@ for i=1:length(h)
 			 [dots,dim,Prob,lam,coords]=image_dimension_reduction(...
 				 fullfile(input_dir,h(i).name));
 			 save(fullfile(output_dir,[name,'_dimension_reduced.mat'])...
-				 ,'dots','Prob','lam','dim','coords','no_iterations','-v7')
+				 ,'dots','Prob','lam','dim','coords','-v7')
 			 delete(fullfile(output_dir,[h(i).name,'-in_progress.mat']))
 		   
 
