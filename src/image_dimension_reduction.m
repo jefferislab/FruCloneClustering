@@ -95,8 +95,12 @@ for z1=1:length(connectedRegions);
 					% Nick: I just wanted to double check this is the right
 					% way around ie nearest neighbour distances (x axis)
 					% against log2 to log20 on y axis
-					p1=polyfit(log(sqrt(nndist(2:20,i))),log2to20,1);
-					dimension(i)=p1(1);
+					% polyfit is very slow
+					% p1=polyfit(log(sqrt(nndist(2:20,i))),log2to20,1);
+					% try a very simple solution
+					linfit=[ones(19,1) log(sqrt(nndist(2:20,i)))] \ log2to20;
+					% set dimensionality of this point to gradient
+					dimension(i)=linfit(2);
 				else
 					dimension(i)=0;
 				end
