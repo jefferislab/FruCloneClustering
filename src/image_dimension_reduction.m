@@ -75,29 +75,33 @@ for z1=1:length(connectedRegions);
 	moveInd=[1:K];
 
 	% Construct nearest neighbour search tree
-	[flanntree flannparams speedup] = flann_build_index(xcoords,struct('algorithm','kdtree','trees',8,'checks',64));
+	%[flanntree flannparams speedup] = flann_build_index(xcoords,struct('algorithm','kdtree','trees',8,'checks',64));
+% 	anno_xc=ann(xcoords);
 	for z=1:no_iterations
 		toc;
 		disp([file_name,' iteration ',num2str(z),' out of ',num2str(no_iterations)])
 
 		% Must have at least 50 points 
-		if z>5 && K>=50
+		if z>5 && K>=20
 			% find 50 nearest neighbours and distances 
 			% You would think that it ought to be 20, but FLANN's
 			% approximate matching can cause trouble here
 			% NB FLANN appears to return squared distance
-			[nnidx, nndist] = flann_search(gamma, gamma, 50, struct('algorithm','kdtree','trees',8,'checks',64));
+			%[nnidx, nndist] = flann_search(gamma, gamma, 50, struct('algorithm','kdtree','trees',8,'checks',64));
+			anno_gamma=ann(gamma);
+			[nnidx, nndist] = ksearch(anno_gamma,gamma,20,0);
+			anno_gamma = close(anno_gamma);
 			
 			log2to20=log(2:20)';
 			for i=1:K
-				if nndist(20,i)<=100
+				if nndist(20,i)<=10
 					% Nick: I just wanted to double check this is the right
 					% way around ie nearest neighbour distances (x axis)
 					% against log2 to log20 on y axis
 					% polyfit is very slow
 					% p1=polyfit(log(sqrt(nndist(2:20,i))),log2to20,1);
 					% try a very simple solution
-					linfit=[ones(19,1) log(sqrt(nndist(2:20,i)))] \ log2to20;
+					linfit=[ones(19,1) log(nndist(2:20,i))] \ log2to20;
 					% set dimensionality of this point to gradient
 					dimension(i)=linfit(2);
 				else
@@ -117,7 +121,7 @@ for z1=1:length(connectedRegions);
 
 		gammaNew=zeros(n,K,'single');
 		Pnew=zeros(1,K,'single');
-
+	
 		x(indX)=x(indX)/sum(x(indX));
 
 		% number of nearest neighbours to consider - in general the
@@ -130,11 +134,15 @@ for z1=1:length(connectedRegions);
 		disp(['kpoints: ',num2str(kpoints),' moveInd: ',num2str(length(moveInd))]);
 
 		% find kpoints nearest neighbours and distances
-		[flannidx, di3] = flann_search(flanntree, gamma, kpoints, flannparams);
+		anno_xc=ann(xcoords);
+		[flannidx, di3] = ksearch(anno_xc,gamma,kpoints,0);
+		anno_xc= close(anno_xc);
+		
+		%[flannidx, di3] = flann_search(flanntree, gamma, kpoints, flannparams);
 		
 		% Precompute since it is unchanged inside the loop
 		lambda22=2*lambda.^2;
-		ex3=exp(-di3/lambda22(1));
+		ex3=exp(-di3.^2/lambda22(1));
 		% Iterate over all points in current region
 		for u=1:K
 			nnidxsForThisPoint=flannidx(:,u);
