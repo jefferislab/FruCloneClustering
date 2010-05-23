@@ -82,7 +82,6 @@ for z1=1:length(connectedRegions);
 
 		% Must have at least 50 points 
 		if z>5 && K>=50
-			moveInd=[];
 			% find 50 nearest neighbours and distances 
 			% You would think that it ought to be 20, but FLANN's
 			% approximate matching can cause trouble here
@@ -105,13 +104,15 @@ for z1=1:length(connectedRegions);
 					dimension(i)=0;
 				end
 				
-				if dimension(i)>maxDim
-					% TODO: Ask Nick what this is doing?!  Looks like there
-					% is no change in lambda
-					lambda(i)=lambda(i)+0;
-					moveInd=[moveInd i];
-				end
+% 				if dimension(i)>maxDim
+% 					% TODO: Ask Nick what this is doing?!  Looks like there
+% 					% is no change in lambda
+% 					lambda(i)=lambda(i)+0;
+% 					moveInd=[moveInd i];
+% 				end
 			end
+			% Vectorised calculation of moveInd
+			moveInd=find(dimension>maxDim);
 		end
 
 		gammaNew=zeros(n,K,'single');
