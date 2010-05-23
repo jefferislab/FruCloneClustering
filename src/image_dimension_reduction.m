@@ -16,7 +16,6 @@ if nargin < 2
 	min_points_per_region = 200;
 end
 
-
 load(file_name)
 
 % find all label values
@@ -83,11 +82,7 @@ for z1=1:length(connectedRegions);
 
 		% Must have at least 50 points 
 		if z>5 && K>=20
-			% find 50 nearest neighbours and distances 
-			% You would think that it ought to be 20, but FLANN's
-			% approximate matching can cause trouble here
-			% NB FLANN appears to return squared distance
-			%[nnidx, nndist] = flann_search(gamma, gamma, 50, struct('algorithm','kdtree','trees',8,'checks',64));
+			% find 20 nearest neighbours and distances 
 			anno_gamma=ann(gamma);
 			[nnidx, nndist] = ksearch(anno_gamma,gamma,20,0);
 			anno_gamma = close(anno_gamma);
@@ -135,20 +130,18 @@ for z1=1:length(connectedRegions);
 
 		% find kpoints nearest neighbours and distances
 		anno_xc=ann(xcoords);
-		[flannidx, di3] = ksearch(anno_xc,gamma,kpoints,0);
+		[nnidx, nndist] = ksearch(anno_xc,gamma,kpoints,0);
 		anno_xc= close(anno_xc);
-		
-		%[flannidx, di3] = flann_search(flanntree, gamma, kpoints, flannparams);
 		
 		% Precompute since it is unchanged inside the loop
 		lambda22=2*lambda.^2;
-		ex3=exp(-di3.^2/lambda22(1));
+		negexpdist=exp(-nndist.^2/lambda22(1));
 		% Iterate over all points in current region
 		for u=1:K
-			nnidxsForThisPoint=flannidx(:,u);
+			nnidxsForThisPoint=nnidx(:,u);
 
 			% -ve exponential of distance/space constant
-			Px=P(nnidxsForThisPoint).*ex3(:,u)';
+			Px=P(nnidxsForThisPoint).*negexpdist(:,u)';
 			% normalise so weight of all points is 1
 			Px=Px/sum(Px);
 
