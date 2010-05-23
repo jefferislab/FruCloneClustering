@@ -80,12 +80,14 @@ for z1=1:length(connectedRegions);
 		toc;
 		disp([file_name,' iteration ',num2str(z),' out of ',num2str(no_iterations)])
 
-		% Must have at least 20 points
-		if z>5 && K>=20
+		% Must have at least 50 points
+		if z>5 && K>=50
 			moveInd=[];
-			% find 20 nearest neighbours and distances
+			% find 50 nearest neighbours and distances
+			% You would think that it ought to be 20, but FLANN's
+			% approximate matching can cause trouble here
 			% NB FLANN appears to return squared distance
-			[nnidx, nndist] = flann_search(gamma, gamma, 20, struct('algorithm','kdtree','trees',8,'checks',64));
+			[nnidx, nndist] = flann_search(gamma, gamma, 50, struct('algorithm','kdtree','trees',8,'checks',64));
 
 			log2to20=log(2:20)';
 			for i=1:K
