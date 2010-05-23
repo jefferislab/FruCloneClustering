@@ -106,7 +106,11 @@ for z1=1:length(connectedRegions);
 
 		x(indX)=x(indX)/sum(x(indX));
 
-		% number of nearest neighbours to consider
+		% number of nearest neighbours to consider - in general the
+		% interaction between points falls off very rapidly due to a
+		% negative exponential.  Therefore it makes sense only to consider
+		% a few close neighbours and set the interaction of all other
+		% points to 0.
 		kpoints=min([K ceil(1.5*K^(1/3))]);
 		Px=zeros(1,kpoints,'single');
 
