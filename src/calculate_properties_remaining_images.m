@@ -1,6 +1,6 @@
 function calculate_properties_remaining_images(input_dir,output_dir,ann_dir);
 
-% this script takes the reformated image and calculates the the principal eigenvector (tangent vector)
+% this script takes the reformatted image and calculates the the principal eigenvector (tangent vector)
 % and the term alpha (alpha=1 -> one-dimenionsal, alpha=0 -> isotropic) from the moment of inertia.
 % The input files are XXX_reformated.mat and output files are XXX_properties.mat.
 
@@ -12,22 +12,19 @@ h=dir([input_dir,'*_reformated.mat']);
 % OUTPUT
 %output_dir='/Volumes/JData/JPeople/Nick/FruCloneClustering/images/';
 
-% Directory for the approximate nearest neighbour function
-%ann_dir='/lmb/home/nmasse/bin/ann_1.1.2/bin/';
+if ~exist(output_dir,'dir')
+    % FIXME this seems to fail if output_dir has a trailing /
+    mkdir output_dir;
+end
 
 for i=1:length(h)
     
     n=find(h(i).name=='_',1,'first');
     name=h(i).name(1:n-1);
     
-    n=find(h(i).name=='-',1,'first');
-    short_name=h(i).name(1:n-1);
-    
     flag=1;
     
-    
     h1=dir([output_dir,'*_properties.mat']);
-    
     
     for j=1:length(h1)
         
@@ -58,8 +55,7 @@ for i=1:length(h)
             
         end
         
-    end
-    
+    end    
     
     if flag==1
         
@@ -76,29 +72,23 @@ for i=1:length(h)
         
         load([input_dir,h(i).name])
         
-        for j=1:length(dots)
+        for j=1:length(dots) % iterate over each group of connected dots
             
-            y=dots{j};
+            y=dots{j}; % dots in original coord space
             
             if ~isempty(y)
                 
-                q=floor(rand*1000000);
-                
-                y=dotsReformated{j};
-                [m1 m2]=size(y);
+                y=dotsReformated{j}; % dots in reference coord space
                 
                 p.gamma1=[p.gamma1 y];
-                % 		    p.dimension1=[p.dimension1 dim{i}(1:m2)];
-                % 		    p.lambda1=[p.lambda1 lam{i}(1:m2)];
                 
-                
-                [temp1,temp2]=extract_properties(y',ann_dir,q);
+                [temp1,temp2]=extract_properties(y);
+
                 p.alpha=[p.alpha temp1];
                 p.vect=[p.vect temp2];
             end
             
         end
-        
         
         % This part removes any points outside of a mask that covers the
         % central brain an all of its tracts. It also removes points with
@@ -127,11 +117,9 @@ for i=1:length(h)
         p.gamma2=p.gamma1(:,find(maskInd));
         p.vect2=p.vect(:,find(maskInd));
         
-        
         %%%%
         save([output_dir,name,'_properties.mat'],'p','-v7');
         delete([output_dir,h(i).name,'-in_progress.mat'])
-        
         
     end
     
