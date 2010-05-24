@@ -37,10 +37,10 @@ RCode_dir='/Volumes/JData/JPeople/Greg/FruMARCMCode/';
 gregxform_dir='/Applications/IGSRegistrationTools/bin/';
 
 % Directory of ANN unix coomand
-% TODO - use of ann_sample command line tool is a bit ugly (and slow).
-% replace with appropriate library - however not sure if there
-% is something that we could use in both Matlab and Octave
-ann_dir=[root_dir 'ann_1.1.2/bin/'];
+% TODO - Still need to provide nearest neighbour support for Octave
+% and figure out how to pass path to ann bin dir to ann_meta_wrapper
+% as a fall back
+% ann_dir=[root_dir 'ann_1.1.2/bin/'];
 %%%%
 
 
@@ -60,7 +60,7 @@ process_images_for_dimension_reduction(segmented_images_dir,dimension_reduced_di
 % Refomat onto template brain
 reformat_remaining_images(dimension_reduced_dir,reformatted_dir,registration_dir,gregxform_dir,processed_images_dir);
 
-calculate_properties_remaining_images(reformatted_dir,properties_dir,ann_dir);
+calculate_properties_remaining_images(reformatted_dir,properties_dir);
 
 find_matched_dots_remaining_images(properties_dir,matched_points_dir);
 
