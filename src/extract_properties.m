@@ -7,7 +7,7 @@ vect=zeros(3,total,'single');
 %ann_dir='/lmb/home/nmasse/bin/ann_1.1.2/bin/';
 
 if total>=20
-
+	
 	save(['DotAlphaData',num2str(q),'.txt'],'gamma1','-ascii');
 
 	command=[ann_dir,'ann_sample -d 3 -e 0.01 -max 999999 -nn 20 -df DotAlphaData',num2str(q),'.txt -qf DotAlphaData',num2str(q),'.txt >DotAlphaOutput',num2str(q),'.txt'];
@@ -23,7 +23,7 @@ if total>=20
 		t(i)=single(f2{i}(1));
 	end
 
-% 73 is the numeric value of 'I'
+	% 73 is the numeric value of 'I'
 	ind=find(t==73);
 
 	gamma1=gamma1';
@@ -35,7 +35,7 @@ if total>=20
 			indNN=[indNN 1+str2num(f2{ind(k)+j})];
 		end
 
-%indNN= find(sum((repmat(gamma1(:,k),1,total)-gamma1).^2)<=10^2);
+		%indNN= find(sum((repmat(gamma1(:,k),1,total)-gamma1).^2)<=10^2);
 		nn=length(indNN);
 
 		center_mass=sum(gamma1(:, indNN),2)/nn;
