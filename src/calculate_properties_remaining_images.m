@@ -16,7 +16,7 @@ h=dir([input_dir,'*_reformated.mat']);
 %ann_dir='/lmb/home/nmasse/bin/ann_1.1.2/bin/';
 
 for i=1:length(h)
-
+	
 	n=find(h(i).name=='_',1,'first');
 	name=h(i).name(1:n-1);
 
@@ -36,10 +36,10 @@ for i=1:length(h)
 
 
 		if strcmp(name,name1)
-
+			
 			flag=0;
 			break
-
+			
 		end
 
 	end
@@ -61,18 +61,16 @@ for i=1:length(h)
 	end
 
 
-
 	if flag==1
-
 
 		save([output_dir,h(i).name,'-in_progress.mat'],'flag','-v7');
 
-%%%% Main code       
+		%%%% Main code
 
 		p=[];
 		p.gamma1=[];
-% 		p.dimension1=[];
-% 		p.lambda1=[];
+		% 		p.dimension1=[];
+		% 		p.lambda1=[];
 		p.alpha=[];
 		p.vect=[];
 
@@ -90,8 +88,8 @@ for i=1:length(h)
 				[m1 m2]=size(y);
 
 				p.gamma1=[p.gamma1 y];
-% 		    p.dimension1=[p.dimension1 dim{i}(1:m2)];
-% 		    p.lambda1=[p.lambda1 lam{i}(1:m2)];
+				% 		    p.dimension1=[p.dimension1 dim{i}(1:m2)];
+				% 		    p.lambda1=[p.lambda1 lam{i}(1:m2)];
 
 
 				[temp1,temp2]=extract_properties(y',ann_dir,q);
@@ -101,17 +99,17 @@ for i=1:length(h)
 
 		end
 
-
-% This part removes any points outside of a mask that covers the
-% central brain an all of its tracts. It also removes points with
-% p.alpha (eigenvalue 1 -eigenvalue 2)/sum(eigenvalues)) below 0.25. These are points that are not part of a
-% linerar structure.
+		
+		% This part removes any points outside of a mask that covers the
+		% central brain an all of its tracts. It also removes points with
+		% p.alpha (eigenvalue 1 -eigenvalue 2)/sum(eigenvalues)) below 0.25. These are points that are not part of a
+		% linerar structure.
 
 		x=zeros(384,384,173);
 		for j=1:173
 			x(:,:,j)=imread('IS2_nym_mask.tif',i);
 		end
-
+		
 		g(1,:)=round(384/315.13*round(p.gamma1(1,:)));
 		g(2,:)=round(384/315.13*round(p.gamma1(2,:)));
 		g(3,:)=round(1*round(p.gamma1(3,:)));
@@ -125,13 +123,12 @@ for i=1:length(h)
 		end;
 
 		clear g
-
+		
 		p.gamma2=p.gamma1(:,find(maskInd));
 		p.vect2=p.vect(:,find(maskInd));
 
 
-
-%%%%           
+		%%%%
 		save([output_dir,name,'_properties.mat'],'p','-v7');
 		delete([output_dir,h(i).name,'-in_progress.mat'])
 
