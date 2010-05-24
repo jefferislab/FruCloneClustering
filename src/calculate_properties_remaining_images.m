@@ -92,14 +92,17 @@ for i=1:length(h)
 
 		% This part removes any points outside of a mask that covers the
 		% central brain an all of its tracts. It also removes points with
-		% p.alpha (eigenvalue 1 -eigenvalue 2)/sum(eigenvalues)) below 0.25. These are points that are not part of a
-		% linerar structure.
+		% p.alpha (eigenvalue 1 -eigenvalue 2)/sum(eigenvalues)) below 0.25.
+		% These are points that are not part of a linear structure.
+
+		% TODO: make the mask a parameter and supply it in a form that
+		% retains calibration information
 
 		x=zeros(384,384,173);
 		for j=1:173
-			x(:,:,j)=imread('IS2_nym_mask.tif',i);
+			x(:,:,j)=imread('../data/IS2_nym_mask.tif',i);
 		end
-		
+
 		g(1,:)=round(384/315.13*round(p.gamma1(1,:)));
 		g(2,:)=round(384/315.13*round(p.gamma1(2,:)));
 		g(3,:)=round(1*round(p.gamma1(3,:)));
