@@ -13,8 +13,7 @@ h=dir([input_dir,'*_reformated.mat']);
 %output_dir='/Volumes/JData/JPeople/Nick/FruCloneClustering/images/';
 
 if ~exist(output_dir,'dir')
-	% FIXME this seems to fail if output_dir has a trailing /
-	mkdir output_dir;
+	mkdir(output_dir);
 end
 
 for i=1:length(h)
