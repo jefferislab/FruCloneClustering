@@ -11,6 +11,7 @@ function [match_exists, first_matching_image] = matching_images( filename, fileg
 %   fileglob might look like [output_dir,'*_properties.mat']
 %
 match_exists=0;
+first_matching_image=[];
 
 filestem = jlab_filestem(filename);
 
