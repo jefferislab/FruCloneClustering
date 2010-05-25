@@ -1,5 +1,5 @@
 function [match_exists, first_matching_image] = matching_images( filename, fileglob )
-% no_matching_images: see if any file has same image stem as filename
+% matching_images: see if any file has same image stem as filename
 %
 %   filename = filename whose stem will be checked for matches
 %   fileglob = will be passed to dir to produce a list of files
