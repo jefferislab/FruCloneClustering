@@ -10,6 +10,10 @@ function find_matched_dots_remaining_images(input_dir,output_dir)
 input_dir=fullfile(input_dir,filesep);
 output_dir=fullfile(output_dir,filesep);
 
+if ~exist(output_dir,'dir')
+    mkdir(output_dir);
+end
+
 properties_files=dir([input_dir,'*_properties.mat']);
 
 for i=1:length(properties_files)
