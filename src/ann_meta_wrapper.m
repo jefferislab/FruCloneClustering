@@ -8,10 +8,10 @@ function [nnidx, nndist] = ann_meta_wrapper (points, k, query, eps, ann_bin_dir)
 %     nndst - square distance of the points
 %
 %     points - data point(s): a (d)x(#points) matrix
-%     k    - required k nearest neighbors
-%     query - query point(s): a (d)x(#points) matrix
+%     k      - required k nearest neighbors
+%     query  - query point(s): a (d)x(#points) matrix
 %              pass empty matrix [] for self query
-%     eps  - accuracy multiplicative factor
+%     eps    - accuracy multiplicative factor
 %     ann_bin_dir - directory containing ann_sample binary
 
 % Uses Shai Bagon's code in matlab
@@ -47,7 +47,7 @@ if ~isOctave && nargin < 5
 	else
 		[nnidx, nndist] = ksearch(anno,query,k,eps);
 	end
-	anno = close(anno);
+	anno = close(anno); %#ok<NASGU>
 
 elseif isOctave && nargin < 5
 	% Use octave-ann
@@ -78,7 +78,7 @@ else
 	tempstem = tempname;
 	pointsfile = [tempstem ,'-ann-points.txt'];
 	resultsfile = [tempstem,'-ann-results.txt'];
-	points=points';
+	points=points'; %#ok<NASGU>
 	save(pointsfile,'points','-ascii');
 
 	if(selfQuery)
@@ -87,7 +87,7 @@ else
 	else
 		queryfile = [tempstem ,'-ann-query.txt'];
 		save(queryfile,'query','-ascii');
-		[dimignore, nquery] = size(query);
+		[dimignore, nquery] = size(query); %#ok<ASGLU>
 	end
 
 
@@ -106,7 +106,7 @@ else
 	%     1     114     0.0234169
 	%     2     137     0.0301805
 
-	[f1 f2 f3]=textread(resultsfile,'%s %s %s');
+	[f2 f3]=textread(resultsfile,'%*s %s %s');
 
 	% Find the first letter/digit of the second column
 	numlines=length(f2);
@@ -125,8 +125,8 @@ else
 	for i=1:nquery % each query point
 		for j=1:k % each of k neighbours for query point
 			% note that ann is 0-indexed, but matlab 1-indexed
-			nnidx(j,i) = str2num(f2{ind(i)+j})+1;
-			nndist(j,i) = str2num(f3{ind(i)+j});
+			nnidx(j,i) = str2double(f2{ind(i)+j})+1;
+			nndist(j,i) = str2double(f3{ind(i)+j});
 		end
 	end
 
