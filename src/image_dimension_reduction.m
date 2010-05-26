@@ -94,14 +94,14 @@ for z1=1:length(connectedRegions);
 			
 			log2to20=log(2:20)';
 			for i=1:K
-				if nndist(20,i)<=10
+				if nndist(20,i)<=100
 					% Nick: I just wanted to double check this is the right
 					% way around ie nearest neighbour distances (x axis)
 					% against log2 to log20 on y axis
 					% polyfit is very slow
 					% p1=polyfit(log(sqrt(nndist(2:20,i))),log2to20,1);
 					% try a very simple solution
-					linfit=[ones(19,1) log(nndist(2:20,i))] \ log2to20;
+					linfit=[ones(19,1) log(sqrt(nndist(2:20,i)))] \ log2to20;
 					% set dimensionality of this point to gradient
 					dimension(i)=linfit(2);
 				else
@@ -134,13 +134,14 @@ for z1=1:length(connectedRegions);
 		disp(['kpoints: ',num2str(kpoints),' moveInd: ',num2str(length(moveInd))]);
 
 		% find kpoints nearest neighbours and distances
+        % note that ann returns squared distance
 		anno_xc=ann(xcoords);
 		[nnidx, nndist] = ksearch(anno_xc,gamma,kpoints,0);
 		anno_xc= close(anno_xc);
 		
 		% Precompute since it is unchanged inside the loop
 		lambda22=2*lambda.^2;
-		negexpdist=exp(-nndist.^2/lambda22(1));
+		negexpdist=exp(-nndist/lambda22(1));
 		% Iterate over all points in current region
 		for u=1:K
 			nnidxsForThisPoint=nnidx(:,u);
