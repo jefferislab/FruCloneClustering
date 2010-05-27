@@ -51,9 +51,8 @@ if ~isOctave && nargin < 5
 
 elseif isOctave && nargin < 5
 	% Use octave-ann
-	% FIXME - octave-annn not working
-	% ANNkd_tree is invisible inside functions in octave
-	% have written to author for help
+	global ANNkd_tree
+
 	kd=ANNkd_tree(points');
 
 	if selfQuery
@@ -64,7 +63,7 @@ elseif isOctave && nargin < 5
 	nndist=zeros(k,size(query,2));
 	% octave ann does not seem to provide a wrapper for querying with
 	% multiple points, so iterate over each query point
-	% TODO: Write an extra function to all
+	% TODO: Vectorise this - will probably need some C code
 	for i=1:size(query,2),
 		[nnidx_tmp, dist_tmp]=kd.annkSearch(query(:,i),k);
 		nnidx(:,i)=nnidx_tmp;
