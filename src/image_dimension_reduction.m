@@ -16,7 +16,7 @@ if nargin < 2
 	min_points_per_region = 200;
 end
 
-makemovie=false;
+makemovie=true;
 
 load(file_name)
 
@@ -35,7 +35,7 @@ coords={};
 
 maxDim=1.2;
 
-for z1=1:length(connectedRegions);
+for z1=2:length(connectedRegions);
 
 	% Make a mask of points in current region
 	x=zeros(size(L),'single');
