@@ -132,8 +132,8 @@ for z1=2:length(connectedRegions);
 
 		% find kpoints nearest neighbours and distances
         % note that ann returns squared distance
-		anno_xc=ann(xcoords);
-		[nnidx, nndist] = ksearch(anno_xc,gamma,kpoints,0);
+		anno_xc=ann(gamma);
+		[nnidx, nndist] = ksearch(anno_xc,xcoords,kpoints,0);
 		anno_xc= close(anno_xc);
 		
 		% Precompute since it is unchanged inside the loop
