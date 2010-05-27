@@ -63,9 +63,16 @@ for z1=1:length(connectedRegions);
 	lambda=2*ones(1,K,'single');
 	dimension=3*ones(1,K,'single');
 
-	moveInd=[1:K];
+	moveInd=1:K;
+    % Create a new figure, and position it
+    fig1 = figure;
+    winsize = get(fig1,'Position');
+    winsize(1:2) = [0 0];
+    mov = avifile([file_name,'-',num2str(z1),'.avi'],'fps',25,'quality',100);
+    set(fig1,'NextPlot','replacechildren');
+	% Construct nearest neighbour search tree
 
-	for z=1:no_iterations
+    for z=1:no_iterations
 
 		disp([file_name,' iteration ',num2str(z),' out of ',num2str(no_iterations)])
 
@@ -138,7 +145,20 @@ for z1=1:length(connectedRegions);
 		P(moveInd)=Pnew(moveInd);
 		gamma(:,moveInd)=gammaNew(:,moveInd);
 
-	end
+        fixedPoints=setdiff(1:K,moveInd);
+        plot3(gamma(1,moveInd),gamma(2,moveInd),gamma(3,moveInd),'.',...
+            gamma(1,fixedPoints),gamma(2,fixedPoints),gamma(3,fixedPoints),'.');
+        if z==1
+            V = axis;
+        else 
+            axis(V);
+        end
+
+        F = getframe;
+        mov = addframe(mov,F);
+
+    end
+    mov=close(mov);
 
 	dots{z1}=gamma;
 	Prob{z1}=P;
