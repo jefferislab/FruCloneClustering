@@ -129,7 +129,7 @@ for z1=1:length(connectedRegions);
 		% negative exponential.  Therefore it makes sense only to consider
 		% a few close neighbours and set the interaction of all other
 		% points to 0.
-		kpoints=min([K ceil(1.5*K^(1/3))]);
+		kpoints=min([K max([75 ceil(1.5*K^(1/3))])]);
 		Px=zeros(1,kpoints,'single');
 		disp(['kpoints: ',num2str(kpoints),' moveInd: ',num2str(length(moveInd))]);
 
