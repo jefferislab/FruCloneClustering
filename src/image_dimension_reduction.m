@@ -21,6 +21,8 @@ if nargin < 2
 	min_points_per_region = 200;
 end
 
+makemovie=false;
+
 load(file_name)
 
 % find all label values
@@ -77,12 +79,17 @@ for z1=1:length(connectedRegions);
 	dimension=3*ones(1,K,'single');
 
 	moveInd=1:K;
+
+	% Movie code
 	% Create a new figure, and position it
 	fig1 = figure;
 	winsize = get(fig1,'Position');
 	winsize(1:2) = [0 0];
-	mov = avifile([file_name,'-',num2str(z1),'.avi'],'fps',25,'quality',100);
+	if(makemovie)
+		mov = avifile([file_name,'-',num2str(z1),'.avi'],'fps',25,'quality',100);
+	end
 	set(fig1,'NextPlot','replacechildren');
+
 	% Construct nearest neighbour search tree
 	%[flanntree flannparams speedup] = flann_build_index(xcoords,struct('algorithm','kdtree','trees',8,'checks',64));
 % 	anno_xc=ann(xcoords);
@@ -183,6 +190,7 @@ for z1=1:length(connectedRegions);
 		P(moveInd)=Pnew(moveInd);
 		gamma(:,moveInd)=gammaNew(:,moveInd);
 
+		% Movie code
 		fixedPoints=setdiff(1:K,moveInd);
 		plot3(gamma(1,moveInd),gamma(2,moveInd),gamma(3,moveInd),'.',...
 			gamma(1,fixedPoints),gamma(2,fixedPoints),gamma(3,fixedPoints),'.');
@@ -191,12 +199,17 @@ for z1=1:length(connectedRegions);
 		else
 			axis(V);
 		end
-
-		F = getframe;
-		mov = addframe(mov,F);
-
+		if makemovie
+			F = getframe;
+			mov = addframe(mov,F);
+		else
+%             pause;
+		end
 	end
-	mov=close(mov);
+	% Movie code
+	if makemovie
+		mov=close(mov);
+	end
 
 	dots{z1}=gamma;
 	Prob{z1}=P;
