@@ -119,16 +119,9 @@ for z1=1:length(connectedRegions);
 				else
 					dimension(i)=0;
 				end
-
-% 				if dimension(i)>maxDim
-% 					% TODO: Ask Nick what this is doing?!  Looks like there
-% 					% is no change in lambda
-% 					lambda(i)=lambda(i)+0;
-% 					moveInd=[moveInd i];
-% 				end
 			end
 			% Vectorised calculation of moveInd
-			moveInd=find(dimension>maxDim);
+			moveInd=find(dimension>maxDim & nndist(20,:)<=100);
 		end
 
 		gammaNew=zeros(n,K,'single');
