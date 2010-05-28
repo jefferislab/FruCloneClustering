@@ -90,12 +90,9 @@ for z1=2:length(connectedRegions);
 		% points to 0.
 		kpoints=min([K max([75 ceil(1.5*K^(1/3))])]);
 
-        % Construct nearest neighbour search tree
-        anno_gamma=ann(gamma);
-
 		% Must have at least 20 points 
 		if z>5 && K>=20
-            [nnidx, nndist] = ksearch(anno_gamma,gamma,20,0);
+            [nnidx, nndist] = ann_meta_wrapper(gamma,20);
 			log2to20=log(2:20)';
 			for i=1:K
 				if nndist(20,i)<=100
@@ -122,9 +119,8 @@ for z1=2:length(connectedRegions);
 		Px=zeros(1,kpoints,'single');
 		disp(['kpoints: ',num2str(kpoints),' moveInd: ',num2str(length(moveInd))]);
         
-        % find kpoints nearest neighbours and close search tree
-        [nnidx, nndist] = ksearch(anno_gamma,xcoords,kpoints,0);
-        anno_gamma = close(anno_gamma);
+        % find kpoints nearest neighbours from gamma for each xcoord
+        [nnidx, nndist] = ann_meta_wrapper(gamma,kpoints,xcoords);
 
 		% Precompute since it is unchanged inside the loop
 		negexpdist=exp( -nndist / (2*lambda^2) );
