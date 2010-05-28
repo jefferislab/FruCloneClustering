@@ -83,14 +83,19 @@ for z1=2:length(connectedRegions);
 	for z=1:no_iterations
 		toc;
 		disp([file_name,' iteration ',num2str(z),' out of ',num2str(no_iterations)])
+		% number of nearest neighbours to consider - in general the
+		% interaction between points falls off very rapidly due to a
+		% negative exponential.  Therefore it makes sense only to consider
+		% a few close neighbours and set the interaction of all other
+		% points to 0.
+		kpoints=min([K max([75 ceil(1.5*K^(1/3))])]);
+
+        % Construct nearest neighbour search tree
+        anno_gamma=ann(gamma);
 
 		% Must have at least 20 points 
 		if z>5 && K>=20
-			% find 20 nearest neighbours and distances 
-			anno_gamma=ann(gamma);
-			[nnidx, nndist] = ksearch(anno_gamma,gamma,20,0);
-			anno_gamma = close(anno_gamma);
-			
+            [nnidx, nndist] = ksearch(anno_gamma,gamma,20,0);
 			log2to20=log(2:20)';
 			for i=1:K
 				if nndist(20,i)<=100
@@ -114,21 +119,13 @@ for z1=2:length(connectedRegions);
 	
 		x(indX)=x(indX)/sum(x(indX));
 
-		% number of nearest neighbours to consider - in general the
-		% interaction between points falls off very rapidly due to a
-		% negative exponential.  Therefore it makes sense only to consider
-		% a few close neighbours and set the interaction of all other
-		% points to 0.
-		kpoints=min([K max([75 ceil(1.5*K^(1/3))])]);
 		Px=zeros(1,kpoints,'single');
 		disp(['kpoints: ',num2str(kpoints),' moveInd: ',num2str(length(moveInd))]);
+        
+        % find kpoints nearest neighbours and close search tree
+        [nnidx, nndist] = ksearch(anno_gamma,xcoords,kpoints,0);
+        anno_gamma = close(anno_gamma);
 
-		% find kpoints nearest neighbours and distances
-        % note that ann returns squared distance
-		anno_xc=ann(gamma);
-		[nnidx, nndist] = ksearch(anno_xc,xcoords,kpoints,0);
-		anno_xc= close(anno_xc);
-		
 		% Precompute since it is unchanged inside the loop
 		negexpdist=exp( -nndist / (2*lambda^2) );
 		% Iterate over all points in current region
