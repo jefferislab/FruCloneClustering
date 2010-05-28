@@ -8,9 +8,12 @@ function calculate_properties_remaining_images(input_dir,output_dir)
 %
 % See also extract_properties
 
-% INPUT
-%input_dir='/Volumes/JData/JPeople/Nick/FruCloneClustering/images/';
-h=dir([input_dir,'*_reformated.mat']);
+% Make sure that dirs have a trailing slash
+input_dir=fullfile(input_dir,filesep);
+output_dir=fullfile(output_dir,filesep);
+
+% NB Second asterisk permits spelling variants
+infiles=dir([input_dir,'*_reformat*ed.mat']);
 
 % OUTPUT
 %output_dir='/Volumes/JData/JPeople/Nick/FruCloneClustering/images/';
@@ -19,113 +22,81 @@ if ~exist(output_dir,'dir')
 	mkdir(output_dir);
 end
 
-for i=1:length(h)
+for i=1:length(infiles)
+	% This contains just the image stem (everyhing up to first underscore)
+	% e.g. SAKW12-1_reformated.mat => SAKW12-1
+	current_image=jlab_filestem(infiles(i).name);
 
-	n=find(h(i).name=='_',1,'first');
-	name=h(i).name(1:n-1);
+	% Check if we should process current image
+	if matching_images(current_image,...
+			[output_dir,'*_properties.mat'])
+		% skip this image since corresponding output exists
+		continue
+	elseif ~makelock([output_dir,current_image,'-in_progress.mat'])
+		% Looks like someone else is working on this image
+		continue
+	end
 
-	flag=1;
+	%%%% Main code
 
-	h1=dir([output_dir,'*_properties.mat']);
+	p=[];
+	p.gamma1=[];
+	p.alpha=[];
+	p.vect=[];
 
-	for j=1:length(h1)
+	indata=load([input_dir,infiles(i).name]);
 
-		n=find(h1(j).name=='_',1,'first');
-		name1=h1(j).name(1:n-1);
+	for j=1:length(indata.dots) % iterate over each group of connected dots
 
+		y=indata.dots{j}; % dots in original coord space
 
-		if strcmp(name,name1)
-			
-			flag=0;
-			break
-			
+		if ~isempty(y)
+
+			y=indata.dotsReformated{j}; % dots in reference coord space
+
+			p.gamma1=[p.gamma1 y];
+
+			[alpha,vect]=extract_properties(y);
+
+			p.alpha=[p.alpha alpha];
+			p.vect=[p.vect vect];
 		end
 
 	end
 
-	h2=dir([output_dir,'*-in_progress.mat']);
+	% This part removes any points outside of a mask that covers the
+	% central brain an all of its tracts. It also removes points with
+	% p.alpha (eigenvalue 1 -eigenvalue 2)/sum(eigenvalues)) below 0.25.
+	% These are points that are not part of a linear structure.
 
-	for j=1:length(h2)
+	% TODO: make the mask a parameter and supply it in a form that
+	% retains calibration information
 
-		n=find(h2(j).name=='_',1,'first');
-		name2=h2(j).name(1:n-1);
-
-		if strcmp(name,name2)
-
-			flag=0;
-			break
-
-		end
-
+	x=zeros(384,384,173);
+	for j=1:173
+		x(:,:,j)=imread('../data/IS2_nym_mask.tif',i);
 	end
 
-	if flag==1
+	g(1,:)=round(384/315.13*round(p.gamma1(1,:)));
+	g(2,:)=round(384/315.13*round(p.gamma1(2,:)));
+	g(3,:)=round(1*round(p.gamma1(3,:)));
+	g(1,:)=min(384,max(1,g(1,:)));
+	g(2,:)=min(384,max(1,g(2,:)));
+	g(3,:)=min(173,max(1,g(3,:)));
+	maskInd=zeros(1,length(p.gamma1));
+	for j=1:length(p.gamma1)
+		% TODO: Nick: what's going on here?
+		x(g(2,j),g(1,j),g(3,j))>0 & p.alpha(j)>.25;
+		maskInd(j)=1;
+	end;
 
-		save([output_dir,h(i).name,'-in_progress.mat'],'flag','-v7');
+	clear g
 
-		%%%% Main code
+	p.gamma2=p.gamma1(:,find(maskInd));
+	p.vect2=p.vect(:,find(maskInd));
 
-		p=[];
-		p.gamma1=[];
-		% 		p.dimension1=[];
-		% 		p.lambda1=[];
-		p.alpha=[];
-		p.vect=[];
-
-		load([input_dir,h(i).name])
-
-		for j=1:length(dots) % iterate over each group of connected dots
-
-			y=dots{j}; % dots in original coord space
-
-			if ~isempty(y)
-
-				y=dotsReformated{j}; % dots in reference coord space
-
-				p.gamma1=[p.gamma1 y];
-
-				[temp1,temp2]=extract_properties(y);
-
-				p.alpha=[p.alpha temp1];
-				p.vect=[p.vect temp2];
-			end
-
-		end
-
-		% This part removes any points outside of a mask that covers the
-		% central brain an all of its tracts. It also removes points with
-		% p.alpha (eigenvalue 1 -eigenvalue 2)/sum(eigenvalues)) below 0.25.
-		% These are points that are not part of a linear structure.
-
-		% TODO: make the mask a parameter and supply it in a form that
-		% retains calibration information
-
-		x=zeros(384,384,173);
-		for j=1:173
-			x(:,:,j)=imread('../data/IS2_nym_mask.tif',i);
-		end
-
-		g(1,:)=round(384/315.13*round(p.gamma1(1,:)));
-		g(2,:)=round(384/315.13*round(p.gamma1(2,:)));
-		g(3,:)=round(1*round(p.gamma1(3,:)));
-		g(1,:)=min(384,max(1,g(1,:)));
-		g(2,:)=min(384,max(1,g(2,:)));
-		g(3,:)=min(173,max(1,g(3,:)));
-		maskInd=zeros(1,length(p.gamma1));
-		for j=1:length(p.gamma1)
-			x(g(2,j),g(1,j),g(3,j))>0 & p.alpha(j)>.25;
-			maskInd(j)=1;
-		end;
-
-		clear g
-		
-		p.gamma2=p.gamma1(:,find(maskInd));
-		p.vect2=p.vect(:,find(maskInd));
-
-		%%%%
-		save([output_dir,name,'_properties.mat'],'p','-v7');
-		delete([output_dir,h(i).name,'-in_progress.mat'])
-
-	end
-
+	%%%%
+	save([output_dir,name,'_properties.mat'],'p','-v7');
+	removelock([output_dir,current_image,'-in_progress.mat']);
+end
 end
