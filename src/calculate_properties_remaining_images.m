@@ -1,9 +1,12 @@
-function calculate_properties_remaining_images(input_dir,output_dir,ann_dir);
-
-% this script takes the reformatted image and calculates the the principal eigenvector (tangent vector)
-% and the term alpha (alpha=1 -> one-dimenionsal, alpha=0 -> isotropic) from the moment of inertia.
+function calculate_properties_remaining_images(input_dir,output_dir)
+% CALCULATE_PROPERTIES_REMAINING_IMAGES - find tangent vector, alpha
+% Function takes reformatted images and calculates:
+% principal eigenvector (tangent vector)
+% alpha (alpha=1 -> one-dimenionsal, alpha=0 -> isotropic)
+% from the moment of inertia.
 % The input files are XXX_reformated.mat and output files are XXX_properties.mat.
-
+%
+% See also extract_properties
 
 % INPUT
 %input_dir='/Volumes/JData/JPeople/Nick/FruCloneClustering/images/';
