@@ -54,7 +54,6 @@ for z1=2:length(connectedRegions);
 	% Convert indices to coords
 	xcoords=zeros(3,length(indX),'single');
 	[xcoords(1,:) xcoords(2,:) xcoords(3,:)]=ind2sub(size(x),indX);
-
 	gamma=xcoords;
 
 	% K is the number of points of the low dimensional manifold
@@ -66,7 +65,7 @@ for z1=2:length(connectedRegions);
 
 	P=ones(1,K,'single')/K;
 
-	lambda=2*ones(1,K,'single');
+	lambda=2;
 	dimension=3*ones(1,K,'single');
 
 	moveInd=1:K;
@@ -81,14 +80,11 @@ for z1=2:length(connectedRegions);
         set(fig1,'NextPlot','replacechildren');
     end
 	
-    % Construct nearest neighbour search tree
-	%[flanntree flannparams speedup] = flann_build_index(xcoords,struct('algorithm','kdtree','trees',8,'checks',64));
-% 	anno_xc=ann(xcoords);
 	for z=1:no_iterations
 		toc;
 		disp([file_name,' iteration ',num2str(z),' out of ',num2str(no_iterations)])
 
-		% Must have at least 50 points 
+		% Must have at least 20 points 
 		if z>5 && K>=20
 			% find 20 nearest neighbours and distances 
 			anno_gamma=ann(gamma);
@@ -101,8 +97,6 @@ for z1=2:length(connectedRegions);
 					% Nick: I just wanted to double check this is the right
 					% way around ie nearest neighbour distances (x axis)
 					% against log2 to log20 on y axis
-					% polyfit is very slow
-					% p1=polyfit(log(sqrt(nndist(2:20,i))),log2to20,1);
 					% try a very simple solution
 					linfit=[ones(19,1) log(sqrt(nndist(2:20,i)))] \ log2to20;
 					% set dimensionality of this point to gradient
@@ -136,8 +130,7 @@ for z1=2:length(connectedRegions);
 		anno_xc= close(anno_xc);
 		
 		% Precompute since it is unchanged inside the loop
-		lambda22=2*lambda.^2;
-		negexpdist=exp(-nndist/lambda22(1));
+		negexpdist=exp( -nndist / (2*lambda^2) );
 		% Iterate over all points in current region
 		for u=1:K
 			nnidxsForThisPoint=nnidx(:,u);
