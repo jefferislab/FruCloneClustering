@@ -126,7 +126,6 @@ for z1=2:length(connectedRegions);
 		% a few close neighbours and set the interaction of all other
 		% points to 0.
 		kpoints=min([K max([75 ceil(1.5*K^(1/3))])]);
-        kpoints=K;
 		Px=zeros(1,kpoints,'single');
 		disp(['kpoints: ',num2str(kpoints),' moveInd: ',num2str(length(moveInd))]);
 
