@@ -7,7 +7,7 @@ n=find(file_name=='_',1,'first');
 name=file_name(1:n-1);
 
 s=zeros(1,NUM,'single');
-        
+
 for j=1:NUM
     ind=find(L==j);
     s(j)=length(ind);
@@ -31,8 +31,8 @@ for z1=1:length(connectedRegions);
     x=zeros(size(L),'single');
     ind=find(L==connectedRegions(z1));
 
-  
-   x(ind)=1;
+
+    x(ind)=1;
     [n1 n2 n3]=size(x);
 
 
@@ -46,7 +46,7 @@ for z1=1:length(connectedRegions);
 
     K=length(indX);
 
-gamma=xcoords;
+    gamma=xcoords;
 
     K=length(indX);
 
@@ -58,120 +58,120 @@ gamma=xcoords;
 % epsilon is the resolution
 % lamba determines the tradeoff F(M,Pm) = D + lambda*I
 
-[n,m]=size(xcoords);
+    [n,m]=size(xcoords);
 
-K=length(gamma(1,:));
+    K=length(gamma(1,:));
 
-P=ones(1,K,'single')/K;
+    P=ones(1,K,'single')/K;
 
-lambda=2*ones(1,K,'single');
-dimension=3*ones(1,K,'single');
+    lambda=2*ones(1,K,'single');
+    dimension=3*ones(1,K,'single');
 
-no_iterations=45;
+    no_iterations=45;
 
-moveInd=[1:K];
+    moveInd=[1:K];
 
-for z=1:no_iterations
-    
-    disp([file_name,' iteration ',num2str(z),' out of ',num2str(no_iterations)])
+    for z=1:no_iterations
 
-  if z>5
-      moveInd=[];
-    for i=1:K
+        disp([file_name,' iteration ',num2str(z),' out of ',num2str(no_iterations)])
 
- indNN= find(sum((repmat(gamma(:,i),1,K)-gamma).^2)<=10^2);
-         if length(indNN)>=20
-         minDist=sort(sum((repmat(gamma(:,i),1,length(indNN))-gamma(:,indNN)).^2),'ascend');
-          p1=polyfit(log([sqrt(minDist(2:20)) ]),log([2:20]),1);
-         dimension(i)=p1(1);
-         else
-              dimension(i)=0;
-         end
+        if z>5
+            moveInd=[];
+            for i=1:K
 
-        if dimension(i)>maxDim
-            lambda(i)=lambda(i)+0;
-            moveInd=[moveInd i];
+                indNN= find(sum((repmat(gamma(:,i),1,K)-gamma).^2)<=10^2);
+                if length(indNN)>=20
+                    minDist=sort(sum((repmat(gamma(:,i),1,length(indNN))-gamma(:,indNN)).^2),'ascend');
+                    p1=polyfit(log([sqrt(minDist(2:20)) ]),log([2:20]),1);
+                    dimension(i)=p1(1);
+                else
+                    dimension(i)=0;
+                end
 
-
-end
-           end
- end
+                if dimension(i)>maxDim
+                    lambda(i)=lambda(i)+0;
+                    moveInd=[moveInd i];
 
 
-
-    gammaNew=zeros(n,K,'single');
- Pnew=zeros(1,K,'single');
-
-   dist=zeros(1,K,'single');
-
-     Px=zeros(1,K,'single');
-
-  m1=1;
-
-  x(indX)=x(indX)/sum(x(indX));
+                end
+            end
+        end
 
 
 
-    for i=1:m
+        gammaNew=zeros(n,K,'single');
+        Pnew=zeros(1,K,'single');
 
+        dist=zeros(1,K,'single');
 
+        Px=zeros(1,K,'single');
 
-        u=i;
         m1=1;
 
-
-         dist=sum((repmat(xcoords(:,u),1,K)-gamma).^2);
-
-      Px=P.*exp(-dist./(2*lambda.^2));
-
-
-        Px=Px/sum(Px);
+        x(indX)=x(indX)/sum(x(indX));
 
 
 
-      if ~(Px(1)>=0 & Px(1)<=1)
-
-        x(indX(u))=0;
-        Px=zeros(1,K,'single');
-      end
-
-        Pnew=Pnew+x(indX(u))'*Px;
+        for i=1:m
 
 
 
-        for i1=1:n
+            u=i;
+            m1=1;
 
-            gammaNew(i1,:)=gammaNew(i1,:)+((xcoords(i1,u).*x(indX(u))')*Px);
 
+            dist=sum((repmat(xcoords(:,u),1,K)-gamma).^2);
+
+            Px=P.*exp(-dist./(2*lambda.^2));
+
+
+            Px=Px/sum(Px);
+
+
+
+            if ~(Px(1)>=0 & Px(1)<=1)
+
+                x(indX(u))=0;
+                Px=zeros(1,K,'single');
+            end
+
+            Pnew=Pnew+x(indX(u))'*Px;
+
+
+
+            for i1=1:n
+
+                gammaNew(i1,:)=gammaNew(i1,:)+((xcoords(i1,u).*x(indX(u))')*Px);
+
+
+
+            end
 
 
         end
 
+        Pnew=Pnew+10^(-30);
+        Pnew=Pnew/sum(Pnew);
 
-      end
+        for i1=1:n
 
-   Pnew=Pnew+10^(-30);
-    Pnew=Pnew/sum(Pnew);
+            gammaNew(i1,:)=gammaNew(i1,:)./Pnew;
 
-    for i1=1:n
+        end
 
-    gammaNew(i1,:)=gammaNew(i1,:)./Pnew;
+        P(moveInd)=Pnew(moveInd);
+        gamma(:,moveInd)=gammaNew(:,moveInd);
+
+
+
 
     end
 
-      P(moveInd)=Pnew(moveInd);
-       gamma(:,moveInd)=gammaNew(:,moveInd);
-
-
-
-
-end
-
-dots{z1}=gamma;
-Prob{z1}=P;
-coords{z1}=xcoords;
-lam{z1}=lambda;
-dim{z1}=dimension;
+    dots{z1}=gamma;
+    Prob{z1}=P;
+    coords{z1}=xcoords;
+    lam{z1}=lambda;
+    dim{z1}=dimension;
 
 
 end

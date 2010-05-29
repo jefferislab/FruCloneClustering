@@ -32,27 +32,27 @@ x1=dlmread(trace_file);
 if register_option==1 & nargin==3
     error('Must specify registration directory');
 elseif register_option==1 & nargin==4
-    
+
     save(['InputCoords',num2str(q),'.txt'],'x1','-ascii');
-    
+
     command=[gregxform_dir,'gregxform ',reg,' -f',' <InputCoords',num2str(q),'.txt >OutputCoords',num2str(q),'.txt'];
 
     system(command);
-    
+
     [f1 f2 f3]=textread(['OutputCoords',num2str(q),'.txt'],'%s %s %s');
 
     y=zeros(length(f1),3);
 
     for i=1:length(f1);
-    
-    if f1{i}(1)~='E'
-        
-        y(i,1)=str2num(f1{i});
-        y(i,2)=str2num(f2{i});
-        y(i,3)=str2num(f3{i});
-        
-    end
-    
+
+        if f1{i}(1)~='E'
+
+            y(i,1)=str2num(f1{i});
+            y(i,2)=str2num(f2{i});
+            y(i,3)=str2num(f3{i});
+
+        end
+
     end
 
     ind=find(y(:,1)>0);
@@ -61,7 +61,7 @@ elseif register_option==1 & nargin==4
 
     delete(['InputCoords',num2str(q),'.txt'])
     delete(['OutputCoords',num2str(q),'.txt'])
-    
+
 end
 
 
@@ -88,52 +88,52 @@ ptrtree=BuildGLTree3DFEX(y);
 
 % Iterate through each template clone
 for i=1:length(x)
-    
+
     disp(['Comparing trace to clone ',clones{i}])
-  
-    % iterate through each template image for current template clone
+
+% iterate through each template image for current template clone
     for j=1:length(x{i}.s)
 
-        % load dot positions and tangent vectors for this image
-        % note that there may be multiple variants of this image
-        % depending on flips etc - this will just use the first one
-        % TODO - tidy this up
+% load dot positions and tangent vectors for this image
+% note that there may be multiple variants of this image
+% depending on flips etc - this will just use the first one
+% TODO - tidy this up
         h=dir([image_properties_dir x{i}.images{j},'*properties.mat']);
         load([image_properties_dir h(1).name]);
 
-        % p.gamma is aggregated position & vector information for this
-        % template image
+% p.gamma is aggregated position & vector information for this
+% template image
         [m1 n1]=size(p.gamma2);
 
-        % Binary vector containing match points (size of template)
+% Binary vector containing match points (size of template)
         y=zeros(n1,1,'uint8');
 
-        % restrict to template dots above minimum MI score
+% restrict to template dots above minimum MI score
         ind=find(x{i}.s{j}.MI>.005);
         p2=[];
         p2.gamma2=p.gamma2(:,ind);
         p2.vect2=p.vect2(:,ind);
 
-        % find index of template dots that have a match in query
+% find index of template dots that have a match in query
         [matchedPoints]=compareImages_GLTree(p2,p1,ptrtree);
 
         clear p2
 
-        % selected template dots
+% selected template dots
         y(ind(matchedPoints))=1;
 
-        % subtract optimal MI threshold for this template clone (+ rectify)
+% subtract optimal MI threshold for this template clone (+ rectify)
         modified_MI=max(0,x{i}.s{j}.MI'-MI_threshold(x{i}.threshold));
 
-        % count is sum of MI for all template dots
-        % score for matched template dots
+% count is sum of MI for all template dots
+% score for matched template dots
         count(i)=count(i)+sum(modified_MI);
         score(i)=score(i)+sum(single(y(:)).*modified_MI);
 
     end
-   
+
 end
-    
+
 clear y
 
 DeleteGLTree3DFEX(ptrtree);
