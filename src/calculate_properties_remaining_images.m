@@ -86,39 +86,52 @@ for i=1:length(infiles)
 
 	end
 
-	% This part removes any points outside of a mask that covers the
-	% central brain an all of its tracts. It also removes points with
-	% p.alpha (eigenvalue 1 -eigenvalue 2)/sum(eigenvalues)) below 0.25.
-	% These are points that are not part of a linear structure.
+	if ~isempty(mask)
 
-	% TODO: make the mask a parameter and supply it in a form that
-	% retains calibration information
+		% This part removes any points outside of a mask that covers the
+		% central brain and all of its tracts. It also removes points with
+		% p.alpha (eigenvalue 1 -eigenvalue 2)/sum(eigenvalues)) below 0.25.
+		% These are points that are not part of a linear structure.
 
-	x=zeros(384,384,173);
-	for j=1:173
-		x(:,:,j)=imread('../data/IS2_nym_mask.tif',i);
+		% TODO: make the mask a parameter and supply it in a form that
+		% retains calibration information
+		maskInd=coords2indices(mask,vox_dims,p.gamma1);
+
+		p.gamma2=p.gamma1(:,maskInd);
+		p.vect2=p.vect(:,maskInd);
+	elseif ~isempty(alpha_thresh)
+		p.gamma2=p.gamma1(:,p.alpha>alpha_thresh);
+		p.vect2=p.vect(:,p.alpha>alpha_thresh);
 	end
-
-	g(1,:)=round(384/315.13*round(p.gamma1(1,:)));
-	g(2,:)=round(384/315.13*round(p.gamma1(2,:)));
-	g(3,:)=round(1*round(p.gamma1(3,:)));
-	g(1,:)=min(384,max(1,g(1,:)));
-	g(2,:)=min(384,max(1,g(2,:)));
-	g(3,:)=min(173,max(1,g(3,:)));
-	maskInd=zeros(1,length(p.gamma1));
-	for j=1:length(p.gamma1)
-		% TODO: Nick: what's going on here?
-		x(g(2,j),g(1,j),g(3,j))>0 & p.alpha(j)>.25;
-		maskInd(j)=1;
-	end;
-
-	clear g
-
-	p.gamma2=p.gamma1(:,find(maskInd));
-	p.vect2=p.vect(:,find(maskInd));
 
 	%%%%
 	save([output_dir,name,'_properties.mat'],'p','-v7');
 	removelock([output_dir,current_image,'-in_progress.mat']);
+end
+end
+
+function indices = coords2indices(img,voxdims,coords)
+% COORDS2INDICES returns the image indices of a set of coordinates
+imsize=size(img);
+
+g=coords;
+
+% first convert from physical coords to pixel coords
+g(1,:)=round(coords(1,:)/voxdims(1));
+g(2,:)=round(coords(2,:)/voxdims(2));
+g(3,:)=round(coords(3,:)/voxdims(3));
+
+% make sure no points are out of range
+g(1,:)=min(imsize(1),max(1,g(1,:)));
+g(2,:)=min(imsize(2),max(1,g(2,:)));
+g(3,:)=min(imsize(3),max(1,g(3,:)));
+
+maskInd=false(length(coords));
+
+%FIXME UNFINISHED
+for j=1:length(coords)
+	% TODO: Nick: what's going on here?
+	x(g(2,j),g(1,j),g(3,j))>0 & p.alpha(j)>.25;
+	maskInd(j)=1;
 end
 end
