@@ -12,19 +12,19 @@ score=zeros(m,40);
 
 for i=1:m
 
-    disp([num2str(i),'. Comparing brain to clone ',x{i}.clone]);
+	disp([num2str(i),'. Comparing brain to clone ',x{i}.clone]);
 
 
 
-    template_images_ind=[];
+	template_images_ind=[];
 
-    for j=1:length(x{i}.images)
+	for j=1:length(x{i}.images)
 
-        template_images_ind=[template_images_ind find(strcmp(imageList,x{i}.images{j}))];
+		template_images_ind=[template_images_ind find(strcmp(imageList,x{i}.images{j}))];
 
-    end
+	end
 
 
-    score(i,:)=classify_image(x{i}.s,template_images_ind,imageList,test_image_ind,matchedPoints_dir);
+	score(i,:)=classify_image(x{i}.s,template_images_ind,imageList,test_image_ind,matchedPoints_dir);
 
 end

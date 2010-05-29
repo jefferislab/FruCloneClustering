@@ -46,71 +46,71 @@ fid = fopen(filename, 'r');
 
 if fid ~= -1
 % Initialize universal structure fields to fix the order
-    metadata.Filename = '';
-    metadata.FileModDate = [];
-    metadata.FileSize = [];
-    metadata.Format = 'pic';
-    metadata.FormatVersion = [];
-    metadata.Width = [];
-    metadata.Height = [];
-    metadata.BitDepth = [];
-    metadata.ColorType = 'grayscale';
-    filename = fopen(fid);  % Get the full path name if not in pwd
-    d = dir(filename);      % Read directory information
+	metadata.Filename = '';
+	metadata.FileModDate = [];
+	metadata.FileSize = [];
+	metadata.Format = 'pic';
+	metadata.FormatVersion = [];
+	metadata.Width = [];
+	metadata.Height = [];
+	metadata.BitDepth = [];
+	metadata.ColorType = 'grayscale';
+	filename = fopen(fid);  % Get the full path name if not in pwd
+	d = dir(filename);      % Read directory information
 
-    metadata.Filename = filename;
-    metadata.FileModDate = d.date;
-    metadata.FileSize = d.bytes;
+	metadata.Filename = filename;
+	metadata.FileModDate = d.date;
+	metadata.FileSize = d.bytes;
 
 % check to make sure that the file isn't zero length
-    fseek(fid, 0, 'eof');
-    endOfFile = ftell(fid);
-    if endOfFile > HEADER_LEN
+	fseek(fid, 0, 'eof');
+	endOfFile = ftell(fid);
+	if endOfFile > HEADER_LEN
 % read header
-        fseek(fid, 0, 'bof');
-        metadata.Width = fread(fid, 1, 'int16');
-        metadata.Height = fread(fid, 1, 'int16');
-        metadata.NumImages = fread(fid, 1, 'int16');
-        metadata.Ramp1 = fread(fid, 2, 'int16');
-        metadata.Notes = fread(fid, 1, 'int32');
-        byteFormat = fread(fid, 1, 'int16');
-        metadata.ImageNumber = fread(fid, 1, 'int16');
-        fread(fid, 32, 'char');
-        if fread(fid, 1, 'int16')
+		fseek(fid, 0, 'bof');
+		metadata.Width = fread(fid, 1, 'int16');
+		metadata.Height = fread(fid, 1, 'int16');
+		metadata.NumImages = fread(fid, 1, 'int16');
+		metadata.Ramp1 = fread(fid, 2, 'int16');
+		metadata.Notes = fread(fid, 1, 'int32');
+		byteFormat = fread(fid, 1, 'int16');
+		metadata.ImageNumber = fread(fid, 1, 'int16');
+		fread(fid, 32, 'char');
+		if fread(fid, 1, 'int16')
 % merged format is not currently supported
-            metadata = [];
-            return
-        end
+			metadata = [];
+			return
+		end
 
-        metadata.ColorStatus1 = fread(fid, 1, 'int16');
-        if fread(fid, 1, 'int16') ~= 12345
-            metadata = [];
-            return
-        end
+		metadata.ColorStatus1 = fread(fid, 1, 'int16');
+		if fread(fid, 1, 'int16') ~= 12345
+			metadata = [];
+			return
+		end
 
-        metadata.Ramp2 = fread(fid, 2, 'int16');
-        metadata.ColorStatus2 = fread(fid, 1, 'int16');
-        metadata.IsEdited = fread(fid, 1, 'int16');
-        metadata.LensMagnification = fread(fid, 1, 'int16');
-        metadata.LensFactor = fread(fid, 1, 'float32');
-        fread(fid, 3, 'int16');
+		metadata.Ramp2 = fread(fid, 2, 'int16');
+		metadata.ColorStatus2 = fread(fid, 1, 'int16');
+		metadata.IsEdited = fread(fid, 1, 'int16');
+		metadata.LensMagnification = fread(fid, 1, 'int16');
+		metadata.LensFactor = fread(fid, 1, 'float32');
+		fread(fid, 3, 'int16');
 
-        if byteFormat == 1
-            metadata.BitDepth = 8;
-        else
-            metadata.BitDepth = 16;
-        end
+		if byteFormat == 1
+			metadata.BitDepth = 8;
+		else
+			metadata.BitDepth = 16;
+		end
 
 % read notes
-        fseek(fid, metadata.Width * metadata.Height * metadata.NumImages * metadata.BitDepth / 8, 'cof');
-        notesOffset = ftell(fid);
-        getAxisInfo;
-        fclose(fid);
-    else
-        metadata = []; %tell calling subroutine that the file was zero length
-    end
+		fseek(fid, metadata.Width * metadata.Height * metadata.NumImages * metadata.BitDepth / 8, 'cof');
+		notesOffset = ftell(fid);
+		getAxisInfo;
+		fclose(fid);
+	else
+		metadata = []; %tell calling subroutine that the file was zero length
+	end
 else
-    metadata = []; %tell calling subroutine that no file was found
+	metadata = []; %tell calling subroutine that no file was found
 end
 
 function getAxisInfo
@@ -119,60 +119,60 @@ fseek(fid, notesOffset, 'bof');
 noteIndex = 1;
 
 while notesOffset + NOTE_LEN * (noteIndex - 1) <= endOfFile
-    metadata.Note{noteIndex} = readNote(noteIndex);
+	metadata.Note{noteIndex} = readNote(noteIndex);
 
-    if metadata.Note{noteIndex}.type == NOTE_TYPE_VARIABLE
-        if strfind(metadata.Note{noteIndex}.text, 'AXIS_2') == 1
+	if metadata.Note{noteIndex}.type == NOTE_TYPE_VARIABLE
+		if strfind(metadata.Note{noteIndex}.text, 'AXIS_2') == 1
 % horizontal axis
-            tempData = sscanf(metadata.Note{noteIndex}.text(7:end), ' %d %g %g %s');
-            axisType = tempData(1);
-            if axisType == AXT_D
-                metadata.Origin(1) = tempData(2);
-                metadata.Delta(1) = tempData(3);
-            end
-            metadata.Units{1} = char(tempData(4:end)');
-        elseif strfind(metadata.Note{noteIndex}.text, 'AXIS_3') == 1
+			tempData = sscanf(metadata.Note{noteIndex}.text(7:end), ' %d %g %g %s');
+			axisType = tempData(1);
+			if axisType == AXT_D
+				metadata.Origin(1) = tempData(2);
+				metadata.Delta(1) = tempData(3);
+			end
+			metadata.Units{1} = char(tempData(4:end)');
+		elseif strfind(metadata.Note{noteIndex}.text, 'AXIS_3') == 1
 % vertical axis
-            tempData = sscanf(metadata.Note{noteIndex}.text(7:end), ' %d %g %g %s');
-            axisType = tempData(1);
-            if axisType == AXT_D
-                metadata.Origin(2) = tempData(2);
-                metadata.Delta(2) = tempData(3);
-            end
-            metadata.Units{2} = char(tempData(4:end)');
-        elseif strfind(metadata.Note{noteIndex}.text, 'AXIS_4') == 1
+			tempData = sscanf(metadata.Note{noteIndex}.text(7:end), ' %d %g %g %s');
+			axisType = tempData(1);
+			if axisType == AXT_D
+				metadata.Origin(2) = tempData(2);
+				metadata.Delta(2) = tempData(3);
+			end
+			metadata.Units{2} = char(tempData(4:end)');
+		elseif strfind(metadata.Note{noteIndex}.text, 'AXIS_4') == 1
 % z axis
-            tempData = sscanf(metadata.Note{noteIndex}.text(7:end), ' %d %g %g %s');
-            axisType = tempData(1);
-            if axisType == AXT_D
-                metadata.Origin(3) = tempData(2);
-                metadata.Delta(3) = tempData(3);
-            end
-            metadata.Units{3} = char(tempData(4:end)');
-        elseif strfind(metadata.Note{noteIndex}.text, 'AXIS_9') == 1
-            tempData = sscanf(metadata.Note{noteIndex}.text(7:end), ' %d %g %g %s');
-            axisType = tempData(1);
-            if axisType == AXT_RGB
-                metadata.Origin(4) = tempData(2);
-                metadata.Delta(4) = tempData(3);
-                metadata.Units{4} = char(tempData(4:end)');
-            end
-        elseif strfind(metadata.Note{noteIndex}.text, 'INFO_FRAME_RATE') == 1
-            metadata.FramesPerSecond = sscanf(metadata.Note{noteIndex}.text(14:end), ' %d');
-        elseif strfind(metadata.Note{noteIndex}.text, 'INFO_OBJECTIVE_NAME = ') == 1
-            metadata.Objective = metadata.Note{noteIndex}.text(23:end);
-            metadata.Objective = metadata.Objective(metadata.Objective ~= char(0));
-        elseif strfind(metadata.Note{noteIndex}.text, 'PIC_FF_VERSION = ') == 1
-            metadata.FormatVersion = str2double(metadata.Note{noteIndex}.text(18:end));
-        else
+			tempData = sscanf(metadata.Note{noteIndex}.text(7:end), ' %d %g %g %s');
+			axisType = tempData(1);
+			if axisType == AXT_D
+				metadata.Origin(3) = tempData(2);
+				metadata.Delta(3) = tempData(3);
+			end
+			metadata.Units{3} = char(tempData(4:end)');
+		elseif strfind(metadata.Note{noteIndex}.text, 'AXIS_9') == 1
+			tempData = sscanf(metadata.Note{noteIndex}.text(7:end), ' %d %g %g %s');
+			axisType = tempData(1);
+			if axisType == AXT_RGB
+				metadata.Origin(4) = tempData(2);
+				metadata.Delta(4) = tempData(3);
+				metadata.Units{4} = char(tempData(4:end)');
+			end
+		elseif strfind(metadata.Note{noteIndex}.text, 'INFO_FRAME_RATE') == 1
+			metadata.FramesPerSecond = sscanf(metadata.Note{noteIndex}.text(14:end), ' %d');
+		elseif strfind(metadata.Note{noteIndex}.text, 'INFO_OBJECTIVE_NAME = ') == 1
+			metadata.Objective = metadata.Note{noteIndex}.text(23:end);
+			metadata.Objective = metadata.Objective(metadata.Objective ~= char(0));
+		elseif strfind(metadata.Note{noteIndex}.text, 'PIC_FF_VERSION = ') == 1
+			metadata.FormatVersion = str2double(metadata.Note{noteIndex}.text(18:end));
+		else
 % add any note you care about here
 
-        end
-    else
+		end
+	else
 % add info about other note types here
 
-    end
-    noteIndex = noteIndex + 1;
+	end
+	noteIndex = noteIndex + 1;
 end
 end
 

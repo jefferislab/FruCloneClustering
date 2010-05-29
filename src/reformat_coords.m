@@ -42,13 +42,13 @@ y=zeros(length(f1),3);
 
 for i=1:length(f1);
 
-    if f1{i}(1)~='E'
+	if f1{i}(1)~='E'
 
-        y(i,1)=str2num(f1{i});
-        y(i,2)=str2num(f2{i});
-        y(i,3)=str2num(f3{i});
+		y(i,1)=str2num(f1{i});
+		y(i,2)=str2num(f2{i});
+		y(i,3)=str2num(f3{i});
 
-    end
+	end
 
 end
 

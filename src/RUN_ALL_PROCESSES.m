@@ -41,7 +41,7 @@ ann_dir='~/NickTempFolder/ann_1.1.2/bin/';
 %%% Different steps of the procedure
 
 command=['cat ',root_dir,'scripts/SebaStartup.R ',root_dir,'nick/PreprocessImages.R | R --vanilla --args ',...
-    original_images_dir,' ',processed_images_dir];
+	original_images_dir,' ',processed_images_dir];
 
 % Anisotropic filtering and tubing
 system(command);

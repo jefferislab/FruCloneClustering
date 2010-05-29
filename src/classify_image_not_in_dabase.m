@@ -51,9 +51,9 @@ p1.vect2=p.vect2;
 
 if nargin==7
 
-    count2=zeros(1,40)+10^(-20);
-    score2=zeros(1,40);
-    MI_threshold2=[0.005:0.005:0.1]*5;
+	count2=zeros(1,40)+10^(-20);
+	score2=zeros(1,40);
+	MI_threshold2=[0.005:0.005:0.1]*5;
 end
 
 for i=1:length(s)
@@ -63,58 +63,58 @@ for i=1:length(s)
 % clone. The matrix y indicates which dots matched dots in other
 % images.
 
-    h=dir([image_properties_dir imageList{template_images_ind(i)},'*properties.mat']);
-    load([image_properties_dir h(1).name]);
+	h=dir([image_properties_dir imageList{template_images_ind(i)},'*properties.mat']);
+	load([image_properties_dir h(1).name]);
 
-    [m1 n1]=size(p.gamma2);
+	[m1 n1]=size(p.gamma2);
 
-    y=zeros(n1,1,'uint8');
+	y=zeros(n1,1,'uint8');
 
-    ind=find(s{i}.MI>.005);
-    p2=[];
-    p2.gamma2=p.gamma2(:,ind);
-    p2.vect2=p.vect2(:,ind);
+	ind=find(s{i}.MI>.005);
+	p2=[];
+	p2.gamma2=p.gamma2(:,ind);
+	p2.vect2=p.vect2(:,ind);
 
-    [dist1,dotProd1,dist2,dotProd2]=compareImages(p2,p1,text_dir,ann_dir);
+	[dist1,dotProd1,dist2,dotProd2]=compareImages(p2,p1,text_dir,ann_dir);
 
-    clear p2
+	clear p2
 
-    matchedPoints=ind(find((dist1<5 & dotProd1>cosd(20)) | (dist2<5 & dotProd2>cosd(20))));
+	matchedPoints=ind(find((dist1<5 & dotProd1>cosd(20)) | (dist2<5 & dotProd2>cosd(20))));
 
-    y(matchedPoints)=1;
-
-
-
-    for j=1:40
-
-        if j<=20
-
-            ind=find(s{i}.MI>=MI_threshold(j));
-            count(j)=count(j)+length(ind);
-            score(j)=score(j)+sum(y(ind));
-
-            if nargin==7
-                ind=find(s2{i}.MI>=MI_threshold2(j));
-                count2(j)=count2(j)+length(ind);
-                score2(j)=score2(j)+sum(y(ind));
-            end
-
-        else
-
-            modified_MI=max(0,s{i}.MI'-MI_threshold(j-20));
-            count(j)=count(j)+sum(modified_MI);
-            score(j)=score(j)+sum(single(y(:)).*modified_MI);
-
-            if nargin==8
-                modified_MI=max(0,s2{i}.MI'-MI_threshold2(j-20));
-                count2(j)=count2(j)+sum(modified_MI);
-                score2(j)=score2(j)+sum(single(y(:)).*modified_MI);
-            end
+	y(matchedPoints)=1;
 
 
-        end
 
-    end
+	for j=1:40
+
+		if j<=20
+
+			ind=find(s{i}.MI>=MI_threshold(j));
+			count(j)=count(j)+length(ind);
+			score(j)=score(j)+sum(y(ind));
+
+			if nargin==7
+				ind=find(s2{i}.MI>=MI_threshold2(j));
+				count2(j)=count2(j)+length(ind);
+				score2(j)=score2(j)+sum(y(ind));
+			end
+
+		else
+
+			modified_MI=max(0,s{i}.MI'-MI_threshold(j-20));
+			count(j)=count(j)+sum(modified_MI);
+			score(j)=score(j)+sum(single(y(:)).*modified_MI);
+
+			if nargin==8
+				modified_MI=max(0,s2{i}.MI'-MI_threshold2(j-20));
+				count2(j)=count2(j)+sum(modified_MI);
+				score2(j)=score2(j)+sum(single(y(:)).*modified_MI);
+			end
+
+
+		end
+
+	end
 
 
 end
@@ -124,7 +124,7 @@ clear y
 
 score=score./count;
 if nargin==7
-    score2=score2./count2;
+	score2=score2./count2;
 else
-    score2=ones(size(score));
+	score2=ones(size(score));
 end

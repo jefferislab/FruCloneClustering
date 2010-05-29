@@ -12,35 +12,35 @@ s={};
 
 for i=1:length(fileNamesIN)
 
-    h=dir([matched_dots_dir, fileNamesIN{i},'*matchedPoints.mat']);
-    load([matched_dots_dir h(1).name],'y','imageList');
+	h=dir([matched_dots_dir, fileNamesIN{i},'*matchedPoints.mat']);
+	load([matched_dots_dir h(1).name],'y','imageList');
 
 
-    if nargin==2 & i==1
-        fileNamesOUT=setdiff(imageList,fileNamesIN);
-    end
+	if nargin==2 & i==1
+		fileNamesOUT=setdiff(imageList,fileNamesIN);
+	end
 % during the first iteration, set up the index list
 % imageList is the list of file names that make up each XXXmatchedPoints.mat
 % file
 
-    if i==1
+	if i==1
 
-        indIN=zeros(1,length(fileNamesIN));
-        indOUT=zeros(1,length(fileNamesOUT));
+		indIN=zeros(1,length(fileNamesIN));
+		indOUT=zeros(1,length(fileNamesOUT));
 
-        for j=1:length(fileNamesIN)
+		for j=1:length(fileNamesIN)
 % n=find(fileNamesIN{j}=='-',1,'first');
 % name=fileNamesIN{j}(1:n-1);
-            indIN(j)=find(strcmp(fileNamesIN{j},imageList));
-        end
+			indIN(j)=find(strcmp(fileNamesIN{j},imageList));
+		end
 
-        for j=1:length(fileNamesOUT)
+		for j=1:length(fileNamesOUT)
 % n=find(fileNamesOUT{j}=='-',1,'first');
 % name=fileNamesOUT{i}(1:n-1);
-            indOUT(j)=find(strcmp(fileNamesOUT{j},imageList));
-        end
+			indOUT(j)=find(strcmp(fileNamesOUT{j},imageList));
+		end
 
-    end
+	end
 
 
 % y is a matrix in each XXXmatchedPoints.mat file where each dot is
@@ -49,39 +49,39 @@ for i=1:length(fileNamesIN)
 
 
 % remove the comparaison between the image and itself 
-    indIN_current=indIN([1:i-1 i+1:end]);
+	indIN_current=indIN([1:i-1 i+1:end]);
 
 
 
-    yIN=y(:,indIN_current);
-    yOUT=y(:,indOUT);
-    n1=length(indIN_current);
-    n2=length(indOUT);
+	yIN=y(:,indIN_current);
+	yOUT=y(:,indOUT);
+	n1=length(indIN_current);
+	n2=length(indOUT);
 
-    [m dummy]=size(yIN);
+	[m dummy]=size(yIN);
 
-    s{i}.MI=zeros(1,m,'single');
+	s{i}.MI=zeros(1,m,'single');
 %s{i}.y=y;
 
 
 
-    t11=single(sum(yIN,2)/(n1+n2))+10^(-20);
+	t11=single(sum(yIN,2)/(n1+n2))+10^(-20);
 
-    t01=single(n1/(n1+n2))-single(sum(yIN,2)/(n1+n2))+10^(-20);
+	t01=single(n1/(n1+n2))-single(sum(yIN,2)/(n1+n2))+10^(-20);
 
-    t10=single(sum(yOUT,2)/(n1+n2))+10^(-20);
+	t10=single(sum(yOUT,2)/(n1+n2))+10^(-20);
 
-    t00=single(n2/(n1+n2))-single(sum(yOUT,2)/(n1+n2))+10^(-20);
+	t00=single(n2/(n1+n2))-single(sum(yOUT,2)/(n1+n2))+10^(-20);
 
-    s{i}.MI(:)=s{i}.MI(:)+(t11.*log2(t11./((t11+t10).*(t11+t01))));
-    s{i}.MI(:)=s{i}.MI(:)+(t10.*log2(t10./((t11+t10).*(t10+t00))));
-    s{i}.MI(:)=s{i}.MI(:)+(t01.*log2(t01./((t00+t01).*(t11+t01))));
-    s{i}.MI(:)=s{i}.MI(:)+(t00.*log2(t00./((t00+t01).*(t10+t00))));
+	s{i}.MI(:)=s{i}.MI(:)+(t11.*log2(t11./((t11+t10).*(t11+t01))));
+	s{i}.MI(:)=s{i}.MI(:)+(t10.*log2(t10./((t11+t10).*(t10+t00))));
+	s{i}.MI(:)=s{i}.MI(:)+(t01.*log2(t01./((t00+t01).*(t11+t01))));
+	s{i}.MI(:)=s{i}.MI(:)+(t00.*log2(t00./((t00+t01).*(t10+t00))));
 
-    s{i}.image=fileNamesIN{i};
+	s{i}.image=fileNamesIN{i};
 
 
-    clear y
+	clear y
 
 end
 

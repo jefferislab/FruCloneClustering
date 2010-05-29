@@ -45,36 +45,36 @@ for i=1:length(s)
 % clone. The matrix y indicates which dots matched dots in other
 % images.
 
-    h=dir([matchedPoints_dir imageList{template_images_ind(i)},'-*matchedPoints.mat']);
-    load([matchedPoints_dir h(1).name],'y');
+	h=dir([matchedPoints_dir imageList{template_images_ind(i)},'-*matchedPoints.mat']);
+	load([matchedPoints_dir h(1).name],'y');
 
 %remove any images form matched points list that were deemed bad
 
-    for k=1:length(test_image_ind)
+	for k=1:length(test_image_ind)
 
-        if test_image_ind(k)~=template_images_ind(i)
+		if test_image_ind(k)~=template_images_ind(i)
 
-            for j=1:40
+			for j=1:40
 
-                if j<=20
+				if j<=20
 
-                    ind=find(s{i}.MI>=MI_threshold(j));
-                    count(k,j)=count(k,j)+length(ind);
-                    score(k,j)=score(k,j)+sum(y(ind,test_image_ind(k)));
+					ind=find(s{i}.MI>=MI_threshold(j));
+					count(k,j)=count(k,j)+length(ind);
+					score(k,j)=score(k,j)+sum(y(ind,test_image_ind(k)));
 %     mp{j}=[mp{j} y(ind,test_image_ind)'];
-                else
+				else
 
-                    modified_MI=max(0,s{i}.MI'-MI_threshold(j-20));
-                    count(k,j)=count(k,j)+sum(modified_MI);
-                    score(k,j)=score(k,j)+sum(single(y(:,test_image_ind(k))).*modified_MI);
+					modified_MI=max(0,s{i}.MI'-MI_threshold(j-20));
+					count(k,j)=count(k,j)+sum(modified_MI);
+					score(k,j)=score(k,j)+sum(single(y(:,test_image_ind(k))).*modified_MI);
 
 
-                end
+				end
 
-            end
-        end
+			end
+		end
 
-    end
+	end
 
 
 end
