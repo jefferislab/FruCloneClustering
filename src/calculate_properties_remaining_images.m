@@ -1,12 +1,34 @@
-function calculate_properties_remaining_images(input_dir,output_dir)
+function calculate_properties_remaining_images(input_dir,output_dir,alpha_thresh,mask_file,vox_dims)
 % CALCULATE_PROPERTIES_REMAINING_IMAGES - find tangent vector, alpha
+%
 % Function takes reformatted images and calculates:
 % principal eigenvector (tangent vector)
 % alpha (alpha=1 -> one-dimenionsal, alpha=0 -> isotropic)
 % from the moment of inertia.
+%
+% Optionally: save only points with alpha > alpha_thresh
+% Optionally: supply a mask_file (currently only tif)
+% and voxel dimensions (a vector containing physical size in each axis)
+%
 % The input files are XXX_reformated.mat and output files are XXX_properties.mat.
 %
 % See also extract_properties
+
+if nargin < 3
+	alpha_thresh = [];
+end
+if nargin >= 4
+	mask = load3dtif(mask_file);
+else
+	% Set default to empty array
+	mask = [];
+end
+
+if nargin < 5
+	% default to size that Nick was assuming
+	% in fact Z step was 1.066
+	vox_dims=[384/315.13 384/315.13 1];
+end
 
 % Make sure that dirs have a trailing slash
 input_dir=fullfile(input_dir,filesep);
