@@ -12,6 +12,10 @@ function [ind_union]=compareImages_ANNTree(query,template,anntree,distance_thres
 % Output:
 %   indices of matching points from query
 
+if nargin<3
+	anntree = [];
+end
+
 if nargin<4
 	distance_thresh = 5;
 end
@@ -24,7 +28,11 @@ end
 
 % ANN options
 % knn = 1, eps = 0 (exact), asm = 0 (no self matches);
-[NNG,distances] = ksearch(anntree,query.gamma2,1,0,0);
+if isempty(anntree)
+	[NNG,distances] = ann_meta_wrapper(template.gamma2,1,query.gamma2);
+else
+	[NNG,distances] = ksearch(anntree,query.gamma2,1,0,0);
+end
 
 ind=find(distances<distance_thresh);
 
@@ -38,7 +46,11 @@ ind1=ind(dot_prod>cosd(angle_thresh));
 query.gamma2(2,:)=315.13-query.gamma2(2,:);
 query.vect2(1,:)=-query.vect2(1,:);
 
-[NNG,distances] = ksearch(anntree,query.gamma2,1,0,0);
+if isempty(anntree)
+	[NNG,distances] = ann_meta_wrapper(template.gamma2,1,query.gamma2);
+else
+	[NNG,distances] = ksearch(anntree,query.gamma2,1,0,0);
+end
 
 ind=find(distances<distance_thresh);
 
