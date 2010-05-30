@@ -14,9 +14,11 @@ function calculate_properties_remaining_images(input_dir,output_dir,alpha_thresh
 %
 % See also extract_properties
 
+
 if nargin < 3
 	alpha_thresh = [];
 end
+
 if nargin >= 4
 	mask = load3dtif(mask_file);
 else
@@ -28,11 +30,16 @@ if nargin < 5
 	% default to size that Nick was assuming
 	% in fact Z step was 1.066
 	vox_dims=[384/315.13 384/315.13 1];
+	% TODO: supply mask in a form that retains calibration information
 end
 
 % Make sure that dirs have a trailing slash
 input_dir=fullfile(input_dir,filesep);
 output_dir=fullfile(output_dir,filesep);
+
+if ~exist(output_dir,'dir')
+	mkdir(output_dir);
+end
 
 % NB Second asterisk permits spelling variants
 infiles=dir([input_dir,'*_reformat*ed.mat']);
