@@ -1,4 +1,4 @@
-function [score,MI_threshold,score2]=classify_image_not_in_database(s,template_images_ind,imageList,test_image,image_properties_dir,MI_multiplier,s2);
+function [score,MI_threshold,score2]=classify_image_not_in_database(s,template_images_ind,imageList,test_image,image_properties_dir,MI_multiplier,s2)
 
 % This function is used to determine whether an image contains a clone of
 % interest. This version uses the masked verison of the image. 
@@ -32,32 +32,23 @@ function [score,MI_threshold,score2]=classify_image_not_in_database(s,template_i
 %                thresholds defined above and rectifying.
 %
 
-ann_dir='~/src/ann_1.1.2/bin/'; 
-text_dir='/Users/nmasse/Projects/imageProcessing/image_classification/';
-
-MI_threshold=[0.005:0.005:0.1]*MI_multiplier;
+MI_threshold=(0.005:0.005:0.1)*MI_multiplier;
 
 count=zeros(1,40)+10^(-20);
 score=zeros(1,40);
-
-
 
 h=dir([image_properties_dir test_image,'*properties.mat']);
 load([image_properties_dir h(1).name]);
 p1.gamma2=p.gamma2;
 p1.vect2=p.vect2;
 
-
-
 if nargin==7
-
 	count2=zeros(1,40)+10^(-20);
 	score2=zeros(1,40);
-	MI_threshold2=[0.005:0.005:0.1]*5;
+	MI_threshold2=(0.005:0.005:0.1)*5;
 end
 
 for i=1:length(s)
-
 
 % load the XXXmatchedPoints.mat file of the ith image containing the
 % clone. The matrix y indicates which dots matched dots in other
@@ -66,7 +57,7 @@ for i=1:length(s)
 	h=dir([image_properties_dir imageList{template_images_ind(i)},'*properties.mat']);
 	load([image_properties_dir h(1).name]);
 
-	[m1 n1]=size(p.gamma2);
+	[m1 n1]=size(p.gamma2); %#ok<ASGLU>
 
 	y=zeros(n1,1,'uint8');
 
@@ -75,14 +66,13 @@ for i=1:length(s)
 	p2.gamma2=p.gamma2(:,ind);
 	p2.vect2=p.vect2(:,ind);
 
-	[dist1,dotProd1,dist2,dotProd2]=compareImages(p2,p1,text_dir,ann_dir);
+	[dist1,dotProd1,dist2,dotProd2]=compareImages_ANNTree(p2,p1);
 
 	clear p2
 
-	matchedPoints=ind(find((dist1<5 & dotProd1>cosd(20)) | (dist2<5 & dotProd2>cosd(20))));
+	matchedPoints=ind((dist1<5 & dotProd1>cosd(20)) | (dist2<5 & dotProd2>cosd(20)));
 
 	y(matchedPoints)=1;
-
 
 
 	for j=1:40
