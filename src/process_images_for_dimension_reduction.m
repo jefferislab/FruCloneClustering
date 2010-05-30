@@ -33,9 +33,9 @@ for i=1:length(segmented_data)
 	
 	% Perform dimension reduction
 	[dots,dim,Prob,lam,coords]=image_dimension_reduction(...
-	 fullfile(input_dir,segmented_data(i).name)); %#ok<*NASGU,ASGLU>
-	save(fullfile(output_dir,[name,'_dimension_reduced.mat'])...
-	 ,'dots','Prob','lam','dim','coords','-v7')
+	 [input_dir,segmented_data(i).name]); %#ok<*NASGU,ASGLU>
+	save([output_dir,current_image,'_dimension_reduced.mat'],...
+	 'dots','Prob','lam','dim','coords','-v7');
 	removelock([output_dir,current_image,'-in_progress.mat']);
 
 end
