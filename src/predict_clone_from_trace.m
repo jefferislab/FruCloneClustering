@@ -1,79 +1,45 @@
-function predict_clone_from_trace(trace_file,clone_classifier,register_option,registration_dir);
-
+function [sortedscores, sortedclones] = predict_clone_from_trace(trace_file,clone_classifier,registration)
+% PREDICT_CLONE_FROM_TRACE - Match tracing against clone image database
+% 
+% Usage: 
+% [sortedscores, sortedclones] = ...
+%	predict_clone_from_trace(trace_file,clone_classifier,registration)
+% 
+% trace_file     - CSV or space/tab delimited set of 3D points
+% clone_classier - .mat file created by create_image_classifier
+% registration   - optional CMTK registration 
+%
+% See also create_image_classifier
 
 % Choose register_option=1 to reformat coordinates
-% clone_classier is a .mat file created by create_image_classifier.m
 
 disp('Location of gregxform unix command...');
 gregxform_dir='/Applications/IGSRegistrationTools/bin/'
 
-disp('Location of ann command...');
-ann_dir='~/dev/ann_1.1.2/bin/'
-
 disp('Location of image properties (ie SAKU1-1_properties.mat...)');
 image_properties_dir='~/NickTempFolder/imageProperties/'
 
-
 % Load classifier structure with mutual information data
-load clone_classifier
+load(clone_classifier);
 
-clones={};
-
+clones=cell(1,length(x));
 for i=1:length(x)
 	clones{i}=x{i}.clone;
 end
 
-q=999;
-
 % Read in trace file
-x1=dlmread(trace_file);
+y=dlmread(trace_file);
 
-% Optionally transform query points based on a registration file
-if register_option==1 & nargin==3
-	error('Must specify registration directory');
-elseif register_option==1 & nargin==4
-
-	save(['InputCoords',num2str(q),'.txt'],'x1','-ascii');
-
-	command=[gregxform_dir,'gregxform ',reg,' -f',' <InputCoords',num2str(q),'.txt >OutputCoords',num2str(q),'.txt'];
-
-	system(command);
-
-	[f1 f2 f3]=textread(['OutputCoords',num2str(q),'.txt'],'%s %s %s');
-
-	y=zeros(length(f1),3);
-
-	for i=1:length(f1);
-
-		if f1{i}(1)~='E'
-
-			y(i,1)=str2num(f1{i});
-			y(i,2)=str2num(f2{i});
-			y(i,3)=str2num(f3{i});
-
-		end
-
-	end
-
-	ind=find(y(:,1)>0);
-
-	y=y(ind,:);
-
-	delete(['InputCoords',num2str(q),'.txt'])
-	delete(['OutputCoords',num2str(q),'.txt'])
-
+% Transform points if necessary
+if nargin>2
+	y=reformat_coords(x1,registration);
 end
 
-
-% rename var (FIXME)
-y=x1;
-clear x1
-
 % Calculate tangent vectors for query points
-[alpha,vect]=extract_properties(y,ann_dir,q);
+[alpha,vect]=extract_properties(y);
 
-MI_threshold=[0.005:0.005:0.1];
-MI_threshold2=[0.005:0.005:0.1]*5;
+MI_threshold=0.005:0.005:0.1;
+MI_threshold2=(0.005:0.005:0.1)*5;
 count=zeros(1,length(x))+10^(-20);
 score=zeros(1,length(x));
 % count2=zeros(1,40)+10^(-20);
@@ -142,6 +108,8 @@ score=score./count;
 
 [dummy ind]=sort(score,'descend');
 
+sortedscores = score(ind);
+sortedclones = clones{ind};
 
 disp('The top five clone scores...');
 disp(' ')
