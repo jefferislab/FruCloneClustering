@@ -8,15 +8,12 @@ function [s]=build_MI_structure(matched_dots_dir,fileNamesIN,fileNamesOUT)
 
 s={};
 
-
-
 for i=1:length(fileNamesIN)
 
 	h=dir([matched_dots_dir, fileNamesIN{i},'*matchedPoints.mat']);
 	load([matched_dots_dir h(1).name],'y','imageList');
 
-
-	if nargin==2 & i==1
+	if nargin==2 && i==1
 		fileNamesOUT=setdiff(imageList,fileNamesIN);
 	end
 % during the first iteration, set up the index list
@@ -29,14 +26,10 @@ for i=1:length(fileNamesIN)
 		indOUT=zeros(1,length(fileNamesOUT));
 
 		for j=1:length(fileNamesIN)
-% n=find(fileNamesIN{j}=='-',1,'first');
-% name=fileNamesIN{j}(1:n-1);
 			indIN(j)=find(strcmp(fileNamesIN{j},imageList));
 		end
 
 		for j=1:length(fileNamesOUT)
-% n=find(fileNamesOUT{j}=='-',1,'first');
-% name=fileNamesOUT{i}(1:n-1);
 			indOUT(j)=find(strcmp(fileNamesOUT{j},imageList));
 		end
 
@@ -51,8 +44,6 @@ for i=1:length(fileNamesIN)
 % remove the comparaison between the image and itself 
 	indIN_current=indIN([1:i-1 i+1:end]);
 
-
-
 	yIN=y(:,indIN_current);
 	yOUT=y(:,indOUT);
 	n1=length(indIN_current);
@@ -61,10 +52,8 @@ for i=1:length(fileNamesIN)
 	[m dummy]=size(yIN);
 
 	s{i}.MI=zeros(1,m,'single');
-%s{i}.y=y;
 
-
-
+	
 	t11=single(sum(yIN,2)/(n1+n2))+10^(-20);
 
 	t01=single(n1/(n1+n2))-single(sum(yIN,2)/(n1+n2))+10^(-20);
@@ -79,7 +68,6 @@ for i=1:length(fileNamesIN)
 	s{i}.MI(:)=s{i}.MI(:)+(t00.*log2(t00./((t00+t01).*(t10+t00))));
 
 	s{i}.image=fileNamesIN{i};
-
 
 	clear y
 
