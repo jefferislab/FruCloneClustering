@@ -1,42 +1,36 @@
-function y=reformat_coords(name,x,q,gregxform_dir,registration_dir,image_data);
+function y=reformat_coords(coords,registration,gregxform_dir)
+%REFORMAT_COORDS transform a 3 x N matrix using a CMTK registration file
+% Input:
+% coords        - 3 x N matrix of XYZ coordinates in original image space
+% registration  - path to CMTK registration file or .list dir containing it
+% gregxform_dir - location of registration binary
+%                 defaults to /Applications/IGSRegistration/bin/
+% 
+% Output: 3 x N matrix of points in the template registration space
 
+if nargin<3
+	gregxform_dir = '/Applications/IGSRegistration/bin/';
+end
 
-%imageDir='/Volumes/JData/JPeople/Nick/FruCloneClustering/images/';
-%imageDir='~/Projects/imageProcessing/';
-%registrationDir='/Volumes/JData/JPeople/Sebastian/fruitless/Registration/IS2Reg/Registration/warp/';
-%registrationDir='~/Registration/warp/';
-
-
-
-
-%in the original implementation, images were all given a depth of 152
-%images. Here we scale back to original size.
-%zScale=image_data.x.NumImages/152;
-x(:,3)=x(:,3)*image_data.Delta(3);
-
-x(:,1)=x(:,1)*image_data.Delta(1);
-% NB mirror image in Y to conform to matlab's coordinate system which is 
-% left handed (starting bottom, left, front vs top, left front in ImageJ)
-x(:,2)=(image_data.Height-x(:,2))*image_data.Delta(2);
-
-
-save(['InputCoords',num2str(q),'.txt'],'x','-ascii');
-
-reg=[registration_dir,'IS2_',name,'_01_warp_m0g80c8e1e-1x26r4.list'];
-
+% change to N x 3 columnar organisation expected by gregxform
+coords=coords';
 
 % TODO: Some new versions of gregxform were bailing out due to an assertion
 % failure in GetJacobian:
-% Assertion failed: ((f[dim] >= 0.0) && (f[dim] <= 1.0)), function GetJacobian, file /Users/jefferis/dev/cmtk/core/libs/Base/cmtkSplineWarpXformJacobian.cxx, line 228.
+% Assertion failed: ((f[dim] >= 0.0) && (f[dim] <= 1.0)), function GetJacobian, 
+% file /Users/jefferis/dev/cmtk/core/libs/Base/cmtkSplineWarpXformJacobian.cxx, line 228.
 % Abort trap
 % Need to fix/discuss with Torsten Rohlfing
 
-%command=['/Users/nmasse/src/cmtk/core/build/bin/gregxform ',reg,' -f',' <InputCoords',num2str(q),'.txt >OutputCoords',num2str(q),'.txt'];
-command=[gregxform_dir,'gregxform ',reg,' ',' <InputCoords',num2str(q),'.txt >OutputCoords',num2str(q),'.txt'];
+infile = [tempname '-input.txt'];
+outfile = [tempname '-output.txt'];
 
+dlmwrite(infile,coords,'\t');
+
+command=[gregxform_dir 'gregxform ' registration ' <' infile ' >' outfile];
 system(command);
 
-[f1 f2 f3]=textread(['OutputCoords',num2str(q),'.txt'],'%s %s %s');
+[f1 f2 f3]=textread(infile,'%s %s %s');
 
 y=zeros(length(f1),3);
 
@@ -44,20 +38,19 @@ for i=1:length(f1);
 
 	if f1{i}(1)~='E'
 
-		y(i,1)=str2num(f1{i});
-		y(i,2)=str2num(f2{i});
-		y(i,3)=str2num(f3{i});
+		y(i,1)=str2double(f1{i});
+		y(i,2)=str2double(f2{i});
+		y(i,3)=str2double(f3{i});
 
 	end
 
 end
 
-ind=find(y(:,1)>0);
+% restrict to points with valid X coord and transpose back to 3 x N
+y=y(y(:,1)>0,:)';
 
-y=y(ind,:);
-
-delete(['InputCoords',num2str(q),'.txt'])
-delete(['OutputCoords',num2str(q),'.txt'])
+delete(infile);
+delete(outfile);
 
 end
 
