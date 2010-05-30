@@ -28,9 +28,9 @@ if ~isempty(lockdir)
 		if createDirectories
 			% nb mkdir is recursive
 			mkdir(lockdir);
+		else
+			error('Lock directory for lockfile %s does not exist',lockfile);
 		end
-	else
-		error('Lock directory for lockfile %s does not exist',lockfile);
 	end
 end
 
