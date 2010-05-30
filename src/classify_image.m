@@ -31,7 +31,7 @@ function [score,MI_threshold]=classify_image(s,template_images_ind,imageList,tes
 %
 
 
-MI_threshold=[0.005:0.005:0.1]*MI_multiplier;
+MI_threshold=(0.005:0.005:0.1)*MI_multiplier;
 
 count=zeros(length(test_image_ind),40)+10^(-20);
 score=zeros(length(test_image_ind),40);
@@ -57,7 +57,7 @@ for i=1:length(s)
 
 					ind=find(s{i}.MI>=MI_threshold(j));
 					count(k,j)=count(k,j)+length(ind);
-					score(k,j)=score(k,j)+sum(y(ind,test_image_ind(k)));
+					score(k,j)=score(k,j)+sum(y(ind,test_image_ind(k))); %#ok<*NODEF>
 
 				else
 

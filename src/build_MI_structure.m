@@ -6,7 +6,7 @@ function [s]=build_MI_structure(matched_dots_dir,fileNamesIN,fileNamesOUT)
 %names that all contain the same clone, and those that don't, and this function will identify how
 %informative each dots in each these files is of the clone.
 
-s={};
+s=cell(1,length(fileNamesIN));
 
 for i=1:length(fileNamesIN)
 
@@ -35,21 +35,19 @@ for i=1:length(fileNamesIN)
 
 	end
 
-
 % y is a matrix in each XXXmatchedPoints.mat file where each dot is
 % described by a row. A one in a column mean that dot in the image matched
 % another dot in the image specified by the column.
 
-
 % remove the comparaison between the image and itself 
 	indIN_current=indIN([1:i-1 i+1:end]);
 
-	yIN=y(:,indIN_current);
+	yIN=y(:,indIN_current); %#ok<NODEF>
 	yOUT=y(:,indOUT);
 	n1=length(indIN_current);
 	n2=length(indOUT);
 
-	[m dummy]=size(yIN);
+	[m dummy]=size(yIN); %#ok<NASGU>
 
 	s{i}.MI=zeros(1,m,'single');
 
@@ -72,6 +70,3 @@ for i=1:length(fileNamesIN)
 	clear y
 
 end
-
-
-

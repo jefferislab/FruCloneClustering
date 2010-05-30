@@ -1,4 +1,4 @@
-function score=compare_image_to_all_clones(brain_name);
+function score=compare_image_to_all_clones(brain_name)
 
 
 matchedPoints_dir='~/Projects/imageProcessing/imageProperties/';
@@ -13,7 +13,6 @@ score=zeros(m,40);
 for i=1:m
 
 	disp([num2str(i),'. Comparing brain to clone ',x{i}.clone]);
-
 
 
 	template_images_ind=[];
