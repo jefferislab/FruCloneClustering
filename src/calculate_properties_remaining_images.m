@@ -86,17 +86,20 @@ for i=1:length(infiles)
 
 	end
 
+	% This part removes any points outside of a mask that covers the
+	% central brain and all of its tracts. It also removes points with
+	% p.alpha (eigenvalue 1 -eigenvalue 2)/sum(eigenvalues)) below 0.25
+	% (by default) that are not part of a linear structure.
+
 	if ~isempty(mask)
+		indices=coords2ind(mask,vox_dims,p.gamma1);
 
-		% This part removes any points outside of a mask that covers the
-		% central brain and all of its tracts. It also removes points with
-		% p.alpha (eigenvalue 1 -eigenvalue 2)/sum(eigenvalues)) below 0.25.
-		% These are points that are not part of a linear structure.
-
-		% TODO: make the mask a parameter and supply it in a form that
-		% retains calibration information
-		maskInd=coords2indices(mask,vox_dims,p.gamma1);
-
+		if isempty(alpha_thresh)
+			maskInd = x(indices)>0;
+		else
+			maskInd = x(indices)>0 & p.alpha>alpha_thresh;
+		end
+		
 		p.gamma2=p.gamma1(:,maskInd);
 		p.vect2=p.vect(:,maskInd);
 	elseif ~isempty(alpha_thresh)
@@ -110,28 +113,39 @@ for i=1:length(infiles)
 end
 end
 
-function indices = coords2indices(img,voxdims,coords)
-% COORDS2INDICES returns the image indices of a set of coordinates
-imsize=size(img);
+function indices = coords2ind(img,voxdims,coords)
+% COORDS2IND - find 1D indices into 3D image of XYZ coordinates
+% 
+% Input:
+% img     - 3d img array
+% voxdims - vector of 3 voxel dimensions (width, height, depth, dx,dy,dz)
+% coords  - 3xN XYZ triples 
+% 
+% indices  - 1D indices into the image array
+% 
+% NB for the time being no reordering of image axes is done
+%
+% See also SUB2IND
 
-g=coords;
+imsize=size(img);
+if(length(imsize)) ~= 3
+	error('coords2ind only handles 3d data');
+end
+	
+pixcoords=zeros(size(coords));
 
 % first convert from physical coords to pixel coords
-g(1,:)=round(coords(1,:)/voxdims(1));
-g(2,:)=round(coords(2,:)/voxdims(2));
-g(3,:)=round(coords(3,:)/voxdims(3));
+pixcoords(1,:)=round(coords(1,:)/voxdims(1));
+pixcoords(2,:)=round(coords(2,:)/voxdims(2));
+pixcoords(3,:)=round(coords(3,:)/voxdims(3));
 
 % make sure no points are out of range
-g(1,:)=min(imsize(1),max(1,g(1,:)));
-g(2,:)=min(imsize(2),max(1,g(2,:)));
-g(3,:)=min(imsize(3),max(1,g(3,:)));
+pixcoords(1,:)=min(imsize(1),max(1,pixcoords(1,:)));
+pixcoords(2,:)=min(imsize(2),max(1,pixcoords(2,:)));
+pixcoords(3,:)=min(imsize(3),max(1,pixcoords(3,:)));
+% TODO: convert pixel coords to array subscripts by swapping X and Y axes
+% and flipping Y?  Either the image or these coords must be flipped
 
-maskInd=false(length(coords));
-
-%FIXME UNFINISHED
-for j=1:length(coords)
-	% TODO: Nick: what's going on here?
-	x(g(2,j),g(1,j),g(3,j))>0 & p.alpha(j)>.25;
-	maskInd(j)=1;
-end
+% convert to 1d indices
+indices=sub2ind(imsize,pixcoords(1,:),pixcoords(2,:),pixcoords(3,:));
 end
