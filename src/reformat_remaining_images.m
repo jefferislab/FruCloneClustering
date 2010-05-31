@@ -81,8 +81,7 @@ for i=1:length(h)
 			% left handed (starting bottom, left, front vs top, left front in ImageJ)
 			y(:,2)=(image_data.Height-y(:,2))*image_data.Delta(2);
 
-			dotsReformatted{j}=reformat_coords(y,registration,...
-				image_data,gregxform_dir);
+			dotsReformatted{j}=reformat_coords(y,registration,gregxform_dir);
 		end
 	end
 
