@@ -58,7 +58,7 @@ segment_remaining_images(processed_images_dir,segmented_images_dir)
 process_images_for_dimension_reduction(segmented_images_dir,dimension_reduced_dir);
 
 % Refomat onto template brain
-reformat_remaining_images(dimension_reduced_dir,reformatted_dir,registration_dir,gregxform_dir,processed_images_dir);
+reformat_remaining_images(dimension_reduced_dir,reformatted_dir,registration_dir,processed_images_dir,gregxform_dir);
 
 calculate_properties_remaining_images(reformatted_dir,properties_dir);
 
