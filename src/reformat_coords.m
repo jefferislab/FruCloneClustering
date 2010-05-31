@@ -12,6 +12,10 @@ if nargin<3
 	gregxform_dir = '/Applications/IGSRegistration/bin/';
 end
 
+if ~exist(registration,'file')
+	error('Unable to read registration %s',registration);
+end
+
 % change to N x 3 columnar organisation expected by gregxform
 coords=coords';
 
