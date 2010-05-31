@@ -1,7 +1,7 @@
 function [alpha,vect]=extract_properties(points,k)
-% extract_properties_gj - find principal eigenvector and dimensionality of points
+% extract_properties - find principal eigenvector and dimensionality of points
 %
-% Usage: [alpha,vect]=extract_properties_gj(points,[k])
+% Usage: [alpha,vect]=extract_properties(points,[k])
 %
 % Input:
 %   points - (d)x(N) matrix of d-dimensional vectors representing N points

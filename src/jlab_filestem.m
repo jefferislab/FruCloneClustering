@@ -1,5 +1,5 @@
 function [filestem] = jlab_filestem( filename, sep )
-% jlab_filestem: return stem of image name up to first underscore (by default)
+% JLAB_FILESTEM return stem of image name up to first underscore (by default)
 %   sep = '_' by default
 %
 % returns the original filename if sep does not occur

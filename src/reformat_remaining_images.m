@@ -65,7 +65,7 @@ for i=1:length(h)
 	for j=1:length(dots)
 		y=dots{j};
 		if ~isempty(y)
-			% FIXME: Is this axis flippinf really correct?
+			% FIXME: Is this axis flipping really correct?
 			% And should it be happening here anyway?
 			% In general flipping input image data may be preferable
 			% Also when should coords of points be in pixels vs microns?
