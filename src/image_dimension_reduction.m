@@ -43,8 +43,8 @@ for z1=1:length(connectedRegions);
 	indX=find(L==connectedRegions(z1));
 
 	% Convert indices to coords
-	xcoords=zeros(3,length(indX),'single');
-	[xcoords(1,:) xcoords(2,:) xcoords(3,:)]=ind2sub(size(x),indX);
+%	xcoords=ind2coord(size(x),indX,voxdims,axperm);
+	xcoords=ind2coord(size(x),indX,[0.9225 0.9225 1.0592]);
 
 	% Swap commented line to make a movie
 	moviefile='';
