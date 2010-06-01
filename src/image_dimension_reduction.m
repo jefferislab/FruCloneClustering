@@ -1,4 +1,4 @@
-function [dots,dim,Prob,lam,coords]=image_dimension_reduction(file_name,voxdims,min_points_per_region,no_iterations)
+function [dots,dim,Prob,lam,coords]=image_dimension_reduction(file_name,min_points_per_region,no_iterations)
 % Attempts to captures tubular structure in dot collections
 %
 % Input: matlab file containing 1 or more sets of connected dots
