@@ -1,4 +1,4 @@
-function calculate_properties_remaining_images(input_dir,output_dir,alpha_thresh,mask_file,vox_dims)
+function calculate_properties_remaining_images(input_dir,output_dir,alpha_thresh,mask_file)
 % CALCULATE_PROPERTIES_REMAINING_IMAGES - find tangent vector, alpha
 %
 % Function takes reformatted images and calculates:
@@ -8,7 +8,6 @@ function calculate_properties_remaining_images(input_dir,output_dir,alpha_thresh
 %
 % Optionally: save only points with alpha > alpha_thresh
 % Optionally: supply a mask_file (currently only tif)
-% and voxel dimensions (a vector containing physical size in each axis)
 %
 % The input files are XXX_reformated.mat and output files are XXX_properties.mat.
 %
@@ -20,17 +19,11 @@ if nargin < 3
 end
 
 if nargin >= 4
+	%FIXME make sure this mask is loaded up with correct axis orientation
 	mask = load3dtif(mask_file);
 else
 	% Set default to empty array
 	mask = [];
-end
-
-if nargin < 5
-	% default to size that Nick was assuming
-	% in fact Z step was 1.066
-	vox_dims=[384/315.13 384/315.13 1];
-	% TODO: supply mask in a form that retains calibration information
 end
 
 % Make sure that dirs have a trailing slash
