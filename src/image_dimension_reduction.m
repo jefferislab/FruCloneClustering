@@ -42,8 +42,8 @@ for z1=1:length(connectedRegions);
 	% find indices of points in current region
 	indX=find(L==connectedRegions(z1));
 
-	% Convert indices to coords
-	xcoords=ind2coord(size(L),indX,voxdims);
+	% Convert indices to coords (using standard matlab axis permutation)
+	xcoords=ind2coord(size(L),indX,voxdims,[2 1 3]);
 
 	% Swap commented line to make a movie
 	moviefile='';
