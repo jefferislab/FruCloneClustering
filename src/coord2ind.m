@@ -1,11 +1,12 @@
-function indices = coord2ind(img,voxdims,coords)
+function indices = coord2ind(img,voxdims,coords,aperm)
 % COORD2IND - find 1D indices into 3D image of XYZ coordinates
 % 
 % Input:
 % img     - 3d img array
 % voxdims - vector of 3 voxel dimensions (width, height, depth, dx,dy,dz)
 % coords  - 3xN XYZ triples 
-% 
+% aperm   - permutation order for axes
+%
 % indices  - 1D indices into the image array
 % 
 % NB for the time being no reordering of image axes is done
@@ -32,5 +33,10 @@ pixcoords(3,:)=min(imsize(3),max(1,pixcoords(3,:)));
 % and flipping Y?  Either the image or these coords must be flipped
 
 % convert to 1d indices
-indices=sub2ind(imsize,pixcoords(1,:),pixcoords(2,:),pixcoords(3,:));
+if nargin<4
+	indices=sub2ind(imsize,pixcoords(1,:),pixcoords(2,:),pixcoords(3,:));
+else
+	indices=sub2ind(imsize(aperm),pixcoords(aperm(1),:),...
+		pixcoords(aperm(2),:),pixcoords(aperm(3),:));
+end
 end
