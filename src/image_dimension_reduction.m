@@ -1,7 +1,10 @@
-function [dots,dim,Prob,lam,coords]=image_dimension_reduction(file_name,min_points_per_region,no_iterations)
+function [dots,dim,Prob,lam,coords]=image_dimension_reduction(file_name,voxdims,min_points_per_region,no_iterations)
 % Attempts to captures tubular structure in dot collections
 %
 % Input: matlab file containing 1 or more sets of connected dots
+%    voxdims - 3-vector giving voxel dimensions
+%    min_points_per_region defaults to 200 points
+%    no_iterations defaults to 45 iterations
 %
 % This implements the algorithm described in
 % Optimal Manifold Representation of Data: An Information Theoretic Approach
@@ -9,15 +12,12 @@ function [dots,dim,Prob,lam,coords]=image_dimension_reduction(file_name,min_poin
 % which attempts to reduce higher dimensional data onto a 1D manifold
 % For our images this means trying to reduce dot clouds to compact
 % representations of tubular structures
-%
-% min_points_per_region defaults to 200 points
-% no_iterations defaults to 45 iterations
 
-if nargin < 3
+if nargin < 4
 	no_iterations=45;
 end
 
-if nargin < 2
+if nargin < 3
 	min_points_per_region = 200;
 end
 
@@ -43,8 +43,7 @@ for z1=1:length(connectedRegions);
 	indX=find(L==connectedRegions(z1));
 
 	% Convert indices to coords
-%	xcoords=ind2coord(size(x),indX,voxdims,axperm);
-	xcoords=ind2coord(size(x),indX,[0.9225 0.9225 1.0592]);
+	xcoords=ind2coord(size(L),indX,voxdims);
 
 	% Swap commented line to make a movie
 	moviefile='';
