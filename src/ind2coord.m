@@ -47,8 +47,8 @@ if(nargin==4)
 end
 
 % then convert from pixel coords to physical coords
-coords(1,:)=round(pixcoords(1,:)*voxdims(1));
-coords(2,:)=round(pixcoords(2,:)*voxdims(2));
-coords(3,:)=round(pixcoords(3,:)*voxdims(3));
+coords(1,:)=pixcoords(1,:)*voxdims(1);
+coords(2,:)=pixcoords(2,:)*voxdims(2);
+coords(3,:)=pixcoords(3,:)*voxdims(3);
 
 end
