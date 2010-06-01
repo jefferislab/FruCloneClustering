@@ -34,7 +34,7 @@ dlmwrite(infile,coords,'\t');
 command=[gregxform_dir 'gregxform ' registration ' <' infile ' >' outfile];
 system(command);
 
-[f1 f2 f3]=textread(infile,'%s %s %s');
+[f1 f2 f3]=textread(outfile,'%s %s %s');
 
 y=zeros(length(f1),3);
 
