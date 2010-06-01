@@ -9,7 +9,7 @@ if ~isstruct(inf)
 	error('Unable to parse tif: %s',infile);
 end
 
-img=zeros(inf(1).Width,inf(1).Height,length(inf));
+img=zeros(inf(1).Height,inf(1).Width,length(inf));
 for j=1:length(inf)
 	img(:,:,j)=imread(infile,j);
 end
