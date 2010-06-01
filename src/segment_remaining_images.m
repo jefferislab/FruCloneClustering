@@ -39,7 +39,11 @@ for i=1:length(input_files)
 	end
 	
 	% read in image
-	x=readpic(fullfile(input_dir,input_files(i).name));
+	infile=fullfile(input_dir,input_files(i).name);
+	x=readpic(infile);
+	% FIXME permute image data array into standard form
+	iminfo=impicinfo(infile);
+	voxdims=iminfo.Delta;
 
 	% threshold at arbitrary low level
 	u=zeros(size(x),'uint8');
@@ -50,7 +54,7 @@ for i=1:length(input_files)
 
 	disp(['Segmented image ',input_files(i).name,'. Image has ',num2str(NUM),' components.'])
 
-	save(fullfile(output_dir,[current_image,'_filtered2_tubed.mat']),'x','L','NUM');
+	save(fullfile(output_dir,[current_image,'_filtered2_tubed.mat']),'x','L','NUM','voxdims');
 	% delete lockfile
 	removelock(lockfile);
 end
