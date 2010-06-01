@@ -30,11 +30,11 @@ labelhist = hist(L(:),labels);
 % keep non-zero regions that have at least min_points_per_region
 connectedRegions=labels(labels>0 & labelhist>min_points_per_region);
 
-dots=cell(length(connectedRegions));
-dim=cell(length(connectedRegions));
-Prob=cell(length(connectedRegions));
-lam=cell(length(connectedRegions));
-coords=cell(length(connectedRegions));
+dots=cell(1,length(connectedRegions));
+dim=cell(1,length(connectedRegions));
+Prob=cell(1,length(connectedRegions));
+lam=cell(1,length(connectedRegions));
+coords=cell(1,length(connectedRegions));
 
 tic;
 for z1=1:length(connectedRegions);
