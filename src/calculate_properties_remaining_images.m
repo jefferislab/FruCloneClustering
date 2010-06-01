@@ -108,7 +108,7 @@ for i=1:length(infiles)
 	end
 
 	%%%%
-	save([output_dir,name,'_properties.mat'],'p','-v7');
+	save([output_dir,current_image,'_properties.mat'],'p','-v7');
 	removelock([output_dir,current_image,'-in_progress.mat']);
 end
 end
