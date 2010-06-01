@@ -81,7 +81,7 @@ for i=1:length(infiles)
 
 		if ~isempty(y)
 
-			y=indata.dotsReformated{j}; % dots in reference coord space
+			y=indata.dotsReformatted{j}; % dots in reference coord space
 
 			p.gamma1=[p.gamma1 y];
 
