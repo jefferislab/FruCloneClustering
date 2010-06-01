@@ -21,8 +21,6 @@ if nargin < 2
 	min_points_per_region = 200;
 end
 
-makemovie=false;
-
 load(file_name)
 
 % find all label values
@@ -32,58 +30,91 @@ labelhist = hist(L(:),labels);
 % keep non-zero regions that have at least min_points_per_region
 connectedRegions=labels(labels>0 & labelhist>min_points_per_region);
 
-dots={};
-dim={};
-Prob={};
-lam={};
-coords={};
-
-maxDim=1.2;
+dots=cell(length(connectedRegions));
+dim=cell(length(connectedRegions));
+Prob=cell(length(connectedRegions));
+lam=cell(length(connectedRegions));
+coords=cell(length(connectedRegions));
 
 tic;
 for z1=1:length(connectedRegions);
 
-	% Make a mask of points in current region
-	x=zeros(size(L),'single');
-	x(L==connectedRegions(z1))=1;
-
-	% find indices of those points
-	indX=find(x>0);
-	% Normalise x by number of points (so sum(x)=1)
-	x=x/length(indX);
+	% find indices of points in current region
+	indX=find(L==connectedRegions(z1));
 
 	% Convert indices to coords
 	xcoords=zeros(3,length(indX),'single');
 	[xcoords(1,:) xcoords(2,:) xcoords(3,:)]=ind2sub(size(x),indX);
-	gamma=xcoords;
+
+	% Swap commented line to make a movie
+	moviefile='';
+%	moviefile=[file_name,'-',num2str(z1),'.avi'];
+	disp(['Starting dimension reduction for ',file_name]);
+	[gamma,P,lambda,dimension] = chigirev_dim_reduction(xcoords,no_iterations,moviefile);
+
+	dots{z1}=gamma;
+	Prob{z1}=P;
+	coords{z1}=xcoords;
+	lam{z1}=lambda;
+	dim{z1}=dimension;
+
+end
+end
+
+function [gamma,P,lambda,dimension] = chigirev_dim_reduction(xcoords,no_iterations,moviefile)
+% CHIGIREV_DIM_REDUCTION Compute Optimal Manifold Representation of points
+%
+% Usage:
+% [gamma,P,lambda,dimension] = ...
+%     chigirev_dim_reduction(pts,no_iterations,[makemovie])
+%
+% Input:
+% pts           -  d x N matrix of d-dimensional vectors representing N points
+% no_iterations - 
+% moviefile     - optional - file to write a movie for each iteration
+%
+% This implements the algorithm described in
+% Optimal Manifold Representation of Data: An Information Theoretic Approach
+% Denis Chigirev and William Bialek
+% which attempts to reduce higher dimensional data onto a 1D manifold
 
 	% K is the number of points of the low dimensional manifold
-	% x is the original data (should be between 0 and 1)
-	% epsilon is the resolution
+	% xx is the original data (should be between 0 and 1)
 	% lamba determines the tradeoff F(M,Pm) = D + lambda*I
-
+	% gamma will be new manifold positions
+	gamma=xcoords;
 	[n,K]=size(xcoords);
 
 	P=ones(1,K,'single')/K;
-
+	
+	% a mask on the points in xcoords
+	xx=ones(1,K,'single')/K;
+	
 	lambda=2;
 	dimension=3*ones(1,K,'single');
+
+	maxDim=1.2; % points with local dimensionality < maxDim will be fixed
 
 	moveInd=1:K;
 
 	% Movie code
+	if nargin<3
+		moviefile=''; % no movie will be made
+	elseif n~=3
+		error('movie can only be made for 3d data');
+	end
 	% Create a new figure, and position it
-	if(makemovie)
+	if ~isempty(moviefile)
 		fig1 = figure;
 		winsize = get(fig1,'Position');
 		winsize(1:2) = [0 0];
-		mov = avifile([file_name,'-',num2str(z1),'.avi'],'fps',25,'quality',100);
+		mov = avifile(moviefile,'fps',25,'quality',100);
 		set(fig1,'NextPlot','replacechildren');
 	end
 
 	for z=1:no_iterations
 		toc;
-		disp([file_name,' iteration ',num2str(z),' out of ',num2str(no_iterations)])
+		disp(['iteration ',num2str(z),' out of ',num2str(no_iterations)])
 		% number of nearest neighbours to consider - in general the
 		% interaction between points falls off very rapidly due to a
 		% negative exponential.  Therefore it makes sense only to consider
@@ -115,9 +146,8 @@ for z1=1:length(connectedRegions);
 		gammaNew=zeros(n,K,'single');
 		Pnew=zeros(1,K,'single');
 
-		x(indX)=x(indX)/sum(x(indX));
+		xx=xx/sum(xx);
 
-		Px=zeros(1,kpoints,'single');
 		disp(['kpoints: ',num2str(kpoints),' moveInd: ',num2str(length(moveInd))]);
 
 		% find kpoints nearest neighbours from gamma for each xcoord
@@ -137,16 +167,16 @@ for z1=1:length(connectedRegions);
 			% If first item in Px has gone out of range
 			% then zero corresponding point in mask
 			if ~(Px(1)>=0 && Px(1)<=1)
-				x(indX(u))=0;
+				xx(u)=0;
 				Px=zeros(1,kpoints,'single');
 			end
 			% Add to Pnew the xth fraction of Px
-			Pnew(nnidxsForThisPoint)=Pnew(nnidxsForThisPoint)+x(indX(u))*Px;
+			Pnew(nnidxsForThisPoint)=Pnew(nnidxsForThisPoint)+xx(u)*Px;
 			% add to every point in gammaNew a fraction of
 			% the original coords of current point * Px weight
 			for i1=1:n
 				gammaNew(i1,nnidxsForThisPoint)=gammaNew(i1,nnidxsForThisPoint)...
-					+((xcoords(i1,u)*x(indX(u)))*Px);
+					+((xcoords(i1,u)*xx(u))*Px);
 			end
 
 		end
@@ -162,7 +192,7 @@ for z1=1:length(connectedRegions);
 		gamma(:,moveInd)=gammaNew(:,moveInd);
 
 		% Movie code
-		if makemovie
+		if ~isempty(moviefile)
 			fixedPoints=setdiff(1:K,moveInd);
 			plot3(gamma(1,moveInd),gamma(2,moveInd),gamma(3,moveInd),'.',...
 				gamma(1,fixedPoints),gamma(2,fixedPoints),gamma(3,fixedPoints),'.');
@@ -176,14 +206,7 @@ for z1=1:length(connectedRegions);
 		end
 	end
 	% Movie code
-	if makemovie
+	if ~isempty(moviefile)
 		mov=close(mov);
 	end
-
-	dots{z1}=gamma;
-	Prob{z1}=P;
-	coords{z1}=xcoords;
-	lam{z1}=lambda;
-	dim{z1}=dimension;
-
 end
