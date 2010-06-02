@@ -16,12 +16,12 @@ if ~exist(registration,'file')
 	error('Unable to read registration %s',registration);
 end
 
-% TODO: Some new versions of gregxform were bailing out due to an assertion
-% failure in GetJacobian:
+% Note some binary versions of gregxform can fail with assertion failures:
 % Assertion failed: ((f[dim] >= 0.0) && (f[dim] <= 1.0)), function GetJacobian, 
 % file /Users/jefferis/dev/cmtk/core/libs/Base/cmtkSplineWarpXformJacobian.cxx, line 228.
-% Abort trap
-% Need to fix/discuss with Torsten Rohlfing
+% The assertion failure turns out to be harmless, but we shouldn't be
+% seeing it anyway. It happens that the builds on macosx have been Debug 
+% not Release builds for a while. Assertions are ignored in Release.
 
 infile = [tempname '-input.txt'];
 outfile = [tempname '-output.txt'];
