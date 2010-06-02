@@ -30,7 +30,13 @@ fid = fopen(infile, 'w');
 fwrite(fid, coords, 'float');
 fclose(fid);
 
-command=[gregxform_dir 'gregxform --binary -i ' infile ' -o ' outfile ' ' registration];
+gregxform = fullfile(gregxform_dir,'gregxform');
+
+if ~exist(gregxform,'file')
+	error ('Unable to locate gregxform binary at %s',gregxform);
+end
+
+command=[ gregxform ' --binary -i ' infile ' -o ' outfile ' ' registration ];
 % TODO: Check when gregxform returns non-zero and suppress error messages
 status = system(command);
 
