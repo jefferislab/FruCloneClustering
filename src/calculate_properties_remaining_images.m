@@ -1,4 +1,4 @@
-function calculate_properties_remaining_images(input_dir,output_dir,alpha_thresh,mask_file)
+function calculate_properties_remaining_images(input_dir,output_dir,mask_file,alpha_thresh)
 % CALCULATE_PROPERTIES_REMAINING_IMAGES - find tangent vector, alpha
 %
 % Function takes reformatted images and calculates:
@@ -12,15 +12,16 @@ function calculate_properties_remaining_images(input_dir,output_dir,alpha_thresh
 % The input files are XXX_reformated.mat and output files are XXX_properties.mat.
 %
 % See also extract_properties
+tic;
 
-
-if nargin < 3
-	alpha_thresh = [];
+if nargin < 4
+	alpha_thresh = 0.25;
 end
 
-if nargin >= 4
+if nargin >= 3
 	%FIXME make sure this mask is loaded up with correct axis orientation
-	mask = load3dtif(mask_file);
+	mask = readpic(mask_file);
+	maskiminfo = impicinfo(mask_file);
 else
 	% Set default to empty array
 	mask = [];
@@ -92,12 +93,12 @@ for i=1:length(infiles)
 	% (by default) that are not part of a linear structure.
 
 	if ~isempty(mask)
-		indices=coords2ind(mask,vox_dims,p.gamma1);
+		indices=coord2ind(mask,maskiminfo.Delta,p.gamma1);
 
 		if isempty(alpha_thresh)
-			maskInd = x(indices)>0;
+			maskInd = mask(indices)>0;
 		else
-			maskInd = x(indices)>0 & p.alpha>alpha_thresh;
+			maskInd = mask(indices)>0 & p.alpha>alpha_thresh;
 		end
 		
 		p.gamma2=p.gamma1(:,maskInd);
@@ -110,5 +111,6 @@ for i=1:length(infiles)
 	%%%%
 	save([output_dir,current_image,'_properties.mat'],'p','-v7');
 	removelock([output_dir,current_image,'-in_progress.mat']);
+	toc;
 end
 end
