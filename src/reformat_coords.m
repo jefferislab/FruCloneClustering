@@ -16,9 +16,6 @@ if ~exist(registration,'file')
 	error('Unable to read registration %s',registration);
 end
 
-% change to N x 3 columnar organisation expected by gregxform
-coords=coords';
-
 % TODO: Some new versions of gregxform were bailing out due to an assertion
 % failure in GetJacobian:
 % Assertion failed: ((f[dim] >= 0.0) && (f[dim] <= 1.0)), function GetJacobian, 
@@ -29,32 +26,23 @@ coords=coords';
 infile = [tempname '-input.txt'];
 outfile = [tempname '-output.txt'];
 
-dlmwrite(infile,coords,'\t');
+fid = fopen(infile, 'w');
+fwrite(fid, coords, 'float');
+fclose(fid);
 
-command=[gregxform_dir 'gregxform ' registration ' <' infile ' >' outfile];
-system(command);
+command=[gregxform_dir 'gregxform --binary -i ' infile ' -o ' outfile ' ' registration];
+% TODO: Check when gregxform returns non-zero and suppress error messages
+status = system(command);
 
-[f1 f2 f3]=textread(outfile,'%s %s %s');
+if ~status
+	fid = fopen(outfile, 'r');
+	y=fread(fid, size(coords), '*float');
+	fclose(fid);
 
-y=zeros(length(f1),3);
-
-for i=1:length(f1);
-
-	if f1{i}(1)~='E'
-
-		y(i,1)=str2double(f1{i});
-		y(i,2)=str2double(f2{i});
-		y(i,3)=str2double(f3{i});
-
-	end
-
+	y=y(:,~isnan(y(1,:)));
 end
-
-% restrict to points with valid X coord and transpose back to 3 x N
-y=y(y(:,1)>0,:)';
 
 delete(infile);
 delete(outfile);
 
 end
-
