@@ -9,7 +9,7 @@ function y=reformat_coords(coords,registration,gregxform_dir)
 % Output: 3 x N matrix of points in the template registration space
 
 if nargin<3
-	gregxform_dir = '/Applications/IGSRegistration/bin/';
+	gregxform_dir = '/Applications/IGSRegistrationTools/bin/';
 end
 
 if ~exist(registration,'file')
