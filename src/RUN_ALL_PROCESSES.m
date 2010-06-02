@@ -22,6 +22,8 @@ properties_dir=[root_dir 'Properties_images/'];
 
 matched_points_dir=[root_dir 'Matched_images/'];
 
+data_dir=[root_dir 'data/'];
+
 %%%%%
 
 
@@ -36,31 +38,25 @@ RCode_dir='/Volumes/JData/JPeople/Greg/FruMARCMCode/';
 % Directory of gregxform unix command to refomat the coordinates
 gregxform_dir='/Applications/IGSRegistrationTools/bin/';
 
-% Directory of ANN unix coomand
-% TODO - Still need to provide nearest neighbour support for Octave
-% and figure out how to pass path to ann bin dir to ann_meta_wrapper
-% as a fall back
-% ann_dir=[root_dir 'ann_1.1.2/bin/'];
-%%%%
-
-
-%%% Different steps of the procedure
+%%% Steps of the image data processing procedure
 
 % Anisotropic filtering and tubing using Fiji
 command=['cat ',RCode_dir,'scripts/SebaStartup.R ',RCode_dir,'nick/PreprocessImages.R | R --vanilla --args ',...
 	original_images_dir,' ',processed_images_dir];
 system(command);
 
-% Threshold and segment images
+% Threshold and segment images - output is a mat file including voxdims
 segment_remaining_images(processed_images_dir,segmented_images_dir)
 
-% Dimension reduction
+% Dimension reduction - output are points in external coords
 process_images_for_dimension_reduction(segmented_images_dir,dimension_reduced_dir);
 
-% Refomat onto template brain
+% Reformat onto template brain
 reformat_remaining_images(dimension_reduced_dir,reformatted_dir,registration_dir,processed_images_dir,gregxform_dir);
 
-calculate_properties_remaining_images(reformatted_dir,properties_dir);
+% Calculate tangent vectors etc
+calculate_properties_remaining_images(reformatted_dir,properties_dir,[data_dir 'IS2_nym_mask.PIC']);
 
+% Find and store which dots in each image match dots in other images
 find_matched_dots_remaining_images(properties_dir,matched_points_dir);
 
