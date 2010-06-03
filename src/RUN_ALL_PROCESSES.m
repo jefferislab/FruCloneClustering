@@ -7,6 +7,7 @@
 %%%% Input and output directories
 
 root_dir = '/Users/jefferis/projects/Nick/FruCloneClustering/';
+root_dir = '/Volumes/JData/JPeople/Nick/FruCloneClustering/';
 
 original_images_dir=[root_dir 'Source_images/'];
 
