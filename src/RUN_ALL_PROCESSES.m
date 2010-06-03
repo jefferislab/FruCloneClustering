@@ -41,7 +41,7 @@ gregxform_dir='/Applications/IGSRegistrationTools/bin/';
 %%% Steps of the image data processing procedure
 
 % Anisotropic filtering and tubing using Fiji
-command=['cat ',RCode_dir,'scripts/SebaStartup.R ',RCode_dir,'nick/PreprocessImages.R | R --vanilla --args ',...
+command=['cat ',RCode_dir,'scripts/SebaStartup.R ',' PreprocessImages.R | R --vanilla --args ',...
 	original_images_dir,' ',processed_images_dir];
 system(command);
 
