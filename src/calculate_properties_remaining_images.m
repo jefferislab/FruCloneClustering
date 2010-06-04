@@ -1,5 +1,5 @@
 function calculate_properties_remaining_images(input_dir,output_dir,mask_file,alpha_thresh)
-% CALCULATE_PROPERTIES_REMAINING_IMAGES - find tangent vector, alpha
+% CALCULATE_PROPERTIES_REMAINING_IMAGES find local tangent vector and dimensionality (alpha)
 %
 % Function takes reformatted images and calculates:
 % principal eigenvector (tangent vector)

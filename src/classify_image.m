@@ -1,5 +1,10 @@
 function [score,MI_threshold]=classify_image(s,template_images_ind,imageList,test_image_ind,matchedPoints_dir,MI_multiplier)
-
+% CLASSIFY_IMAGE determine whether an image contains a clone of interest
+% 
+% Usage:
+% [score,MI_threshold]=classify_image(s,template_images_ind,imageList,...
+%					test_image_ind,matchedPoints_dir,MI_multiplier)
+%
 % This function is used to determine whether an image contains a clone of
 % interest. It is assumed that the user has already created the neccessary
 % XXXmatchedPoints.mat files that compare existing images to the test image.
@@ -9,13 +14,15 @@ function [score,MI_threshold]=classify_image(s,template_images_ind,imageList,tes
 % the matching dots in other images and whether those images contain the 
 % clone.
 %
-% Input: s, output from build_MI_structure.m
-%        template_image_ind, index images containing the clone. Must match
+% Input: 
+%  
+% s                  - output from build_MI_structure.m
+% template_image_ind - index of images containing the clone. Must match
 %                         the list of images used to produce the cell s.
 %                         The index is based on the imageList cell
-%        test_image_ind, is the index where test_image appears in the imageList
-%        image_dir, the location of the template image XXXmatchedPoints.mat
-%                   files
+% imageList          - List of image names 
+% test_image_ind     - index where test_image appears in the imageList
+% matchedPoints_dir  - location of the template image XXXmatchedPoints.matfiles
 %
 % Output: score, is a 1 by 12 vector given the score that the test_image
 %                contains the clone of interest. Scores near zero mean the 
@@ -29,7 +36,7 @@ function [score,MI_threshold]=classify_image(s,template_images_ind,imageList,tes
 %                information is modified by subtacting one of the
 %                thresholds defined above and rectifying.
 %
-
+% See also compare_image_to_all_clones, create_image_classifie
 
 MI_threshold=(0.005:0.005:0.1)*MI_multiplier;
 

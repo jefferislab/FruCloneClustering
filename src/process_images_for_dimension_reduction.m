@@ -1,5 +1,8 @@
 function process_images_for_dimension_reduction(input_dir,output_dir)
-% PROCESS_IMAGES_FOR_DIMENSION_REDUCTION (input_dir,output_dir)
+% PROCESS_IMAGES_FOR_DIMENSION_REDUCTION Dimension reduction on all dots
+%
+% Usage: process_images_for_dimension_reduction(input_dir,output_dir)
+%
 % this function takes segmented images ie point collections
 % input files typically in Segmented_images directory end in *tubed.mat
 % output to Dimension_reduced_images directory

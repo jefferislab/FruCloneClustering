@@ -1,5 +1,5 @@
-%RUN_ALL_PROCESSES.m
-
+%RUN_ALL_PROCESSES Preprocessing to turn images into all x all dot database
+%
 % This script runs all the preprocessing steps required to turn a folder of
 % source images into a set of processed dots that are cross-matched
 % against dots in all other images.
