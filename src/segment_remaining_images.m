@@ -4,7 +4,12 @@ function segment_remaining_images(input_dir,output_dir,threshold)
 % This function takes tubed images, thresholds them, and then segments them
 % the input files are XXXtubed.PIC the and output files are XXXtubed.mat.
 % The segmentation threshold defaults to 10
-
+%
+% Note that this function will use bwlabeln to find sets of connected dots
+% If bwlabeln is missing (No Image Processing toolobox) it will just 
+% threshold the input image with a small decrease in performance.
+%
+% bwlabeln
 if nargin < 3
 	threshold = 10;
 end
@@ -49,12 +54,22 @@ for i=1:length(input_files)
 	u=zeros(size(x),'uint8');
 	u(x>=threshold)=1;
 
-	% Find connected components and give each island a unique index
-	[L,NUM]=bwlabeln(u,26);
+	if exist('bwlabeln','file')
+		% image processing toolbox is present
+		% Find connected components and give each island a unique index
+		[L,NUM]=bwlabeln(u,26);
 
-	disp(['Segmented image ',input_files(i).name,'. Image has ',num2str(NUM),' components.'])
-
-	save(fullfile(output_dir,[current_image,'_filtered2_tubed.mat']),'x','L','NUM','voxdims');
+		disp(['Segmented image ',input_files(i).name,'. Image has ',num2str(NUM),' components.'])
+	else
+		% no image processing toolbox, just threshold
+		% this means that the next steps will occupy more memory but 
+		% now that image_dimension_reduction is O(n) speed will not really be 
+		% affected.
+		
+		L=u;
+		NUM = 1;
+	end
+	save(fullfile(output_dir,[current_image,'_filtered2_tubed.mat']),'x','L','NUM','voxdims','-v7');
 	% delete lockfile
 	removelock(lockfile);
 end
