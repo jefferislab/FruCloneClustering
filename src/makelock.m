@@ -14,15 +14,15 @@ if(nargin<2)
 	if isunix
 		% get this hostname as additional protection against
 		% collision of unique identifier
-		[~, hostname]=system('hostname');
-		% note strcat removes trailing whitespace from hostname
-		lockmsg = strcat(hostname,tempname);
+		[status, hostname]=system('hostname');
+		% note strtrim removes trailing whitespace from hostname
+		lockmsg = strcat(strtrim(hostname),tempname);
 	else
 		lockmsg = tempname;
 	end
 end
 
-[lockdir,~,~] = fileparts(lockfile);
+lockdir = fileparts(lockfile);
 if ~isempty(lockdir)
 	if ~exist(lockdir,'dir')
 		if createDirectories
