@@ -66,7 +66,8 @@ elseif isOctave && nargin < 5
 	% TODO: Vectorise this - will probably need some C code
 	for i=1:size(query,2),
 		[nnidx_tmp, dist_tmp]=kd.annkSearch(query(:,i),k);
-		nnidx(:,i)=nnidx_tmp;
+		% note that ANN is 0-indexed so add 1 to indices to match matlab
+		nnidx(:,i)=nnidx_tmp+1;
 		nndist(:,i)=dist_tmp;
 	end
 else
