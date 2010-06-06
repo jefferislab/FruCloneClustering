@@ -66,7 +66,7 @@ for i=1:length(input_files)
 		% now that image_dimension_reduction is O(n) speed will not really be 
 		% affected.
 		
-		L=u;
+		L=double(u);
 		NUM = 1;
 	end
 	save(fullfile(output_dir,[current_image,'_filtered2_tubed.mat']),'x','L','NUM','voxdims','-v7');
