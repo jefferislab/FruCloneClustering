@@ -32,6 +32,8 @@
 %   load3dtif                              - Loads 3d tif by loading each 2d plane into a 3d matrix
 %
 % Utility Functions
+%   addsystempath                          - adds a given path to the current system path
+%   CheckForNewerInput                     - Check if any input files are newer than outfile
 %   jlab_filestem                          - return stem of image name up to first underscore (by default)
 %   makelock                               - Make a lockfile (NFS safe in principle)
 %   matching_images                        - see if any file has same image stem as filename
@@ -40,7 +42,7 @@
 %   WritePointsToAM                        - WritePointsToAM Write 3D points to a text file that can be opened in Amira
 %
 % Unknown Function
-%   detectProb                             - 
+%   detectProb                             - TODO:Nick explain what this does!
 %
 % Dependencies:
 % ANN Nearest Neighbour library as wrapped for Matlab or Octave
