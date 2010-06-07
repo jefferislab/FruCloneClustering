@@ -25,7 +25,9 @@ matched_points_dir=[root_dir 'Matched_images/'];
 data_dir=[root_dir 'data/'];
 
 %%%%%
+% Check path
 
+addsystempath('/usr/local/bin');
 
 %%%% Data directories
 
@@ -59,4 +61,3 @@ calculate_properties_remaining_images(reformatted_dir,properties_dir,[data_dir '
 
 % Find and store which dots in each image match dots in other images
 find_matched_dots_remaining_images(properties_dir,matched_points_dir);
-
