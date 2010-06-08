@@ -22,10 +22,12 @@ d1=dir([input_dir '*.pic']);
 d2=dir([input_dir '*.PIC']);
 h=[d1;d2];
 
-[mfilepath, mfile]= fileparts(mfilename());
-scriptfile=fullfile(mfilepath, 'rescale.js');
+if nargin < 4
+	scale = [0.5 0.5 1];
+end
 
-anisomacro=fullfile(mfilepath, 'anisofilterimage.ijm');
+[mfilepath, mfile]= fileparts(mfilename());
+scriptfile=fullfile(mfilepath, 'scaleandfilter.py');
 
 for i=1:length(h)
 
@@ -47,25 +49,11 @@ for i=1:length(h)
 
 	disp(['Rescaling image ',infile])
 	
-	% make temporary script
-	temp_script_header=tempname;
-	temp_script=[output_dir current_image '-rescale.js'];
-	fid=fopen(temp_script_header,'w')
-	fprintf(fid,'infile="%s";\n',[input_dir	infile]);	
-	fprintf(fid,'outfile="%s";\n',[output_dir outfile]);
-	fclose(fid);
-	system(sprintf('cat %s %s >> %s',temp_script_header,scriptfile,temp_script));
-	delete(temp_script_header);
-	
 	% run script
-	cmd = ['fiji --headless ',temp_script,' -batch'];
+	cmd = sprintf('fiji --headless %s -i %s -o %s -x %f -y %f -batch',scriptfile,...
+		[input_dir infile], [output_dir outfile], scale(1), scale (2));
 	system(cmd);
-	delete(temp_script);
-
-	% now run anisotropic diffusion filtering
-	cmd = ['fiji --headless -macro ' anisomacro ' ' [output_dir	outfile] ' -batch']
-	system(cmd);
-	
+		
 	removelock(lockfile);
 end
 
