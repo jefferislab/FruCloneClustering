@@ -2,6 +2,7 @@ function [ success ] = makelock( lockfile, lockmsg, verbose, createDirectories )
 %MAKELOCK Make a lockfile (NFS safe in principle)
 %  Make a lockfile containing lockmsg
 %  lockmsg defaults to matlab's tempname preceded (on unix) by hostname
+%  When running as a grid engine job defaults to hostname:JOB_ID
 %  verbose = false by default
 %  Create director(y|ies) containing lockfile if required
 %  Returns 1 for success, 0 otherwise
@@ -20,8 +21,15 @@ if nargin<2 || isempty(lockmsg)
 		% get this hostname as additional protection against
 		% collision of unique identifier
 		[status, hostname]=system('hostname');
-		% note strtrim removes trailing whitespace from hostname
-		lockmsg = strcat(strtrim(hostname),tempname);
+		% Gridengine sets this
+		jobid=getenv('JOB_ID');
+		if ~isempty(jobid)
+			lockmsg=strcat(strtrim(hostname),':',jobid);
+		else
+			% note strtrim removes trailing whitespace from hostname
+			lockmsg = strcat(strtrim(hostname),':',tempname);
+		end
+
 	else
 		lockmsg = tempname;
 	end
