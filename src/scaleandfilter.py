@@ -77,8 +77,8 @@ def usage():
 
 def main(argv):
 
-	scalex=1.0
-	scaley=1.0
+	scalex=0.5
+	scaley=0.5
 	infile=''
 	outfile=''
 	
