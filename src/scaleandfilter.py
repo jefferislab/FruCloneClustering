@@ -21,7 +21,9 @@ import getopt
 from ij import *
 from ij.io import *
 from ij.process import *
-import subprocess
+if sys.version_info > (2, 4):
+	import subprocess
+import os
 
 def scaleandfilter(infile,outfile,scalex,scaley):
 	
@@ -55,9 +57,13 @@ def scaleandfilter(infile,outfile,scalex,scaley):
 	anisopts="-scanrange:10 -tau:2 -nsteps:2 -lambda:0.1 -ipflag:0 -anicoeff1:1 -anicoeff2:0 -anicoeff3:0"
 	anisopts=anisopts+" -dx:%f -dy:%f -dz:%f" % (cal.pixelWidth,cal.pixelHeight,cal.pixelDepth)
 	
-	subprocess.check_call(["anisofilter"]+anisopts.split(' ')+[intif,outtif])
+	if sys.version_info > (2, 4):
+		subprocess.check_call(["anisofilter"]+anisopts.split(' ')+[intif,outtif])
+	else:
+		os.system(" ".join(["anisofilter"]+anisopts.split(' ')+[intif,outtif]))
+	
 	#for testing
-	subprocess.check_call(["cp",intif,outtif])
+	# subprocess.check_call(["cp",intif,outtif])
 
 	# Hessian (tubeness)
 	print("Opening output tif: "+outtif)
