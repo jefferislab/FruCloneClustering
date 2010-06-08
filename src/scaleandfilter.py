@@ -32,14 +32,14 @@ def scaleandfilter(infile,outfile,scalex,scaley):
 	print ("infile is: "+infile)
 	IJ.run("Biorad...", "open=["+infile+"]")
 	imp = IJ.getImage()
-	
+	print imp
 	print "scalex = %f; scaley = %f" % (scalex,scaley)
 	# Rescale
 	ip = imp.getProcessor()
 	ip.setInterpolate(True)
 	sp = StackProcessor(imp.getStack(),ip);
 	sp2=sp.resize(int(round(ip.width * scalex)), int(round(ip.height *scaley)));
-	imp.setStack(sp2);
+	imp.setStack(imp.getTitle(),sp2);
 	
 	cal = imp.getCalibration()
 	cal.pixelWidth /= scalex
