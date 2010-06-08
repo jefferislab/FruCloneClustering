@@ -8,7 +8,7 @@
 
 root_dir = '/Users/jefferis/projects/Nick/FruCloneClustering/';
 
-original_images_dir=[root_dir 'Source_images/'];
+original_images_dir=[root_dir 'images/'];
 
 processed_images_dir=[root_dir 'Processed_images/'];
 
@@ -43,9 +43,7 @@ gregxform_dir='/Applications/IGSRegistrationTools/bin/';
 %%% Steps of the image data processing procedure
 
 % Anisotropic filtering and tubing using Fiji
-command=['cat ',RCode_dir,'scripts/SebaStartup.R ',' PreprocessImages.R | R --vanilla --args ',...
-	original_images_dir,' ',processed_images_dir];
-system(command);
+rescale_images(original_images_dir,processed_images_dir,'-4xd-tubed');
 
 % Threshold and segment images - output is a mat file including voxdims
 segment_remaining_images(processed_images_dir,segmented_images_dir)
