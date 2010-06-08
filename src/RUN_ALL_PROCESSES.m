@@ -4,9 +4,30 @@
 % source images into a set of processed dots that are cross-matched
 % against dots in all other images.
 
-%%%% Input and output directories
-
 root_dir = '/Users/jefferis/projects/Nick/FruCloneClustering/';
+
+isOctave = exist('OCTAVE_VERSION','builtin') ~= 0;
+
+if isOctave && strcmp(program_name,'RUN_ALL_PROCESSES.m')
+    % We're running as a script
+    % get argv and take first element as root_dir
+    % NB if no argument besides scriptname is given then
+    % first argument is scriptname so gaurd against that
+    arg_list=argv();
+    if length(arg_list) > 0 && ~strcmp(arg_list{1},program_name())
+        root_dir = arg_list{1};
+        disp(['Setting root_dir to ' root_dir]);
+    end
+%     for i=1:length(arg_list)
+%         printf('%s ',arg_list{i});
+%     end
+%     printf('\n');
+end
+
+% make sure root_dir ends in slash
+root_dir=fullfile(root_dir,filesep);
+
+%%%% Input and output directories
 
 original_images_dir=[root_dir 'images/'];
 
