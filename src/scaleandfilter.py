@@ -58,12 +58,11 @@ def scaleandfilter(infile,outfile,scalex,scaley):
 	anisopts=anisopts+" -dx:%f -dy:%f -dz:%f" % (cal.pixelWidth,cal.pixelHeight,cal.pixelDepth)
 	
 	if sys.version_info > (2, 4):
+		#for testing
+		# subprocess.check_call(["cp",intif,outtif])
 		subprocess.check_call(["anisofilter"]+anisopts.split(' ')+[intif,outtif])
 	else:
 		os.system(" ".join(["anisofilter"]+anisopts.split(' ')+[intif,outtif]))
-	
-	#for testing
-	# subprocess.check_call(["cp",intif,outtif])
 
 	# Hessian (tubeness)
 	print("Opening output tif: "+outtif)
