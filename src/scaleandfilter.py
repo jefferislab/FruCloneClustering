@@ -82,6 +82,11 @@ def usage():
 
 def main(argv):
 
+	# remove -batch argument which puts imagej into batch mode but is not
+	# helpful here
+	if argv.count('-batch') > 0:
+		argv.remove('-batch')
+	
 	scalex=0.5
 	scaley=0.5
 	infile=''
@@ -108,5 +113,4 @@ def main(argv):
 	scaleandfilter(infile,outfile,scalex,scaley)
 	
 if __name__ == "__main__":
-	#main(['-i/Test.PIC','-o Test-out.PIC','-x 0.5','-y 0.5'])
-	main(sys.argv[1:-1])
+	main(sys.argv[1:])
