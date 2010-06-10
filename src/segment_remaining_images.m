@@ -10,9 +10,6 @@ function segment_remaining_images(input_dir,output_dir,threshold)
 % threshold the input image with a small decrease in performance.
 %
 % bwlabeln
-if nargin < 3
-	threshold = 10;
-end
 
 % Make sure that dirs have a trailing slash
 input_dir=fullfile(input_dir,filesep);
@@ -50,6 +47,18 @@ for i=1:length(input_files)
 	iminfo=impicinfo(infile);
 	voxdims=iminfo.Delta;
 
+	% Choose threshold level as mode + 10
+	if nargin < 3
+		if iminfo.BitDepth~=8
+			error('Cannot handle images that are not uint8');
+		end
+		h=hist(x(:),0:255);
+		[maxcount,maxbinidx]=max(h);
+		% nb this is mode+10 since bins are 1-indexed but values start at 0
+		threshold = maxbinidx + 9;
+		disp(['Thresholding at x=' num2str(threshold)])
+	end
+	
 	% threshold at arbitrary low level
 	u=zeros(size(x),'uint8');
 	u(x>=threshold)=1;
@@ -69,7 +78,7 @@ for i=1:length(input_files)
 		L=double(u);
 		NUM = 1;
 	end
-	save(fullfile(output_dir,[current_image,'_filtered2_tubed.mat']),'x','L','NUM','voxdims','-v7');
+	save(fullfile(output_dir,[current_image,'_filtered2_tubed.mat']),'x','L','NUM','voxdims','threshold','-v7');
 	% delete lockfile
 	removelock(lockfile);
 end
