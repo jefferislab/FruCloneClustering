@@ -78,7 +78,7 @@ for i=1:length(input_files)
 		L=double(u);
 		NUM = 1;
 	end
-	save(fullfile(output_dir,[current_image,'_filtered2_tubed.mat']),'x','L','NUM','voxdims','-v7');
+	save(fullfile(output_dir,[current_image,'_filtered2_tubed.mat']),'x','L','NUM','voxdims','threshold','-v7');
 	% delete lockfile
 	removelock(lockfile);
 end
