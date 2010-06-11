@@ -50,25 +50,13 @@ if ~isOctave && nargin < 5
 	anno = close(anno); %#ok<NASGU>
 
 elseif isOctave && nargin < 5
-	% Use octave-ann
-	global ANNkd_tree
-
-	kd=ANNkd_tree(points');
+	% Use Greg's new Octave annsearch function
+	% based on Shai Bagon's interface
 
 	if selfQuery
-		query = points;
-	end
-
-	nnidx=zeros(k,size(query,2));
-	nndist=zeros(k,size(query,2));
-	% octave ann does not seem to provide a wrapper for querying with
-	% multiple points, so iterate over each query point
-	% TODO: Vectorise this - will probably need some C code
-	for i=1:size(query,2),
-		[nnidx_tmp, dist_tmp]=kd.annkSearch(query(:,i),k);
-		% note that ANN is 0-indexed so add 1 to indices to match matlab
-		nnidx(:,i)=nnidx_tmp+1;
-		nndist(:,i)=dist_tmp;
+		[nnidx, nndist] = annsearch(points,points,k,eps);
+	else
+		[nnidx, nndist] = annsearch(points,query,k,eps);
 	end
 else
 	% fall back to ann_sample tool
