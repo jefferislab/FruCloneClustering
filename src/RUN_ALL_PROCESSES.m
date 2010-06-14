@@ -31,6 +31,8 @@ root_dir=fullfile(root_dir,filesep);
 
 original_images_dir=[root_dir 'images/'];
 
+backsub_images_dir=[root_dir 'BackgroundSubtracted_images/'];
+
 processed_images_dir=[root_dir 'Processed_images/'];
 
 segmented_images_dir=[root_dir 'Segmented_images/'];
@@ -64,7 +66,7 @@ gregxform_dir='/Applications/IGSRegistrationTools/bin/';
 %%% Steps of the image data processing procedure
 
 % Anisotropic filtering and tubing using Fiji
-rescale_images(original_images_dir,processed_images_dir,'-4xd-tubed');
+rescale_images(backsub_images_dir,processed_images_dir,'-4xd-tubed');
 
 % Threshold and segment images - output is a mat file including voxdims
 segment_remaining_images(processed_images_dir,segmented_images_dir)

@@ -18,9 +18,10 @@ if ~exist(output_dir,'dir')
 	mkdir(output_dir);
 end
 
-d1=dir([input_dir '*.pic']);
-d2=dir([input_dir '*.PIC']);
-h=[d1;d2];
+% d1=dir([input_dir '*.pic']);
+% d2=dir([input_dir '*.PIC']);
+% h=[d1;d2];
+h=dir([input_dir '*.nhdr']);
 
 if nargin < 4
 	scale = [0.5 0.5 1];
