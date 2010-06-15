@@ -51,10 +51,10 @@ for i=1:length(h)
 	disp(['Rescaling image ',infile])
 	
 	% run script
-	cmd = sprintf('fiji --headless %s -i %s -o %s -x %f -y %f -batch',scriptfile,...
-		[input_dir infile], [output_dir outfile], scale(1), scale (2));
+	cmd = sprintf('fiji --headless -Dpython.cachedir.skip=false %s -i %s -o %s -x %f -y %f -batch',...
+		scriptfile, [input_dir infile], [output_dir outfile], scale(1), scale (2));
 	system(cmd);
-		
+	% disp(cmd);
 	removelock(lockfile);
 end
 
