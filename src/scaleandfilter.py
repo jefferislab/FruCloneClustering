@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-"""Script to rescale and filter biorad PIC file
+"""Script to rescale and filter confocal files (e.g. nrrd or pic)
 
 Usage: fiji --headless scaleandfilter.py
 
@@ -27,10 +27,9 @@ import os
 
 def scaleandfilter(infile,outfile,scalex,scaley):
 	
-	# This form works in the Interpreter but not from command line
-	# imp = Opener().openImage("/Volumes/JData/JPeople/Nick/FruCloneClustering/images/SAAG7-1_02.pic")
 	print ("infile is: "+infile)
-	IJ.run("Biorad...", "open=["+infile+"]")
+	
+	imp = Opener().openImage(infile)
 	imp = IJ.getImage()
 	print imp
 	print "scalex = %f; scaley = %f" % (scalex,scaley)
