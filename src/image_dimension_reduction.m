@@ -36,6 +36,11 @@ Prob=cell(1,length(connectedRegions));
 lam=cell(1,length(connectedRegions));
 coords=cell(1,length(connectedRegions));
 
+if sum(L(:)>0)>1e6
+	warning('skipping image with > 1e6 points)
+	return
+end
+
 tic;
 for z1=1:length(connectedRegions);
 
