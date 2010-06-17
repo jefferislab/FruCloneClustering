@@ -30,7 +30,6 @@ def scaleandfilter(infile,outfile,scalex,scaley):
 	print ("infile is: "+infile)
 	
 	imp = Opener().openImage(infile)
-	imp = IJ.getImage()
 	print imp
 	print "scalex = %f; scaley = %f" % (scalex,scaley)
 	# Rescale
