@@ -48,7 +48,8 @@ def scaleandfilter(infile,outfile,scalex,scaley):
 	intif=infile+".tif"
 	outtif=infile+"-filtered.tif"
 	print("saving input file as "+intif)
-	IJ.saveAs("tiff",intif)
+	f=FileSaver(imp)
+	f.saveAsTiffStack(intif)
 	imp.close()
 
 	# anisotropic filtering
