@@ -71,5 +71,6 @@ else
 		% neck and neck race which we lost by a head
 		% Multiple processes wrote to same lockfile and we weren't first
 	end
+	fclose(fid);
 end
 end
