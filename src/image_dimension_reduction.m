@@ -86,6 +86,7 @@ function [gamma,P,lambda,dimension] = chigirev_dim_reduction(xcoords,no_iteratio
 	% xx is the original data (should be between 0 and 1)
 	% lamba determines the tradeoff F(M,Pm) = D + lambda*I
 	% gamma will be new manifold positions
+	xcoords=single(xcoords);
 	gamma=xcoords;
 	[n,K]=size(xcoords);
 
