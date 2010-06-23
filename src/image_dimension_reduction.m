@@ -124,7 +124,8 @@ function [gamma,P,lambda,dimension] = chigirev_dim_reduction(xcoords,no_iteratio
 		% negative exponential.  Therefore it makes sense only to consider
 		% a few close neighbours and set the interaction of all other
 		% points to 0.
-		kpoints=min([K max([75 ceil(1.5*K^(1/3))])]);
+		% kpoints=min([K max([75 ceil(1.5*K^(1/3))])]);
+		kpoints=min([K 75]);
 
 		% Must have at least 20 points
 		if z>5 && K>=20
