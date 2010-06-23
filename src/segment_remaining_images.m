@@ -56,12 +56,17 @@ for i=1:length(input_files)
 		[maxcount,maxbinidx]=max(h);
 		% nb this is mode+10 since bins are 1-indexed but values start at 0
 		threshold = maxbinidx + 9;
-		disp(['Thresholding at x=' num2str(threshold)])
+		disp(['Thresholding ' input_files(i).name ' at x=' num2str(threshold)])
 	end
 	
 	% threshold at arbitrary low level
 	u=zeros(size(x),'uint8');
 	u(x>=threshold)=1;
+	nPoints=sum(u(:));
+	disp(sprintf('there are %d points above threshold',nPoints));
+	if nPoints>1e6
+		warning('more than 1e6 points could cause memory problems.  Increase threshold?');
+	end
 
 	if exist('bwlabeln','file')
 		% image processing toolbox is present

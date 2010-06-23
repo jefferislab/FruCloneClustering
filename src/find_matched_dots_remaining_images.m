@@ -16,7 +16,7 @@ end
 
 properties_files=dir([input_dir,'*_properties.mat']);
 
-for i=1:length(properties_files)
+for i=1:randperm(length(properties_files))
 
 	current_image=jlab_filestem(properties_files(i).name);
 
