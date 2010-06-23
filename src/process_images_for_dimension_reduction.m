@@ -20,7 +20,9 @@ end
 
 segmented_data=dir(fullfile(input_dir,'*_tubed.mat'));
 
-for i=1:length(segmented_data)
+% randperm scrambles order of files - this prevent NFS lockups
+% when 50 jobs all try and make the same lockfile
+for i=randperm(length(segmented_data))
 
 	current_image=jlab_filestem(segmented_data(i).name);
 	
