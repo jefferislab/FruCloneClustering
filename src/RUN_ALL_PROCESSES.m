@@ -4,7 +4,7 @@
 % source images into a set of processed dots that are cross-matched
 % against dots in all other images.
 
-root_dir = '/Users/jefferis/projects/Nick/FruCloneClustering/';
+root_dir = '/lmb/home/jefferis/projects/FruCloneClustering/';
 
 isOctave = exist('OCTAVE_VERSION','builtin') ~= 0;
 
@@ -56,6 +56,8 @@ addsystempath('/usr/local/bin');
 
 % Directory with the warp registration data (ie directory containing IS2_SAKW9-1_01_warp_m0g80c8e1e-1x26r4.list)
 registration_dir='/Volumes/JData/JPeople/Sebastian/fruitless/Registration/IS2Reg/Registration/warp/';
+% this should now work on hex; set up a symlink on JData
+registration_dir=[root_dir 'Registration/warp/'];
 
 % Directory containing R script for initial image processing
 RCode_dir='/Volumes/JData/JPeople/Greg/FruMARCMCode/';
