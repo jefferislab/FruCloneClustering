@@ -50,13 +50,12 @@ if ~isOctave && nargin < 5
 	anno = close(anno); %#ok<NASGU>
 
 elseif isOctave && nargin < 5
-	% Use Greg's new Octave annsearch function
-	% based on Shai Bagon's interface
-
+	% Use Greg's new Octave annoctsearch function
+	% which should have lower memory requirement than modified annmex
 	if selfQuery
-		[nnidx, nndist] = annsearch(points,points,k,eps);
+		[nnidx, nndist] = annoctsearch(points,points,k,eps);
 	else
-		[nnidx, nndist] = annsearch(points,query,k,eps);
+		[nnidx, nndist] = annoctsearch(points,query,k,eps);
 	end
 else
 	% fall back to ann_sample tool
