@@ -17,10 +17,10 @@ function [score,MI_threshold]=classify_image(s,template_images_ind,imageList,tes
 %        image_dir, the location of the template image XXXmatchedPoints.mat
 %                   files
 %
-% Output: score, is a 1 by 12 vector given the score that the test_image
+% Output: score, is a 1 by 40 vector given the score that the test_image
 %                contains the clone of interest. Scores near zero mean the 
 %                clone is not present while higher scores indicate a better
-%                chance. The first six entries give the mean number of matching
+%                chance. The first 20 entries give the mean number of matching
 %                dots above 20 different mutual information thresholds.
 %                These threshold are [.005:.005:.1]
 %                and are contained in the MI_threshold vector. The next 20
