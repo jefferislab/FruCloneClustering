@@ -3,9 +3,9 @@
 
 %%%% Input and output directories
 
-original_images_dir='/Users/jefferis/NickTempFolder/Source_images/';
+original_images_dir='/Volumes/JData/JPeople/Nick/FruCloneClustering/images/';
 
-processed_images_dir='/Users/jefferis/NickTempFolder/Processed_images/';
+processed_images_dir='/Volumes/JData/JPeople/Nick/FruCloneClustering/Test_data/Processed_images/';
 
 segmented_images_dir='/Users/jefferis/NickTempFolder/Segmented_images/';
 

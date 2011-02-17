@@ -6,18 +6,18 @@ function [top5scores,top5ind,score]=score_trace(trace_file);
 %disp('Location of traces');
 
 register_option=0;
-traces_dir='C:\Users\Nicolas Masse\Projects\Tracing\IS2\';
+% traces_dir='C:\Users\Nicolas Masse\Projects\Tracing\IS2\';
+% 
+% image_properties_dir='E:\imageProcessing\imageProperties\';
 
-image_properties_dir='E:\imageProcessing\imageProperties\';
+% addpath('C:\Users\Public\scripts\');
 
-addpath('C:\Users\Public\scripts\');
-load clone_classifier_Jan_6
+load('/Volumes/JData/JPeople/Nick/FruCloneClustering/data/clone_classifier.mat')
 
 clones={};
 
 num_template_images=0;
 clone_template=[0];
-
 for i=1:length(x)
     clones{i}=x{i}.clone;
     num_template_images=num_template_images+length(x{i}.s);
