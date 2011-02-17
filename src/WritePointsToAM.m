@@ -10,10 +10,11 @@ nVertices=length(points(:,1));
 fprintf(fid,'define Markers %d Parameters {\nContentType \"LandmarkSet\",nSets 1\n}\n',nVertices);
 fprintf(fid,'Markers { float[3] Coordinates } = @1\n\n');
 fprintf(fid,'@1\n');
-fclose(fid);
+
 
 % Write the 3D coords (appending to the file containing the header)
 dlmwrite(outfile,points,'-append','delimiter',' ');
 
-end
+fclose(fid);
 
+end
