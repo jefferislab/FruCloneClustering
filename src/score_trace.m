@@ -86,7 +86,7 @@ for j=1:length(x{i}.s)
     count=count+1;
     score(matched_dots_in_trace,count)=x{i}.s{j}.MI(matched_dots_in_template);
     for k=matched_dots_in_trace
-        q=max(0,find(score(k,count)>=x{i}.MI_pct,1,'last')-500);
+        q=min(1,max(0,find(score(k,count)>=x{i}.MI_pct,1,'last')-500));
          if isempty(q)
               score(k,count)=0;
          else
@@ -108,6 +108,7 @@ clone_score=zeros(size(score,1),length(x));
 for i=1:length(x)  
     ix=find(clone_template==i);
     clone_score(:,i)=mean(score(:,ix)')';
+    
    % score(:,ix)=repmat(mean(score(:,ix)),size(score,1),1);
 end
 clone_score(:,end+1)=.0001*ones(size(clone_score,1),1); % if all scores are zero, then maximum value won't correspond to AL-a (clone #1)
@@ -115,6 +116,7 @@ clone_score(:,end+1)=.0001*ones(size(clone_score,1),1); % if all scores are zero
     [dummy ix]=sort(clone_score','descend');
   
   clear y
+  figure;
   subplot(2,1,1),imagesc(clone_score);
   subplot(2,1,2),hold off;plot((ix(1,:)));%hold on;plot((ix(2,:)),'r')
   score1=zeros(1,max(clone_template));
@@ -144,17 +146,21 @@ clone_score(:,end+1)=.0001*ones(size(clone_score,1),1); % if all scores are zero
 
  for i=1:length(x{ind(1)}.s)
    
+      ind(1)=24;
 
-      ix=find(x{ind(1)}.s{i}.MI>.035);
+      ix=find(x{ind(1)}.s{i}.MI>.02);
       
  
      plot3(x{ind(1)}.s{i}.coords(1,ix),x{ind(1)}.s{i}.coords(2,ix),x{ind(1)}.s{i}.coords(3,ix),'k.');
      hold on;
-     plot3(x{ind(1)}.s{i}.coords(1,ix),315.13-x{ind(1)}.s{i}.coords(2,ix),x{ind(1)}.s{i}.coords(3,ix),'k.');
+     plot3(315.13-x{ind(1)}.s{i}.coords(1,ix),x{ind(1)}.s{i}.coords(2,ix),x{ind(1)}.s{i}.coords(3,ix),'k.');
  end
  
  plot3(p1.gamma2(1,:),p1.gamma2(2,:),p1.gamma2(3,:),'r.');
- title(['Red = Trace, Black = ',clones{ind(1)},'  Score = ',num2str(score(ind(1)))]);
+ title(['Red = Trace, Black = ',clones{ind(1)},'  Score = ',num2str(score1(ind(1)))]);
+ zlabel('Depth')
+ ylabel('Medial/Lateral')
+ xlabel('Anterior/Posterior')
  drawnow     
 
   
