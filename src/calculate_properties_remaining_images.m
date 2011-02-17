@@ -1,141 +1,116 @@
-function calculate_properties_remaining_images(input_dir,output_dir,ann_dir);
-
-% this script takes the reformated image and calculates the the principal eigenvector (tangent vector)
-% and the term alpha (alpha=1 -> one-dimenionsal, alpha=0 -> isotropic) from the moment of inertia.
+function calculate_properties_remaining_images(input_dir,output_dir,mask_file,alpha_thresh)
+% CALCULATE_PROPERTIES_REMAINING_IMAGES - find tangent vector, alpha
+%
+% Function takes reformatted images and calculates:
+% principal eigenvector (tangent vector)
+% alpha (alpha=1 -> one-dimenionsal, alpha=0 -> isotropic)
+% from the moment of inertia.
+%
+% Optionally: save only points with alpha > alpha_thresh
+% Optionally: supply a mask_file (currently only tif)
+%
 % The input files are XXX_reformated.mat and output files are XXX_properties.mat.
+%
+% See also extract_properties
+tic;
 
+if nargin < 4
+	alpha_thresh = 0.25;
+end
 
-% INPUT
-%input_dir='/Volumes/JData/JPeople/Nick/FruCloneClustering/images/';
-h=dir([input_dir,'*_reformated.mat']);
+if nargin >= 3
+	%FIXME make sure this mask is loaded up with correct axis orientation
+	mask = readpic(mask_file);
+	maskiminfo = impicinfo(mask_file);
+else
+	% Set default to empty array
+	mask = [];
+end
+
+% Make sure that dirs have a trailing slash
+input_dir=fullfile(input_dir,filesep);
+output_dir=fullfile(output_dir,filesep);
+
+if ~exist(output_dir,'dir')
+	mkdir(output_dir);
+end
+
+% NB Second asterisk permits spelling variants
+infiles=dir([input_dir,'*_reformat*ed.mat']);
 
 % OUTPUT
 %output_dir='/Volumes/JData/JPeople/Nick/FruCloneClustering/images/';
 
-% Directory for the approximate nearest neighbour function
-%ann_dir='/lmb/home/nmasse/bin/ann_1.1.2/bin/';
+if ~exist(output_dir,'dir')
+	mkdir(output_dir);
+end
 
-for i=1:length(h)
-    
-     n=find(h(i).name=='_',1,'first');
-     name=h(i).name(1:n-1);
-     
-     n=find(h(i).name=='-',1,'first');
-     short_name=h(i).name(1:n-1);
-     
-     flag=1;
+for i=1:length(infiles)
+	% This contains just the image stem (everyhing up to first underscore)
+	% e.g. SAKW12-1_reformated.mat => SAKW12-1
+	current_image=jlab_filestem(infiles(i).name);
 
+	% Check if we should process current image
+	if matching_images(current_image,...
+			[output_dir,'*_properties.mat'])
+		% skip this image since corresponding output exists
+		continue
+	elseif ~makelock([output_dir,current_image,'-in_progress.mat'])
+		% Looks like someone else is working on this image
+		continue
+	end
 
-     h1=dir([output_dir,'*_properties.mat']);
+	%%%% Main code
 
-     
-     for j=1:length(h1)
-         
-         n=find(h1(j).name=='_',1,'first');
-         name1=h1(j).name(1:n-1);
-         
-      
-         if strcmp(name,name1)
-         
-                 flag=0;
-                 break
-             
-         end
-         
-     end
-     
-     h2=dir([output_dir,'*-in_progress.mat']);
-     
-     for j=1:length(h2)
-         
-         n=find(h2(j).name=='_',1,'first');
-         name2=h2(j).name(1:n-1);
-         
-         if strcmp(name,name2)
-             
-                 flag=0;
-                 break
-            
-         end
-         
-     end
-     
+	p=[];
+	p.gamma1=[];
+	p.alpha=[];
+	p.vect=[];
 
-         
-         if flag==1
-             
-            
-             save([output_dir,h(i).name,'-in_progress.mat'],'flag','-v7');
-  
-%%%% Main code       
+	indata=load([input_dir,infiles(i).name]);
 
-		p=[];
-		p.gamma1=[];
-% 		p.dimension1=[];
-% 		p.lambda1=[];
-		p.alpha=[];
-		p.vect=[];
+	for j=1:length(indata.dots) % iterate over each group of connected dots
 
-		load([input_dir,h(i).name])
+		y=indata.dots{j}; % dots in original coord space
 
-		for j=1:length(dots)
+		if ~isempty(y)
 
-		    y=dots{j};
+			y=indata.dotsReformatted{j}; % dots in reference coord space
 
-		    if ~isempty(y)
+			p.gamma1=[p.gamma1 y];
 
-		        q=floor(rand*1000000);
+			[alpha,vect]=extract_properties(y);
 
-		    y=dotsReformated{j};
-		    [m1 m2]=size(y);
-
-		    p.gamma1=[p.gamma1 y];
-% 		    p.dimension1=[p.dimension1 dim{i}(1:m2)];
-% 		    p.lambda1=[p.lambda1 lam{i}(1:m2)];
-
-
-		    [temp1,temp2]=extract_properties(y',ann_dir,q);
-		    p.alpha=[p.alpha temp1];
-		    p.vect=[p.vect temp2];
+			p.alpha=[p.alpha alpha];
+			p.vect=[p.vect vect];
 		end
 
-        end
+	end
+
+	% This part removes any points outside of a mask that covers the
+	% central brain and all of its tracts. It also removes points with
+	% p.alpha (eigenvalue 1 -eigenvalue 2)/sum(eigenvalues)) below 0.25
+	% (by default) that are not part of a linear structure.
+
+	if ~isempty(mask)
+		indices=coord2ind(mask,maskiminfo.Delta,p.gamma1);
+
+		if isempty(alpha_thresh)
+			maskInd = mask(indices)>0;
+		else
+			maskInd = mask(indices)>0 & p.alpha>alpha_thresh;
+		end
 		
-        
-        % This part removes any points outside of a mask that covers the
-        % central brain an all of its tracts. It also removes points with
-        % p.alpha (eigenvalue 1 -eigenvalue 2)/sum(eigenvalues)) below 0.25. These are points that are not part of a
-        % linerar structure.
+		p.gamma2=p.gamma1(:,maskInd);
+		p.vect2=p.vect(:,maskInd);
+	elseif ~isempty(alpha_thresh)
+		p.gamma2=p.gamma1(:,p.alpha>alpha_thresh);
+		p.vect2=p.vect(:,p.alpha>alpha_thresh);
+	end
 
-        x=zeros(384,384,173);
-        for j=1:173
-            x(:,:,j)=imread('IS2_nym_mask.tif',i);
-        end
-        
-        g(1,:)=round(384/315.13*round(p.gamma1(1,:)));
-        g(2,:)=round(384/315.13*round(p.gamma1(2,:)));
-        g(3,:)=round(1*round(p.gamma1(3,:)));
-        g(1,:)=min(384,max(1,g(1,:)));
-        g(2,:)=min(384,max(1,g(2,:)));
-    	g(3,:)=min(173,max(1,g(3,:)));
-        maskInd=zeros(1,length(p.gamma1));
-        for j=1:length(p.gamma1)
-    	 x(g(2,j),g(1,j),g(3,j))>0 & p.alpha(j)>.25;
-        maskInd(j)=1;
-        end;
-    	
-        clear g
-        
-        p.gamma2=p.gamma1(:,find(maskInd));
-        p.vect2=p.vect(:,find(maskInd));
-
-
-              
-%%%%           
-              save([output_dir,name,'_properties.mat'],'p','-v7');
-              delete([output_dir,h(i).name,'-in_progress.mat'])
-             
-              
-         end
-         
+	%%%%
+	save([output_dir,current_image,'_properties.mat'],'p','-v7');
+	removelock([output_dir,current_image,'-in_progress.mat']);
+	toc;
+end
 end

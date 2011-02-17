@@ -1,63 +1,78 @@
-function y=reformat_coords(name,x,q,gregxform_dir,registration_dir,image_data);
+function y=reformat_coords(coords,registration,gregxform_dir,return_nans)
+%REFORMAT_COORDS transform a 3 x N matrix using a CMTK registration file
+% 
+% Usage: y=reformat_coords(coords,registration,gregxform_dir,return_nans)
+%
+% Input:
+% coords        - 3 x N matrix of XYZ coordinates in original image space
+% registration  - path to CMTK registration file or .list dir containing it
+% gregxform_dir - location of registration binary
+%                 defaults to /Applications/IGSRegistration/bin/
+% return_nans   - return matrix containg NaNs for points that could not be
+%                 transformed (default false, ie omit these points)
+%
+% Output: 3 x N matrix of points in the template registration space
 
-
-%imageDir='/Volumes/JData/JPeople/Nick/FruCloneClustering/images/';
-%imageDir='~/Projects/imageProcessing/';
-%registrationDir='/Volumes/JData/JPeople/Sebastian/fruitless/Registration/IS2Reg/Registration/warp/';
-%registrationDir='~/Registration/warp/';
-
-
-
-
-%in the original implementation, images were all given a depth of 152
-%images. Here we scale back to original size.
-%zScale=image_data.x.NumImages/152;
-x(:,3)=x(:,3)*image_data.Delta(3);
-
-x(:,1)=x(:,1)*image_data.Delta(1);
-% NB mirror image in Y to conform to matlab's coordinate system which is 
-% left handed (starting bottom, left, front vs top, left front in ImageJ)
-x(:,2)=(image_data.Height-x(:,2))*image_data.Delta(2);
-
-
-save(['InputCoords',num2str(q),'.txt'],'x','-ascii');
-
-reg=[registration_dir,'IS2_',name,'_01_warp_m0g80c8e1e-1x26r4.list'];
-
-
-% TODO: Some new versions of gregxform were bailing out due to an assertion
-% failure in GetJacobian:
-% Assertion failed: ((f[dim] >= 0.0) && (f[dim] <= 1.0)), function GetJacobian, file /Users/jefferis/dev/cmtk/core/libs/Base/cmtkSplineWarpXformJacobian.cxx, line 228.
-% Abort trap
-% Need to fix/discuss with Torsten Rohlfing
-
-%command=['/Users/nmasse/src/cmtk/core/build/bin/gregxform ',reg,' -f',' <InputCoords',num2str(q),'.txt >OutputCoords',num2str(q),'.txt'];
-command=[gregxform_dir,'gregxform ',reg,' ',' <InputCoords',num2str(q),'.txt >OutputCoords',num2str(q),'.txt'];
-
-system(command);
-
-[f1 f2 f3]=textread(['OutputCoords',num2str(q),'.txt'],'%s %s %s');
-
-y=zeros(length(f1),3);
-
-for i=1:length(f1);
-    
-    if f1{i}(1)~='E'
-        
-        y(i,1)=str2num(f1{i});
-        y(i,2)=str2num(f2{i});
-        y(i,3)=str2num(f3{i});
-        
-    end
-    
+if nargin<3
+	gregxform_dir = '/Applications/IGSRegistrationTools/bin/';
 end
 
-ind=find(y(:,1)>0);
-
-y=y(ind,:);
-
-delete(['InputCoords',num2str(q),'.txt'])
-delete(['OutputCoords',num2str(q),'.txt'])
-        
+if nargin<4
+	return_nans=false;
 end
 
+if ~exist(registration,'file')
+	error('Unable to read registration %s',registration);
+end
+
+% Note some binary versions of gregxform can fail with assertion failures:
+% Assertion failed: ((f[dim] >= 0.0) && (f[dim] <= 1.0)), function GetJacobian, 
+% file /Users/jefferis/dev/cmtk/core/libs/Base/cmtkSplineWarpXformJacobian.cxx, line 228.
+% The assertion failure turns out to be harmless, but we shouldn't be
+% seeing it anyway. It happens that the builds on macosx have been Debug 
+% not Release builds for a while. Assertions are ignored in Release.
+
+infile = [tempname '-input.txt'];
+outfile = [tempname '-output.txt'];
+
+fid = fopen(infile, 'w');
+fwrite(fid, coords, 'float');
+fclose(fid);
+
+gregxform = fullfile(gregxform_dir,'gregxform');
+
+if ~exist(gregxform,'file')
+	error ('Unable to locate gregxform binary at %s',gregxform);
+end
+
+command=[ gregxform ' --binary -i ' infile ' -o ' outfile ' ' registration ];
+% TODO: Check when gregxform returns non-zero and suppress error messages
+if isunix
+	command = [ command ' 2>&1' ];
+end
+
+[status result] = system(command);
+
+if ~status
+	fid = fopen(outfile, 'r');
+	y=fread(fid, size(coords), '*float');
+	fclose(fid);
+	
+	% omit points that could not be transformed
+	if ~return_nans
+		nans=isnan(y(1,:));
+		num_nans=sum(nans);
+		if num_nans>0
+			warning('omitting %d / %d points that could not be transformed',...
+				num_nans,length(coords));
+			y=y(:,~nans);
+		end
+	end
+else
+	error('error in gregxform: %s',result);
+end
+
+delete(infile);
+delete(outfile);
+
+end

@@ -1,112 +1,60 @@
-function reformat_remaining_images(input_dir,output_dir,registration_dir,gregxform_dir,filtered_image_dir)
-
-% this script takes the dimension redcued images and transforms them 
+function reformat_remaining_images(input_dir,output_dir,registration_dir,filtered_image_dir,gregxform_dir)
+% REFORMAT_REMAINING_IMAGES Transform points into template brain space
+%
+% Usage: reformat_remaining_images(input_dir,output_dir,registration_dir,...
+%	gregxform_dir)
+% this script takes the dimension reduced images and transforms them 
 % onto the IS2 template
 % the input files are XXX_dimensionReduced.mat and output files are XXX_reformated.mat.
-% Must specify the directory for the registration data, the gregxform
-% command and the image directory which the resized (or filtered) PIC files
+% Must specify the directory for the registration data and the gregxform
+% command 
 
-% INPUT
-%input_dir='/Volumes/JData/JPeople/Nick/FruCloneClustering/images/';
-h=dir([input_dir,'*_dimension_reduced.mat']);
+% Make sure that dirs have a trailing slash
+input_dir=fullfile(input_dir,filesep);
+output_dir=fullfile(output_dir,filesep);
+registration_dir = fullfile(registration_dir,filesep);
+filtered_image_dir = fullfile(filtered_image_dir,filesep);
 
-% OUTPUT
-%output_dir='/Volumes/JData/JPeople/Nick/FruCloneClustering/images/';
-
-%gregxform_dir='~/Desktop/Universal/';
-%registration_dir='~/Registration/warp/';
-%image_dir='/Volumes/JData/JPeople/Nick/FruCloneClustering/images/';
-
-
-for i=1:length(h)
-    
-     n=find(h(i).name=='_',1,'first');
-     name=h(i).name(1:n-1);
-     
-     n=find(h(i).name=='-',1,'first');
-     short_name=h(i).name(1:n-1);
-    
-     flag=1;
-
-     h1=dir([output_dir,'*_reformated.mat']);
-
-     
-     for j=1:length(h1)
-         
-         n=find(h1(j).name=='_',1,'first');
-         name1=h1(j).name(1:n-1);
-         
-      
-         if strcmp(name,name1)
-         
-                 flag=0;
-                 break
-             
-         end
-         
-     end
-     
-     h2=dir([output_dir,'*-in_progress.mat']);
-     
-     for j=1:length(h2)
-         
-         n=find(h2(j).name=='_',1,'first');
-         name2=h2(j).name(1:n-1);
-         
-         if strcmp(name,name2)
-             
-                 flag=0;
-                 break
-            
-         end
-         
-     end
-     
- 
-     
-
-         
-         if flag==1
-             
-            
-             save([output_dir,h(i).name,'-in_progress.mat'],'flag','-v7');
-             disp(['Reformating image ',h(i).name])
-        h1=dir([filtered_image_dir name,'*tubed.PIC']);
-        
- 	
-          load([input_dir,h(i).name])
-		dotsReformated={};
-        
-        image_data = impicinfo([filtered_image_dir,h1(1).name])
-        if (image_data.Delta(1) ~= image_data.Delta(2))
-            disp(['WARNING: X and Y dimension mismatch for image',h1(1).name]);
-        end
-
-		for j=1:length(dots)
-
-		    y=dots{j};
-
-		    if ~isempty(y)
-
-		        q=floor(rand*1000000);
-
-
-		    y=reformat_coords(name,y',q,gregxform_dir,registration_dir,image_data);
-		    [m1 m2]=size(y);
-
-		    dotsReformated{j}=y';
-
-		    end
-
-		end
-              
-           
-              save([output_dir,name,'_reformated.mat'],'dots','dotsReformated','-v7');
-              delete([output_dir,h(i).name,'-in_progress.mat'])
-             
-              
-         end
-         
+% Make output dir if required
+if ~exist(output_dir,'dir')
+	mkdir(output_dir);
 end
 
+h=dir([input_dir,'*_dimension_reduced.mat']);
 
+for i=1:length(h)
+
+	% set up the file names we need
+	current_image=jlab_filestem(h(i).name);
+	lockfile=[output_dir,current_image,'-in_progress.lock'];
+	registration=[registration_dir,'IS2_',current_image,...
+		'_01_warp_m0g80c8e1e-1x26r4.list'];
+
+	% Check if we should process current image
+	if matching_images(current_image,...
+			[output_dir,'*reformat*ed.mat']) % second * for spelling changes
+		% skip this image since corresponding output exists
+		continue
+	elseif ~makelock(lockfile)
+		% skip since someone else is working on this image
+		continue
+	end
+
+	disp(['Reformatting image ',h(i).name])
+	
+	% load input data
+	load([input_dir,h(i).name])
+	
+	dotsReformatted=cell(size(dots));
+	for j=1:length(dots)
+		y=dots{j};
+		if ~isempty(y)
+			dotsReformatted{j}=reformat_coords(y,registration,gregxform_dir);
+		end
+	end
+
+	save([output_dir,current_image,'_reformatted.mat'],'dots','dotsReformatted','-v7');
+	removelock(lockfile);
+end
+
+end
