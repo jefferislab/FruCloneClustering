@@ -1,4 +1,4 @@
-function find_matched_dots_remaining_images(input_dir,output_dir)
+function find_matched_dots_remaining_images_GLTree(input_dir,output_dir)
 
 
 
@@ -17,7 +17,9 @@ function find_matched_dots_remaining_images(input_dir,output_dir)
 properties_files=dir([input_dir,'*_properties.mat']);
 matched_points_files=dir([output_dir,'*_matchedPoints.mat']);
 
+load Final_image_list_Nov29
 
+good_imageList=imageList;
 
 for i=1:length(properties_files)
     
@@ -108,7 +110,7 @@ h=dir([output_dir,'*matchedPoints.mat']);
                  
                  
                  % make sure no comparaisons are repeated
-                 if ~any(strcmp(imageList,short_name))
+                 if ~any(strcmp(imageList,short_name)) & any(strcmp(good_imageList,short_name))
                      flag2=1;
                  end
                  
@@ -125,42 +127,28 @@ h=dir([output_dir,'*matchedPoints.mat']);
                  
                  i1=find(name~='-');
                  name=name(i1);
-                 
-                 imageList{end+1}=short_name;
-                 
-                 
+
                  
                  %ind_union is the index of the query points (p1.gamma2)
                  %that are matched to the templaye (p.gamma2)
-                 ptrtree=BuildGLTree3DFEX(p.gamma2');
-                 [ind_union]=compareImages_GLTree(p1,p,ptrtree);
-                 DeleteGLTree3DFEX(ptrtree);
-                 
-                 y1(ind_union)=1;
-                 
-                 y=[y y1];
-                     
-                     % In the old implementation, the nearest neighbor distance and dot
-                     % products were stored for each point. Here, we only
-                     % save the binary matrix y indicating whether a point
-                     % is matched or not.
                  
                  
-                % [dist1,dotProd1,dist2,dotProd2]=compare_images(p1,p,text_dir,ann_dir);
+                 [dummy q1]=size(p.gamma2);
+                 [dummy q2]=size(p1.gamma2);
+                 if q1>200 & q2>200
+                    ptrtree=BuildGLTree3D(p.gamma2);
+                    [ind_union]=compareImages_GLTree(p1,p,ptrtree);
+                    DeleteGLTree3D(ptrtree);
+                    y1(ind_union)=1;
+                    y=[y y1];
+                    imageList{end+1}=short_name;
+                   
+                 else
+                     ind_union=[];
+                 end
                  
-                 
-                 % distances and dot products are score in uint8 format to
-                 % save space
-%                  dist1=uint8(min(255,dist1/10*255));
-%                  dist2=uint8(min(255,dist2/10*255));
-%                  dotProd1=uint8(min(255,abs(dotProd1)*255));
-%                  dotProd2=uint8(min(255,abs(dotProd2)*255));
-%                  
-%                  x=setfield(x,name,'dist1',dist1);
-%                  x=setfield(x,name,'dist2',dist2);
-%                  x=setfield(x,name,'dotProd1',dotProd1);
-%                  x=setfield(x,name,'dotProd2',dotProd2);
-            
+
+
                  end
       
              end
@@ -170,6 +158,8 @@ h=dir([output_dir,'*matchedPoints.mat']);
 
 
 % Verify that there are no duplicate images 
+
+if length(imageList)>0
     num_images=length(imageList);
     f=sort(imageList);
        
@@ -180,12 +170,11 @@ h=dir([output_dir,'*matchedPoints.mat']);
     
     for j=2:length(f)
         
-      
+
             name1=f{j-1};
-       
+   
             name2=f{j};
-       
-        
+
         if ~strcmp(name1,name2)
 
              ind=[ind j];
@@ -195,25 +184,13 @@ h=dir([output_dir,'*matchedPoints.mat']);
         
     end
     
-%     m=length(getfield(x,f{1},'dist1'));
-%     y=zeros(m,length(ind),'uint8');
-%     
-%     for j=1:length(ind);
-%    
-%         
-%         x1=x.(f{ind(j)});
-%     
-%         matchedPoints=find((x1.dist1<255/2 & x1.dotProd1>cosd(20)*255) | (x1.dist2<255/2 & x1.dotProd2>cosd(20)*255));
-%     
-%         y(matchedPoints,j)=1;
-%     
-%     end
     
     
     imageList=f1(ind); 
     y=y(:,ind);
     
     save([output_dir current_name,'_matchedPoints.mat'],'num_images','imageList','y','-v7');
+end
 
 
      delete([output_dir properties_files(i).name,'-matched_points-in_progress.mat'])
