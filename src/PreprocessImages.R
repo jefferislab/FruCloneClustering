@@ -1,7 +1,18 @@
 # Script to preprocess a directory of images 
-NickImagesDir="/Volumes/JData/JPeople/Nick/FruCloneClustering/images"
-NickProcessedImagesDir="/Volumes/JData/JPeople/Nick/FruCloneClustering/preprocessed"
+cmdargs=commandArgs(trailingOnly=TRUE)
+print(cmdargs)
 
+if(length(cmdargs)!=2) {
+	warning("Using default input and output directories")
+	# Script to preprocess a directory of images 
+	NickImagesDir="/Volumes/JData/JPeople/Nick/FruCloneClustering/images"
+	NickProcessedImagesDir="/Volumes/JData/JPeople/Nick/FruCloneClustering/preprocessed"
+} else {
+	NickImagesDir=cmdargs[[1]]
+	NickProcessedImagesDir=cmdargs[[2]]
+}
+
+cat(NickImagesDir,NickProcessedImagesDir,"\n")
 # - Downsample (factor of 2 xy)
 # - Filter (anisofilter, doesn't yet work on cluster)
 # - Tubeness (Fiji)
