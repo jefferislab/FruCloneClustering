@@ -17,8 +17,14 @@ function coords = ind2coord(siz, IND, voxdims, axperm)
 % axperm = [-1 2 3] flip the points along the array's first axis
 % axperm = [-2 1 3] flip 1st axis and then swap 1st and 2nd
 %
-% axperm = [1 -2 3] fixes coords from images loaded by readpic
+% axperm = [1 -2 3] fixes coords from images loaded by older versions of readpic
+% available from matlab central
+%
 % axperm = [2 1 3] fixes coords from images loaded by imread (eg tif)
+% NB This also by Greg's fixed version of readpic
+% (sha1 4d1208cc9c2ed4b46e9fcae0f94770a8134e3d65, Tue Jun 01 2010 04:08:34)
+% which obeys the matlab convention for reading in image data blocks
+% so that imshow and friends behave as expected.
 %
 % See also coord2ind, ind2sub
 
