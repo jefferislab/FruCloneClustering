@@ -1,4 +1,4 @@
-function [score,MI_threshold]=classify_image(s,template_images_ind,imageList,test_image_ind,matchedPoints_dir,MI_multiplier)
+function [score,MI_threshold]=classify_image(s,test_image_ind,MI_multiplier)
 
 % This function is used to determine whether an image contains a clone of
 % interest. It is assumed that the user has already created the neccessary
@@ -31,52 +31,45 @@ function [score,MI_threshold]=classify_image(s,template_images_ind,imageList,tes
 %
 
 
-MI_threshold=(0.005:0.005:0.1)*MI_multiplier;
+MI_threshold=[0.0025:0.0025:0.1]*MI_multiplier;
+
 
 count=zeros(length(test_image_ind),40)+10^(-20);
 score=zeros(length(test_image_ind),40);
 
 for i=1:length(s)
 
-% load the XXXmatchedPoints.mat file of the ith image containing the
-% clone. The matrix y indicates which dots matched dots in other
-% images.
 
-	h=dir([matchedPoints_dir imageList{template_images_ind(i)},'-*matchedPoints.mat']);
-	load([matchedPoints_dir h(1).name],'y');
-
-%remove any images from matched points list that were deemed bad
 
 	for k=1:length(test_image_ind)
 
-		if test_image_ind(k)~=template_images_ind(i)
+		
 
 			for j=1:40
 
-				if j<=20
+% 				if j<=20
+% 
+% 					ind=find(s{i}.MI>=MI_threshold(j));
+% 					count(k,j)=count(k,j)+length(ind);
+% 					score(k,j)=score(k,j)+sum(s{i}.y(ind,test_image_ind(k))); %#ok<*NODEF>
+% 
+% 				else
 
-					ind=find(s{i}.MI>=MI_threshold(j));
-					count(k,j)=count(k,j)+length(ind);
-					score(k,j)=score(k,j)+sum(y(ind,test_image_ind(k))); %#ok<*NODEF>
-
-				else
-
-					modified_MI=max(0,s{i}.MI'-MI_threshold(j-20));
+					modified_MI=max(0,s{i}.MI'-MI_threshold(j));
 					count(k,j)=count(k,j)+sum(modified_MI);
-					score(k,j)=score(k,j)+sum(single(y(:,test_image_ind(k))).*modified_MI);
+					score(k,j)=score(k,j)+sum(single(s{i}.y(:,test_image_ind(k))).*modified_MI);
 
-				end
+% 				end
 
 			end
-		end
+
 
 	end
 
 
 end
 
-clear y
-
 score=score./count;
+
 end
 

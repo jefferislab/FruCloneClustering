@@ -1,4 +1,4 @@
-function [match_exists, first_matching_image] = matching_images( filename, fileglob )
+function [match_exists, first_matching_image] = matching_images( filename, fileglob, sep )
 % MATCHING_IMAGES see if any file has same image stem as filename
 %
 %   filename = filename whose stem will be checked for matches
@@ -9,17 +9,21 @@ function [match_exists, first_matching_image] = matching_images( filename, fileg
 %
 %   The stem is the filestem found by jlab_filestem
 %   fileglob might look like [output_dir,'*_properties.mat']
+
+if nargin < 3
+    sep = '_';
+end
 %
 match_exists=0;
 first_matching_image=[];
 
-filestem = jlab_filestem(filename);
+filestem = jlab_filestem(filename, sep);
 
 queryfiles=dir(fileglob);
 
 for j=1:length(queryfiles)
 
-	poss_stem = jlab_filestem(queryfiles(j).name());
+	poss_stem = jlab_filestem(queryfiles(j).name(),sep);
 
 	if strcmp(filestem,poss_stem)
 		% stems match so stop and return 1 (true)

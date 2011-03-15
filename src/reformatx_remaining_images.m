@@ -1,13 +1,13 @@
-function reformatx_remaining_images(input_dir,output_dir,registration_dir,templateimage)
+function reformatx_remaining_images(input_dir,output_dir,registration_dir,mask_image)
 % REFORMAT_REMAINING_IMAGES Transform images into template brain space
 %
-% Usage: reformatx_remaining_images(input_dir,output_dir,registration_dir,templateimage)
+% Usage: reformatx_remaining_images(input_dir,output_dir,registration_dir,mask_image)
 % this script takes regular images and transforms them 
 % onto the IS2 template
 % the input files are XXX.PIC and output files are eg IS2_XXX.PIC
 % Must specify the directory for the registration data and the reformatx
 % command 
-% templateimage will determine the size of the output images
+% mask_image will determine the size of the output images
 
 % Make sure that dirs have a trailing slash
 input_dir=fullfile(input_dir,filesep);
@@ -19,7 +19,7 @@ if ~exist(output_dir,'dir')
 	mkdir(output_dir);
 end
 
-[pathstr, mask_name, ext, versn] = fileparts(jlab_filestem(templateimage));
+[pathstr, mask_name, ext, versn] = fileparts(jlab_filestem(mask_image));
 h=dir([input_dir,'*.pic']);
 
 for i=1:length(h)
@@ -32,7 +32,7 @@ for i=1:length(h)
 
 	% Check if we should process current image
 	if matching_images(current_image,...
-			[output_dir,mask_name,'*'])
+			[output_dir,'*',mask_name,'*.nrrd'])
 		% skip this image since corresponding output exists
 		continue
 	elseif ~makelock(lockfile)
@@ -46,13 +46,11 @@ for i=1:length(h)
     % figure out output image name: IS2_<current_image>.PIC
   
     [pathstr, image_name, ext, versn] = fileparts(h(i).name);
-    output_image = [output_dir, mask_name, '_masked_', image_name,'.nrrd'];
+    output_image = [output_dir, image_name,'_',mask_name,'_masked.nrrd'];
     
     %  reformatx [options] --floating floatingImg target x0 [x1 ...]
     cmd=['reformatx -v --pad-out 0 --mask --outfile ', output_image,' ', ... 
-        ' --floating ', input_dir h(i).name,' ',templateimage,' ',registration];
-    
-    disp(cmd)
+        ' --floating ', input_dir h(i).name,' ',mask_image,' ',registration];
     
     system(cmd)
    

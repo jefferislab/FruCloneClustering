@@ -13,6 +13,12 @@ function [sortedscores, sortedclones] = predict_clone_from_trace(trace_file,clon
 
 % Choose register_option=1 to reformat coordinates
 
+
+
+% NOTE; This function is now out of date. Use score_trace or
+% score_trace_w_cell_bodies to score traces to identify traces.
+% Nicolas Masse, Feb 22, 2011
+
 disp('Location of gregxform unix command...');
 gregxform_dir='/Applications/IGSRegistrationTools/bin/'
 

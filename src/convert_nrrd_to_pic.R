@@ -41,7 +41,7 @@ ConvertNrrdToPic<-function(infile,outfile,Verbose=TRUE,DryRun=FALSE,RemoveInterm
 	if(!Verbose) cat("+")
 }
 # debug(ConvertNrrdToPic)
-images=dir(NickImagesDir,patt="02\\.(nrrd|NRRD)+(\\.gz)*$",full=T)
+images=dir(NickImagesDir,patt="C*\\.(nrrd|NRRD)$",full=T)
 for(i in images){
 	# final output file
 	picfile=file.path(dirname(i),paste(sub("nrrd$","pic",basename(i))))

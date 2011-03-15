@@ -1,4 +1,4 @@
-function [s]=build_MI_structure(matched_dots_dir,fileNamesIN,fileNamesOUT)
+function [s]=build_MI_structure(matched_dots_dir,fileNamesIN,fileNamesOUT,neuronal_feature)
 
 %given a list of file names given by the cell fileNamesIN and fileNamesOUT, this function
 %computes the mutual information between matched dots and to which list the image
@@ -9,64 +9,80 @@ function [s]=build_MI_structure(matched_dots_dir,fileNamesIN,fileNamesOUT)
 s=cell(1,length(fileNamesIN));
 
 for i=1:length(fileNamesIN)
-
-	h=dir([matched_dots_dir, fileNamesIN{i},'*matchedPoints.mat']);
-	load([matched_dots_dir h(1).name],'y','imageList');
-
-	if nargin==2 && i==1
-		fileNamesOUT=setdiff(imageList,fileNamesIN);
-	end
-% during the first iteration, set up the index list
-% imageList is the list of file names that make up each XXXmatchedPoints.mat
-% file
-
-	if i==1
-
-		indIN=zeros(1,length(fileNamesIN));
-		indOUT=zeros(1,length(fileNamesOUT));
-
-		for j=1:length(fileNamesIN)
-			indIN(j)=find(strcmp(fileNamesIN{j},imageList));
-		end
-
-		for j=1:length(fileNamesOUT)
-			indOUT(j)=find(strcmp(fileNamesOUT{j},imageList));
-		end
-
-	end
-
-% y is a matrix in each XXXmatchedPoints.mat file where each dot is
-% described by a row. A one in a column mean that dot in the image matched
-% another dot in the image specified by the column.
-
-% remove the comparaison between the image and itself 
-	indIN_current=indIN([1:i-1 i+1:end]);
-
-	yIN=y(:,indIN_current); %#ok<NODEF>
-	yOUT=y(:,indOUT);
-	n1=length(indIN_current);
-	n2=length(indOUT);
-
-	[m dummy]=size(yIN); %#ok<NASGU>
-
-	s{i}.MI=zeros(1,m,'single');
-
-	
-	t11=single(sum(yIN,2)/(n1+n2))+10^(-20);
-
-	t01=single(n1/(n1+n2))-single(sum(yIN,2)/(n1+n2))+10^(-20);
-
-	t10=single(sum(yOUT,2)/(n1+n2))+10^(-20);
-
-	t00=single(n2/(n1+n2))-single(sum(yOUT,2)/(n1+n2))+10^(-20);
-
-	s{i}.MI(:)=s{i}.MI(:)+(t11.*log2(t11./((t11+t10).*(t11+t01))));
-	s{i}.MI(:)=s{i}.MI(:)+(t10.*log2(t10./((t11+t10).*(t10+t00))));
-	s{i}.MI(:)=s{i}.MI(:)+(t01.*log2(t01./((t00+t01).*(t11+t01))));
-	s{i}.MI(:)=s{i}.MI(:)+(t00.*log2(t00./((t00+t01).*(t10+t00))));
-
-	s{i}.image=fileNamesIN{i};
-
-	clear y
-
+    
+    h=dir([matched_dots_dir, fileNamesIN{i},'*matched_dots.mat']);
+    
+    if neuronal_feature == 1
+        load([matched_dots_dir h(1).name],'coords_cell_bodies','match1','matched_images');
+        y = match1; % match1 is the comparaison between dots using both just lcoation
+        coords = coords_cell_bodies;
+        vect=[];
+        
+    elseif neuronal_feature == 2
+        load([matched_dots_dir h(1).name],'coords_projections','vect_projections','match2','matched_images');
+        y = match2; % match2 is the comparaison between dots using both location and tangent vector
+        coords = coords_projections;
+        vect = vect_projections;
+    end
+    
+    if nargin==2 && i==1
+        fileNamesOUT=setdiff(matched_images,fileNamesIN);
+    end
+    % during the first iteration, set up the index list
+    % matched_images is the list of file names that make up each XXXmatchedPoints.mat
+    % file
+    
+    if i==1
+        
+        indIN=zeros(1,length(fileNamesIN));
+        indOUT=zeros(1,length(fileNamesOUT));
+        
+        for j=1:length(fileNamesIN)
+            indIN(j)=find(strcmp(fileNamesIN{j},matched_images));
+        end
+        
+        for j=1:length(fileNamesOUT)
+            indOUT(j)=find(strcmp(fileNamesOUT{j},matched_images));
+        end
+        
+    end
+    
+    % y is a matrix in each XXXmatchedPoints.mat file where each dot is
+    % described by a row. A one in a column mean that dot in the image matched
+    % another dot in the image specified by the column.
+    
+    % remove the comparaison between the image and itself
+    indIN_current=indIN([1:i-1 i+1:end]);
+    
+    yIN=y(:,indIN_current); 
+    yOUT=y(:,indOUT);
+    n1=length(indIN_current);
+    n2=length(indOUT);
+    
+    [m dummy]=size(yIN); 
+    
+    s{i}.MI=zeros(1,m,'single');
+    
+    
+    t11=single(sum(yIN,2)/(n1+n2))+10^(-20);
+    
+    t01=single(n1/(n1+n2))-single(sum(yIN,2)/(n1+n2))+10^(-20);
+    
+    t10=single(sum(yOUT,2)/(n1+n2))+10^(-20);
+    
+    t00=single(n2/(n1+n2))-single(sum(yOUT,2)/(n1+n2))+10^(-20);
+    
+    s{i}.MI(:)=s{i}.MI(:)+(t11.*log2(t11./((t11+t10).*(t11+t01))));
+    s{i}.MI(:)=s{i}.MI(:)+(t10.*log2(t10./((t11+t10).*(t10+t00))));
+    s{i}.MI(:)=s{i}.MI(:)+(t01.*log2(t01./((t00+t01).*(t11+t01))));
+    s{i}.MI(:)=s{i}.MI(:)+(t00.*log2(t00./((t00+t01).*(t10+t00))));
+    
+    s{i}.image = fileNamesIN{i};
+    s{i}.y = uint8(y);
+    s{i}.coords = uint16(coords);
+    s{i}.vect = vect;
+    
+    
+    clear y
+    
 end

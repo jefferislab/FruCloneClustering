@@ -15,6 +15,17 @@ function create_image_classifier(clone_file,matchedPoints_dir,classifier_name);
 % When calibrate = 1, the scripts determines the optimal mutual information
 % level for each clone; might be a bit slow.
 
+
+
+
+
+%%%%%% OUT OF DATE
+% Currently using score_all_clones_cross_validated to create clone
+% classifier. However, this function builds a secondary classification
+% strucure, so useful to keep around for now.
+% Nicolas Masse, Feb 22, 2011
+
+
 x={};
 
 % clone_file='/Users/nmasse/Projects/imageProcessing/cloneProperties/all-clones.tab';

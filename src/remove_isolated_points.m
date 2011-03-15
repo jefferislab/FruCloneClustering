@@ -1,6 +1,16 @@
 function x1=remove_isolated_points(x)
 
+
+% NOTE: This function was used to clean up isolated points that the mask
+% did not take care of. However, not currently used by any function; can
+% get rid of this function.
+% Nicolas Masse. Feb 22, 2011
+
+
+
 x1={};
+
+
 
 for i=1:length(x)
     

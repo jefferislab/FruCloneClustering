@@ -14,6 +14,12 @@ function create_image_classifier_cross_validated(clone_file,matchedPoints_dir);
 % level for each clone; might be a bit slow.
 
 
+%%%%%% OUT OF DATE
+% Currently using score_all_clones_cross_validated to create clone
+% classifier. 
+% Nicolas Masse, Feb 22, 2011
+
+
 save_name='clone_classifier_Jan_6.mat'
 
 x={};

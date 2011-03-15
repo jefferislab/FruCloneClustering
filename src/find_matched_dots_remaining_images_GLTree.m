@@ -1,203 +1,216 @@
-function find_matched_dots_remaining_images_GLTree(input_dir,output_dir)
+function find_matched_dots_remaining_images_GLTree(input_dir,output_dir,neuronal_feature,image_list)
 
 
+%if an image list is not speicifed, the default will be to take all the
+%*properties.mat files in the directory, remove the suffix after the '-',
+%and then only use unique images.
 
 
-% INPUT FILES location of the SA*properties.mat files
-%input_dir='~/Projects/imageProcessing/property_files/';
-%input_dir='/lmb/home/nmasse/FruCloneClustering/property_files/';
+% neuronal_feature(1) == 1
+% use this type to compare cell bodies. It will just the location of the
+% dots.
 
-% OUTPUT FILES location of the SA*matchedPoints.mat files
-%output_dir='~/Projects/imageProcessing/matched_points/';
-%output_dir='/lmb/home/nmasse/FruCloneClustering/matched_points/';
+% neuronal_feature(2) == 1
+% use this type to compare projections. It will compare both the
+% location and the tangent vector of the dots.
+
+% Option to check existing saved matched dots files. Use if you've matched
+% dots for an inital set of images, and have since added to the image list.
+check_existing_saved_files = 0;
 
 
-
-
-properties_files=dir([input_dir,'*_properties.mat']);
-matched_points_files=dir([output_dir,'*_matchedPoints.mat']);
-
-load Final_image_list_Nov29
-
-good_imageList=imageList;
-
-for i=1:length(properties_files)
+if nargin < 4
+    properties_data=dir(fullfile(input_dir,'*_properties.mat'));
+    image_list_temp={};
+    for i=1:length(properties_data)
+        image_list_temp{i}=jlab_filestem(properties.data(i).name,'-');
+    end
+    image_list_temp = sort(image_list_temp);
+    image_list={};
+    count=0;
+    for i=1:length(image_list_temp)
+        if i>1 & ~strcmp(image_list_temp{i-1},image_list_temp{i})
+            count=count+1;
+            image_list{count}=image_list_temp{i};
+        end
+    end
     
-     n=find(properties_files(i).name=='_',1,'first');
-     current_name=properties_files(i).name(1:n-1);
-     
-     n=find(properties_files(i).name=='-',1,'first');
-     short_name=properties_files(i).name(1:n-1);
-     
-    % flag = 1 means that the current file listed in the strcutre h will go ahead for processing
-    % However, there are first several checks to ensure the file is not currently completed or in process 
-      flag=1;
-     
+end
+
+
+
+% Make sure that dirs have a trailing slash
+input_dir=fullfile(input_dir,filesep);
+output_dir=fullfile(output_dir,filesep);
+
+% Make output dir if required
+if ~exist(output_dir,'dir')
+    mkdir(output_dir);
+end
+
+
+% matched_data=dir([output_dir,'*_',suffix,'.mat']);
+image_list = sort(image_list);
+
+
+for i=1:length(image_list)
     
-     
- h=dir([output_dir,'*-matched_points-in_progress.mat']);
-     
-     for j=1:length(h)
-         
-         n=find(h(j).name=='_',1,'first');
-         name2=h(j).name(1:n-1);
-         
-         if strcmp(name2,current_name)
-                 flag=0;
-                 break
-         end
+    current_image=jlab_filestem(image_list{i});
+    lockfile=[output_dir,current_image,'-in_progress.lock'];
+    
+    current_image_file_loaded = 0; % a flag used to ensure we don't keep loading the same properties file
+    
+    % The final argument, '-', removes everything after '-' from the image
+    % name. If there exists multiple versions of the image (ie, SAKU1-1,
+    % SAKU1-2), we only want to use one of them.
+    [match_exists, first_matching_image] = matching_images(current_image, [output_dir,'*_matched_dots.mat'],'_');
+    
+    if check_existing_saved_files | ~match_exists
         
-         
-     end
-     
-
-h=dir([output_dir,'*matchedPoints.mat']);
-
-     for j=1:length(h)
-
-         n=find(h(j).name=='_',1,'first');
-         name2=h(j).name(1:n-1);
-
-      if strcmp(name2,current_name)
-           
-           load([output_dir h(j).name],'num_images','imageList');
-           
-           if num_images==length(properties_files)
-               flag=0;
-           else
-               flag=2;
-               break
-           end
-      end
-      
-     end
-
-
-
-         
-         if flag==1 | flag==2
-             
-             
-             if flag==1
-             imageList={};
-             y=[];
-             else
-             load([output_dir h(j).name])
-             end
-             
-             
-           
-             save([output_dir properties_files(i).name,'-matched_points-in_progress.mat'],'flag');
-             
-     
-             load([input_dir properties_files(i).name],'p');
-             
-             p1=p;
-             clear p
-             
+        if makelock(lockfile)
             
-             
-             [m1 n1]=size(p1.gamma2);
-             
-             for j=1:length(properties_files)
-                 
-                 disp([i j])
-                 
-                 flag2=0;
-                 
-                 n=find(properties_files(j).name=='-',1,'first');
-                 short_name=properties_files(j).name(1:n-1);
-                 
-                 
-                 % make sure no comparaisons are repeated
-                 if ~any(strcmp(imageList,short_name)) & any(strcmp(good_imageList,short_name))
-                     flag2=1;
-                 end
-                 
-                 if flag2==1
-                     
-                     y1=zeros(n1,1,'uint8');
-                 
-           
-                 load([input_dir properties_files(j).name],'p');
-                 
-                 
-                 n=find(properties_files(j).name=='_',1,'first');
-                 name=properties_files(j).name(1:n-1);
-                 
-                 i1=find(name~='-');
-                 name=name(i1);
-
-                 
-                 %ind_union is the index of the query points (p1.gamma2)
-                 %that are matched to the templaye (p.gamma2)
-                 
-                 
-                 [dummy q1]=size(p.gamma2);
-                 [dummy q2]=size(p1.gamma2);
-                 if q1>200 & q2>200
-                    ptrtree=BuildGLTree3D(p.gamma2);
-                    [ind_union]=compareImages_GLTree(p1,p,ptrtree);
-                    DeleteGLTree3D(ptrtree);
-                    y1(ind_union)=1;
-                    y=[y y1];
-                    imageList{end+1}=short_name;
-                   
-                 else
-                     ind_union=[];
-                 end
-                 
-
-
-                 end
-      
-             end
-             
-             
-%     f=fieldnames(x);
-
-
-% Verify that there are no duplicate images 
-
-if length(imageList)>0
-    num_images=length(imageList);
-    f=sort(imageList);
-       
-    f1={};
-
-     ind=[1];
-     f1{1}=f{1};
-    
-    for j=2:length(f)
-        
-
-            name1=f{j-1};
-   
-            name2=f{j};
-
-        if ~strcmp(name1,name2)
-
-             ind=[ind j];
-             f1{j}=name2;
+            if match_exists
+                load([output_dir first_matching_image],'matched_images','match1','match2','coords_cell_bodies','coords_projections');
+            else
+                match1=[];
+                match2=[];
+                matched_images={};
+                
+            end
+            
+            for j=1:length(image_list)
+                
+                if ~any(strcmp(image_list{j},matched_images))
+                    
+                    if ~current_image_file_loaded
+                        
+                        current_image_file_loaded = 1;
+                        
+                        %[match_exists_1, first_matching_image] = matching_images(current_image, [input_dir,'*properties.mat'],'-');
+                        h=dir([input_dir,current_image,'*properties.mat']);
+                        
+                        if isempty(h)
+                            error([image_list{i},' was not found in the input directory']);
+                        else
+                            % h1 = dir([input_dir,first_matching_image]);
+                            load([input_dir,h(1).name],'p');
+                            
+                            
+                            if neuronal_feature(1) == 1
+                                
+                                coords1_1 = p.cell_body_coords;
+                                vect1_1 = [];
+                                [dummy n1_1] = size(coords1_1);
+                                
+                            end
+                            
+                            if neuronal_feature(2) == 1
+                                
+                                coords1_2 = p.gamma3;
+                                vect1_2 = p.vect3;
+                                [dummy n1_2] = size(coords1_2);
+                                
+                            end
+                            
+                            
+                            
+                        end
+                        
+                    end
+                    
+                    %[match_exists_1, first_matching_image] = matching_images(image_list{j}, [input_dir,'*properties.mat'],'-');
+                    h=dir([input_dir,image_list{j},'*properties.mat']);
+                    
+                    if isempty(h)
+                        error([image_list{j},' was not found in the input directory']);
+                    else
+                        %h1 = dir([input_dir,first_matching_image]);
+                        load([input_dir,h(1).name],'p');
+                        
+                        matched_images{end+1}=image_list{j};
+                        
+                        if neuronal_feature(1) == 1
+                            
+                            coords2_1=p.cell_body_coords;
+                            vect2_1=[];
+                            [dummy n2_1]=size(coords2_1);
+                            
+                            if n1_1>20 & n2_1 >20 % something wrong with either image if it contains less than 20 points
+                                y1 = zeros(n1_1,1,'uint8');
+                                ptrtree = BuildGLTree3D(double(coords2_1));
+                                [ind_union] = compareImages_GLTree(coords1_1,coords2_1,vect1_1,vect2_1,ptrtree,1);
+                                DeleteGLTree3D(ptrtree);
+                                y1(ind_union) = 1;
+                                match1 = [match1 y1];
+                                
+                                
+                            else
+                                
+                                y1 = zeros(n1_1,1,'uint8');
+                                match1 = [match1 y1];
+                            end
+                            
+                            
+                            
+                        end
+                        
+                        if neuronal_feature(2) == 1
+                            
+                            coords2_2 = p.gamma3;
+                            vect2_2 = p.vect3;
+                            [dummy n2_2] = size(coords2_2);
+                            
+                            if n1_2 > 20 & n2_2 > 20 % something wrong with either image if it contains less than 20 points
+                                y1 = zeros(n1_2,1,'uint8');
+                                ptrtree = BuildGLTree3D(double(coords2_2));
+                                [ind_union] = compareImages_GLTree(coords1_2,coords2_2,vect1_2,vect2_2,ptrtree,2);
+                                DeleteGLTree3D(ptrtree);
+                                y1(ind_union) = 1;
+                                match2 = [match2 y1];
+                                
+                            else
+                                
+                                y1 = zeros(n1_2,1,'uint8');
+                                match2 = [match2 y1];
+                                
+                            end
+                            
+                        end
+                        
+                        
+                    end
+                    
+                end
+            end
+            
+            if ~match_exists
+                if neuronal_feature(1) == 1
+                    coords_cell_bodies = coords1_1;
+                else
+                    coords_cell_bodies = [];
+                end
+                
+                if neuronal_feature(2) == 1
+                    coords_projections = coords1_2;
+                    vect_projections = vect1_2;
+                else
+                    coords_projections = [];
+                    vect_projections = [];
+                end
+            end
+            
+            
+            save(fullfile(output_dir,[current_image,'_matched_dots.mat']),'match1','match2','coords_cell_bodies', ...
+                'coords_projections','vect_projections','matched_images');
+            % delete lockfile
+            removelock(lockfile);
             
         end
         
     end
     
     
-    
-    imageList=f1(ind); 
-    y=y(:,ind);
-    
-    save([output_dir current_name,'_matchedPoints.mat'],'num_images','imageList','y','-v7');
 end
 
-
-     delete([output_dir properties_files(i).name,'-matched_points-in_progress.mat'])
-
-             
+                
         
-    end
-         
-end
-     
