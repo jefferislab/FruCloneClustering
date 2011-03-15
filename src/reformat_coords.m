@@ -21,7 +21,7 @@ if nargin<4
 	return_nans=false;
 end
 
-if ~exist(registration,'file')
+if ~exist(registration,'file') && ~exist(registration,'dir')
 	error('Unable to read registration %s',registration);
 end
 

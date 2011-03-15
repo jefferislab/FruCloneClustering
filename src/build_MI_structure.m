@@ -1,10 +1,13 @@
 function [s]=build_MI_structure(matched_dots_dir,fileNamesIN,fileNamesOUT,neuronal_feature)
-
+% BUILD_MI_STRUCTURE Calculate mutual information for one clone type
+%
 %given a list of file names given by the cell fileNamesIN and fileNamesOUT, this function
 %computes the mutual information between matched dots and to which list the image
 %belong to. The general purpose is to feed in the file
 %names that all contain the same clone, and those that don't, and this function will identify how
 %informative each dots in each these files is of the clone.
+%
+% See also create_image_classifier
 
 s=cell(1,length(fileNamesIN));
 

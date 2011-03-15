@@ -1,5 +1,5 @@
 function indices = coord2ind(img,voxdims,coords,aperm)
-% COORD2IND - find 1D indices into 3D image of XYZ coordinates
+% COORD2IND find 1D indices into 3D image of XYZ coordinates
 % 
 % Input:
 % img     - 3d img array

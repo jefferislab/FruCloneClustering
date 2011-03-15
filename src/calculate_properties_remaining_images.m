@@ -1,5 +1,5 @@
 function calculate_properties_remaining_images(input_dir,output_dir,mask_file,alpha_thresh,cell_bodies_image_dir,image_list)
-% CALCULATE_PROPERTIES_REMAINING_IMAGES - find tangent vector, alpha
+% CALCULATE_PROPERTIES_REMAINING_IMAGES - find local tangent vector and dimensionality (alpha)
 %
 % Function takes reformatted images and calculates:
 % principal eigenvector (tangent vector)
@@ -69,7 +69,8 @@ if ~exist(output_dir,'dir')
 	mkdir(output_dir);
 end
 
-% infiles=dir([input_dir,'*_reformated.mat']);
+% NB Second asterisk permits spelling variants
+infiles=dir([input_dir,'*_reformat*ed.mat']);
 
 % OUTPUT
 %output_dir='/Volumes/JData/JPeople/Nick/FruCloneClustering/images/';
@@ -80,7 +81,7 @@ end
 
 %%TODO: instead of looping through infiles, loop through the image_list
 
-for i=1:length(image_list)
+for i=1:randperm(length(image_list))
 	% This contains just the image stem (everyhing up to first underscore)
 	% e.g. SAKW12-1_reformated.mat => SAKW12-1
 	current_image=jlab_filestem(image_list{i});

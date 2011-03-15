@@ -1,5 +1,5 @@
 function dp = detectProb(x2, x1)
-
+% DETECTPROB TODO:Nick explain what this does!
 x1 = sort(x1(:));
 x2 = sort(x2(:));
 

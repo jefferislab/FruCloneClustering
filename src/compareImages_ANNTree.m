@@ -1,16 +1,17 @@
 function [ind_union]=compareImages_ANNTree(query,template,anntree,distance_thresh,angle_thresh)
-% Compare point sets derived from images by position and vector similarity
+% COMPAREIMAGES_ANNTREE Compare point sets derived from images by position and vector similarity
+%
 % Usage:
 %   [ind_union]=compareImages_ANNTree(query,template,anntree,[distance_thresh],[angle_thresh])
 %
 % Input:
-%   query, template = point set properties (inc posiition and tangent vector)
-%   anntree is kd tree associated with the structure template
-%   distance_thresh = max distance to consider as match [5]
-%   angle_thresh = max angle to consider as match [20 degrees]
+%   query, template - point set properties (inc posiition and tangent vector)
+%   anntree         - kd tree associated with the structure template
+%   distance_thresh - max distance to consider as match [5]
+%   angle_thresh    - max angle to consider as match [20 degrees]
 %
 % Output:
-%   indices of matching points from query
+%   ind_unionindices of matching points from query
 
 if nargin<3
 	anntree = [];
@@ -43,6 +44,8 @@ dot_prod=abs(query.vect2(1,ind).*template.vect2(1,NNG(ind))+...
 ind1=ind(dot_prod>cosd(angle_thresh));
 
 % Flip horizontally (ie across YZ plane)
+% TODO Generalise this and maybe carry out completely separate comparisons
+% of flipped and non=flipped points
 query.gamma2(2,:)=315.13-query.gamma2(2,:);
 query.vect2(1,:)=-query.vect2(1,:);
 
