@@ -1,5 +1,5 @@
-function [sortedscores, sortedclones] = predict_clone_from_trace(trace_file,clone_classifier,registration)
-% PREDICT_CLONE_FROM_TRACE - Match tracing against clone image database
+function [sortedscores, sortedclones] = predict_clone_from_trace(trace_file,clone_classifier,image_properties_dir,registration)
+% PREDICT_CLONE_FROM_TRACE Match tracing against clone image database
 % 
 % Usage: 
 % [sortedscores, sortedclones] = ...
@@ -16,9 +16,6 @@ function [sortedscores, sortedclones] = predict_clone_from_trace(trace_file,clon
 disp('Location of gregxform unix command...');
 gregxform_dir='/Applications/IGSRegistrationTools/bin/'
 
-disp('Location of image properties (ie SAKU1-1_properties.mat...)');
-image_properties_dir='~/NickTempFolder/imageProperties/'
-
 % Load classifier structure with mutual information data
 load(clone_classifier);
 
@@ -28,15 +25,15 @@ for i=1:length(x)
 end
 
 % Read in trace file
-y=dlmread(trace_file);
+pts=dlmread(trace_file)';
 
 % Transform points if necessary
-if nargin>2
-	y=reformat_coords(x1,registration);
+if nargin>3
+	pts=reformat_coords(pts,registration);
 end
 
 % Calculate tangent vectors for query points
-[alpha,vect]=extract_properties(y);
+[alpha,vect]=extract_properties(pts);
 
 MI_threshold=0.005:0.005:0.1;
 MI_threshold2=(0.005:0.005:0.1)*5;
@@ -46,11 +43,11 @@ score=zeros(1,length(x));
 % score2=zeros(1,40);
 
 % aggregated position & vector information for query points
-p1.gamma2=y';
+p1.gamma2=pts;
 p1.vect2=vect;
 
 % Make a nearest search structure for query points
-ptrtree=BuildGLTree3DFEX(y);
+ptrtree=BuildGLTree3DFEX(pts');
 
 % Iterate through each template clone
 for i=1:length(x)
@@ -64,7 +61,12 @@ for i=1:length(x)
 % note that there may be multiple variants of this image
 % depending on flips etc - this will just use the first one
 % TODO - tidy this up
-		h=dir([image_properties_dir x{i}.images{j},'*properties.mat']);
+		h=dir([image_properties_dir x{i}.images{j},'-*properties.mat']);
+		if length(h)==0
+			warning('Skipping image %s because properties file does not exist',...
+				x{i}.images{j});
+			continue
+		end
 		load([image_properties_dir h(1).name]);
 
 % p.gamma is aggregated position & vector information for this

@@ -1,11 +1,14 @@
 function clone=collect_clone_information(clone_file)
-
+% COLLECT_CLONE_INFORMATION Parse list of clone types and which images they are present in
+%
+% Usage: clone=collect_clone_information(clone_file)
+%
 % This function produces the cell clone which contains the name of each
 % clone and the brains that contain the clone. 
 %
 % Input: cluster_file, a .tab files, containing the image names in the
 %                      first column and the clone names in the second
-%                      column. The file should be strcutrued as such to
+%                      column. The file should be structured as such to
 %                      denote which clones contain which image
 %
 %                      ImageA  CloneA
@@ -16,7 +19,7 @@ function clone=collect_clone_information(clone_file)
 %
 %                      Here, Images A-C contain clone A and images D and E
 %                      contain clone B.
-
+%
 
 %clone_file='/Users/nmasse/Projects/imageProcessing/cloneProperties/all-clones.tab';
 

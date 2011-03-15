@@ -16,7 +16,7 @@ end
 
 properties_files=dir([input_dir,'*_properties.mat']);
 
-for i=1:length(properties_files)
+for i=1:randperm(length(properties_files))
 
 	current_image=jlab_filestem(properties_files(i).name);
 
@@ -82,9 +82,7 @@ for i=1:length(properties_files)
 
 				%ind_union is the index of the query points (p1.gamma2)
 				%that are matched to the template (p.gamma2)
-				anno = ann(p.gamma2);
-				[ind_union] = compareImages_ANNTree(p1,p,anno);
-				anno = close(anno);
+				[ind_union] = compareImages_ANNTree(p1,p);
 
 				y1(ind_union)=1;
 

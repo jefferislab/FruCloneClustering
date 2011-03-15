@@ -1,5 +1,5 @@
 function calculate_properties_remaining_images(input_dir,output_dir,mask_file,alpha_thresh)
-% CALCULATE_PROPERTIES_REMAINING_IMAGES - find tangent vector, alpha
+% CALCULATE_PROPERTIES_REMAINING_IMAGES find local tangent vector and dimensionality (alpha)
 %
 % Function takes reformatted images and calculates:
 % principal eigenvector (tangent vector)
@@ -45,7 +45,7 @@ if ~exist(output_dir,'dir')
 	mkdir(output_dir);
 end
 
-for i=1:length(infiles)
+for i=1:randperm(length(infiles))
 	% This contains just the image stem (everyhing up to first underscore)
 	% e.g. SAKW12-1_reformated.mat => SAKW12-1
 	current_image=jlab_filestem(infiles(i).name);

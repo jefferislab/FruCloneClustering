@@ -23,7 +23,6 @@ for i=1:m
 
 	end
 
-
 	score(i,:)=classify_image(x{i}.s,template_images_ind,imageList,test_image_ind,matchedPoints_dir);
 
 end

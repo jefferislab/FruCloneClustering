@@ -36,6 +36,11 @@ Prob=cell(1,length(connectedRegions));
 lam=cell(1,length(connectedRegions));
 coords=cell(1,length(connectedRegions));
 
+if sum(L(:)>0)>1e6
+	warning('skipping image with > 1e6 points');
+	return
+end
+
 tic;
 for z1=1:length(connectedRegions);
 
@@ -81,6 +86,7 @@ function [gamma,P,lambda,dimension] = chigirev_dim_reduction(xcoords,no_iteratio
 	% xx is the original data (should be between 0 and 1)
 	% lamba determines the tradeoff F(M,Pm) = D + lambda*I
 	% gamma will be new manifold positions
+	xcoords=single(xcoords);
 	gamma=xcoords;
 	[n,K]=size(xcoords);
 
@@ -119,7 +125,8 @@ function [gamma,P,lambda,dimension] = chigirev_dim_reduction(xcoords,no_iteratio
 		% negative exponential.  Therefore it makes sense only to consider
 		% a few close neighbours and set the interaction of all other
 		% points to 0.
-		kpoints=min([K max([75 ceil(1.5*K^(1/3))])]);
+		% kpoints=min([K max([75 ceil(1.5*K^(1/3))])]);
+		kpoints=min([K 75]);
 
 		% Must have at least 20 points
 		if z>5 && K>=20
