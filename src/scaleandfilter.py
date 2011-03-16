@@ -18,9 +18,9 @@ __license__ = "GPL >= v2"
 
 import sys
 import getopt
-from ij import *
-from ij.io import *
-from ij.process import *
+from ij import IJ, ImagePlus, ImageStack
+from ij.io import Opener, FileSaver
+from ij.process import StackProcessor
 if sys.version_info > (2, 4):
 	import subprocess
 import os
