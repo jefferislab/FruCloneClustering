@@ -14,6 +14,11 @@ function indices = coord2ind(img,voxdims,coords,aperm)
 % See also SUB2IND
 
 imsize=size(img);
+
+if length(imsize) == 2 && imsize(1)==1
+	imsize=img;
+end
+
 if length(imsize) ~= 3
 	error('coords2ind only handles 3d data');
 end
