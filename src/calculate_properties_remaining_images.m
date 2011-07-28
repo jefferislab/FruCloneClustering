@@ -105,13 +105,21 @@ for i=1:length(image_list)
         indata=load([input_dir, first_matching_image]);
     end 
     
-    y=p.gamma1;
-      ptrtree=BuildGLTree3D(y);
-			[alpha,vect]=extract_properties(y',ptrtree);
-            DeleteGLTree3D(ptrtree);
-            p.alpha=alpha
-            p.vect=vect;
-    
+    for j=1:length(indata.dotsReformated) % iterate over each group of connected dots
+        y=indata.dotsReformated{j}; % dots in reference coord space
+        
+        if ~isempty(y)
+            [dummy num_dots]=size(y);
+            
+            if num_dots > 20
+                p.gamma1=[p.gamma1 y];
+                ptrtree=BuildGLTree3D(y);
+                [alpha,vect]=extract_properties(y',ptrtree);
+                DeleteGLTree3D(ptrtree);
+                p.alpha=[p.alpha alpha];
+                p.vect=[p.vect vect];
+            end
+        end
     end
       
     % This part removes any points outside of a mask that covers the
