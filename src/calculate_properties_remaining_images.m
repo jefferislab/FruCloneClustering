@@ -1,23 +1,28 @@
-function calculate_properties_remaining_images(input_dir,output_dir,mask_file,alpha_thresh,cell_bodies_image_dir,image_list)
-% CALCULATE_PROPERTIES_REMAINING_IMAGES - find tangent vector, alpha
+function calculate_properties_remaining_images(input_dir,output_dir,mask_file,alpha_thresh,...
+    cell_bodies_image_dir,image_list)
 %
-% Function takes reformatted images and calculates:
-% principal eigenvector (tangent vector)
-% alpha (alpha=1 -> one-dimenionsal, alpha=0 -> isotropic)
-% from the moment of inertia.
+% calculate_properties_remaining_images.m
 %
-% Optionally: save only points with alpha > alpha_thresh
-% Optionally: supply a mask_file (currently only tif)
+% Function takes reformatted images and calculates: principal eigenvector (tangent vector) from momemnt
+% of inertia, cell body locations, and dots that fall within the image mask. Outputs are saved to a
+% structure p in [image_name]_properties.mat
 %
-% The input files are XXX_reformated.mat and output files are XXX_properties.mat.
+% INPUTS:
+%   input_dir:              Directory containing the *_reformated.mat files
+%   output_dir:             Directory in which the *_properties.mat files will be saved to.
+%   mask_file:              PIC file used to mask points.
+%   alpha_thresh:           Cutoff used to determine whether a projection is sufficiently one-dimensional.
+%                           Points above this threshold are saved to p.gamma2. Alpha=1  -> one-dimenionsal,
+%                           Alpha=0 -> isotropic). Default is 0.25
+%   cell_bodies_image_dir:  Directory containing PIC files of the orignal images after reformating.
+%   image_list:             Cell array containing names of image files to be processed. If an image list is not
+%                           speicifed, the default will be to take all the *_reformated.mat files in the input
+%                           directory.
 %
-% See also extract_properties
+% Uses: extract_properties
 
-
-%if an image list is not speicifed, the default will be to take all the
-%*properties.mat files in the directory, remove the suffix after the '-',
-%and then only use unique images.
 if nargin < 6
+    % remove the suffix after the '-',and then only use unique images
     properties_data=dir(fullfile(input_dir,'*_reformated.mat'));
     image_list_temp={};
     for i=1:length(properties_data)
@@ -35,19 +40,17 @@ if nargin < 6
     
 end
 
+% If cell_bodies_image_dir has been specified, then calculate and save cell
+% body locations.
 if nargin < 5
-    
-   find_cell_bodies_flag = 0;
-   
-   else
-    
-   find_cell_bodies_flag = 1;
-   
+    find_cell_bodies_flag = 0;   
+else   
+    find_cell_bodies_flag = 1;   
 end
-    
+
 
 if nargin < 4
-	alpha_thresh = 0.25;
+    alpha_thresh = 0.25;
 end
 
 if nargin >= 3
@@ -55,18 +58,16 @@ if nargin >= 3
 	mask = readpic(mask_file);
 	maskiminfo = impicinfo(mask_file);
 else
-	% Set default to empty array
-	mask = [];
+    % Set default to empty array
+    mask = [];
 end
-
-
 
 % Make sure that dirs have a trailing slash
 input_dir=fullfile(input_dir,filesep);
 output_dir=fullfile(output_dir,filesep);
 
 if ~exist(output_dir,'dir')
-	mkdir(output_dir);
+    mkdir(output_dir);
 end
 
 % infiles=dir([input_dir,'*_reformated.mat']);
