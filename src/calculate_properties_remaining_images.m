@@ -97,17 +97,13 @@ for i=1:length(image_list)
     p.alpha=[];
     p.vect=[];
     
-   % h=dir([input_dir,current_image,'*reformated.mat']);
-    h=dir([input_dir,current_image,'*properties.mat']); %%%%%%%% TEMPORARY CHANGE, REVERT TO PREVIOUS LINE
-    if isempty(h)
+    % Added '-' before '*', NYM May 22, 2011 
+    [match_exists, first_matching_image] = matching_images(current_image, [input_dir,'*reformated.mat'],'-');  
+    if ~match_exists
         error([current_image,' is not in the input directory']);
     else
-
-      %  indata=load([input_dir,h(1).name]);
-        load([input_dir,h(1).name]);%%%%%%%% TEMPORARY CHANGE, REVERT TO PREVIOUS LINE
-        
-    end
-    
+        indata=load([input_dir, first_matching_image]);
+    end 
     
     y=p.gamma1;
       ptrtree=BuildGLTree3D(y);
