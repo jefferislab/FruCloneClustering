@@ -4,9 +4,10 @@
 % source images into a set of processed dots that are cross-matched
 % against dots in all other images.
 
+addpath('C:\Users\Public\scripts')
 %%%% Input and output directories
 
-root_dir = '/Volumes/JData/JPeople/Nick/FruCloneClustering/';
+root_dir = 'F:\FruCloneClustering\';
 
 original_images_dir=[root_dir 'Source_images/'];
 
@@ -14,23 +15,23 @@ processed_images_dir=[root_dir 'Processed_images/'];
 
 segmented_images_dir=[root_dir 'Segmented_images/'];
 
-dimension_reduced_dir=[root_dir 'Dimension_reduced_images/'];
+dimension_reduced_dir=[root_dir 'dimension_reduced_images\']
 
 reformated_points_dir=[root_dir 'Reformated_points/'];
 
 reformated_images_dir=[root_dir 'Reformated_images/'];
 
-properties_dir=[root_dir 'Properties_images_from_backup/'];
 %properties_dir=[root_dir 'imageProperties/'];
-
-matched_dots_dir=[root_dir 'Matched_dots/'];
 
 Chiang_data_dir=['/Volumes/jefferis/projects/flycircuit/ChiangReg/reformatted/'];
 
-mask_image = '/Volumes/JData/JPeople/Nick/FruCloneClustering/Masks/IS2_nym_mask.pic';
+mask_image = 'F:\FruCloneClustering\Masks\IS2_nym_mask.pic';
 
 %%%%%
 
+
+properties_dir='E:\imageProcessing\image_properties_June6\';
+matched_dots_dir='E:\imageProcessing\matched_points_June6\';
 %
 % Loading set of images to use
 load([root_dir,'final_image_list_feb_18.mat']);
@@ -70,7 +71,7 @@ reformat_remaining_images(dimension_reduced_dir,reformatted_dir,registration_dir
 reformatx_remaining_images(original_images_dir,reformated_images_dir,registration_dir,templateimage)
 
 % Calculate tangent vectors etc
-calculate_properties_remaining_images(dimension_reduced_dir,properties_dir,[],.25,reformated_images_dir,image_list);
+calculate_properties_remaining_images(dimension_reduced_dir,properties_dir,mask_image,.25,reformated_images_dir,image_list);
 
 % Find and store which dots in each image match dots in other images
 find_matched_dots_remaining_images_GLTree(properties_dir,matched_dots_dir, [1 1], image_list); 
