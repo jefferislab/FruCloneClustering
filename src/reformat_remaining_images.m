@@ -1,13 +1,19 @@
 function reformat_remaining_images(input_dir,output_dir,registration_dir,filtered_image_dir,gregxform_dir)
-% REFORMAT_REMAINING_IMAGES Transform points into template brain space
+% 
+% reformat_remaining_images.m
 %
-% Usage: reformat_remaining_images(input_dir,output_dir,registration_dir,...
-%	gregxform_dir)
-% this script takes the dimension reduced images and transforms them 
+% This function takes the dimension reduced images and transforms them 
 % onto the IS2 template
 % the input files are XXX_dimensionReduced.mat and output files are XXX_reformated.mat.
 % Must specify the directory for the registration data and the gregxform
 % command 
+%
+% INPUTS:
+%   input_dir:          Directory in which the tubed image files (saved as *tubed.PIC) are located.
+%   output_dir:         Directory in which the segmented image files (saved as *tubed.mat) will be saved to.
+%   registration_dir:   all voxel above this intensity level will form part of the
+%               image. Voxels with intensity levels below this threshold will be
+%               discarded.
 
 % Make sure that dirs have a trailing slash
 input_dir=fullfile(input_dir,filesep);

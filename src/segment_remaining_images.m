@@ -1,9 +1,16 @@
 function segment_remaining_images(input_dir,output_dir,threshold)
-% SEGMENT_REMAINING_IMAGES Find connected regions with pixels > threshold
 %
-% This function takes tubed images, thresholds them, and then segments them
-% the input files are XXXtubed.PIC the and output files are XXXtubed.mat.
-% The segmentation threshold defaults to 10
+% segment_remaining_images.m
+%
+% This function takes tubed images, applies a threshold, and finds the
+% sets voxels that are connected.  
+%
+% INPUTS:
+%   input_dir:  Directory in which the tubed image files (saved as *tubed.PIC) are located.
+%   output_dir: Directory in which the segmented image files (saved as *tubed.mat) will be saved to.
+%   threshold:  all voxel above this intensity level will form part of the
+%               image. Voxels with intensity levels below this threshold will be
+%               discarded.
 
 if nargin < 3
 	threshold = 10;

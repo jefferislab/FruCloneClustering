@@ -1,17 +1,19 @@
 function [dots,dim,Prob,lam,coords]=image_dimension_reduction(file_name,min_points_per_region,no_iterations)
-% Attempts to captures tubular structure in dot collections
 %
-% Input: matlab file containing 1 or more sets of connected dots
-%    voxdims - 3-vector giving voxel dimensions
-%    min_points_per_region defaults to 200 points
-%    no_iterations defaults to 45 iterations
+% image_dimension_reduction.m
 %
-% This implements the algorithm described in
-% Optimal Manifold Representation of Data: An Information Theoretic Approach
-% Denis Chigirev and William Bialek
-% which attempts to reduce higher dimensional data onto a 1D manifold
-% For our images this means trying to reduce dot clouds to compact
-% representations of tubular structures
+% This implements the algorithm described in "Optimal Manifold Representation 
+% of Data: An Information Theoretic Approach", Denis Chigirev and William Bialek. 
+% This function reduces higher dimensional data onto a 1D manifold.
+% In other words, it attempts to captures tubular structure in dot collections
+%
+% INPUTS:
+%   file_name:              File name of the segementd image (saved as a *tubed.mat file).
+%   min_points_per_region:  Sets containing less than min_points_per_region coordinates will
+%                           be discarded. Defaults to 200.
+%   no_iterations:          Number of iteration to run the EM algorithm. Defaults to 45.
+
+
 
 if nargin < 4
 	no_iterations=45;
