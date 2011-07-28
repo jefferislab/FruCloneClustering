@@ -157,13 +157,12 @@ for i=1:length(image_list)
     % Will find the location of putative cell bodies if a directory with
     % the reformated images was specified
     if find_cell_bodies_flag
-        
-        h = dir([cell_bodies_image_dir,current_image,'*.pic']);
-        if isempty(h);
+%        h = dir([cell_bodies_image_dir,current_image,'*.pic']);
+        [match_exists, first_matching_image] = matching_images(current_image, [cell_bodies_image_dir,'*.pic'],'_');
+        if ~match_exists
             p.cell_body_coords = [];
         else
-            p.cell_body_coords = find_cell_body_locations([cell_bodies_image_dir,h(1).name]);;
-            
+            p.cell_body_coords = find_cell_body_locations([cell_bodies_image_dir, first_matching_image]);
         end
     else
         p.cell_body_coords = [];
