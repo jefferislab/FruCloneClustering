@@ -54,8 +54,8 @@ for i=1:length(fileNamesIN)
     % remove the comparaison between the image and itself
     indIN_current=indIN([1:i-1 i+1:end]);
     
-    yIN=y(:,indIN_current); 
-    yOUT=y(:,indOUT);
+    yIN=double(y(:,indIN_current)); 
+    yOUT=double(y(:,indOUT));
     n1=length(indIN_current);
     n2=length(indOUT);
     
@@ -64,13 +64,13 @@ for i=1:length(fileNamesIN)
     s{i}.MI=zeros(1,m,'single');
     
     
-    t11=single(sum(yIN,2)/(n1+n2))+10^(-20);
+    t11=sum(yIN,2)/(n1+n2)+10^(-20);
     
-    t01=single(n1/(n1+n2))-single(sum(yIN,2)/(n1+n2))+10^(-20);
+    t01=n1/(n1+n2)-sum(yIN,2)/(n1+n2)+10^(-20);
     
-    t10=single(sum(yOUT,2)/(n1+n2))+10^(-20);
+    t10=sum(yOUT,2)/(n1+n2)+10^(-20);
     
-    t00=single(n2/(n1+n2))-single(sum(yOUT,2)/(n1+n2))+10^(-20);
+    t00=n2/(n1+n2)-sum(yOUT,2)/(n1+n2)+10^(-20);
     
     s{i}.MI(:)=s{i}.MI(:)+(t11.*log2(t11./((t11+t10).*(t11+t01))));
     s{i}.MI(:)=s{i}.MI(:)+(t10.*log2(t10./((t11+t10).*(t10+t00))));
@@ -79,7 +79,7 @@ for i=1:length(fileNamesIN)
     
     s{i}.image = fileNamesIN{i};
     s{i}.y = uint8(y);
-    s{i}.coords = uint16(coords);
+    s{i}.coords = single(coords);
     s{i}.vect = vect;
  
     
