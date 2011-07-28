@@ -53,10 +53,17 @@ if nargin < 4
     alpha_thresh = 0.25;
 end
 
-if nargin >= 3
-	%FIXME make sure this mask is loaded up with correct axis orientation
-	mask = readpic(mask_file);
-	maskiminfo = impicinfo(mask_file);
+if nargin >= 3  
+    mask_temp = readpic(mask_file);
+    mask = zeros(384,384,173);
+    for i=1:173
+        %FIXME make sure this mask is loaded up with correct axis orientation
+        % currently working with
+        mask(:,:,i)=mask_temp(:,384:-1:1,i);
+    end
+    maskiminfo = impicinfo(mask_file);
+    % make mask symmetric
+    mask = mask + mask(384:-1:1,:,:);  
 else
     % Set default to empty array
     mask = [];
