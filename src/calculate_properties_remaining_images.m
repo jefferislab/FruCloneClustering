@@ -77,38 +77,25 @@ if ~exist(output_dir,'dir')
     mkdir(output_dir);
 end
 
-% infiles=dir([input_dir,'*_reformated.mat']);
-
-% OUTPUT
-%output_dir='/Volumes/JData/JPeople/Nick/FruCloneClustering/images/';
-
-if ~exist(output_dir,'dir')
-	mkdir(output_dir);
-end
-
-%%TODO: instead of looping through infiles, loop through the image_list
-
 for i=1:length(image_list)
-	% This contains just the image stem (everyhing up to first underscore)
-	% e.g. SAKW12-1_reformated.mat => SAKW12-1
-	current_image=jlab_filestem(image_list{i});
-
-	% Check if we should process current image
-	if matching_images(current_image,...
-			[output_dir,'*_properties.mat'])
-		% skip this image since corresponding output exists
-		continue
-	elseif ~makelock([output_dir,current_image,'-in_progress.mat'])
-		% Looks like someone else is working on this image
-		continue
-	end
-
-	%%%% Main code
-
-	p=[];
-	p.gamma1=[];
-	p.alpha=[];
-	p.vect=[];
+    % This contains just the image stem (everything up to first underscore)
+    % e.g. SAKW12-1_reformated.mat => SAKW12-1
+    current_image=jlab_filestem(image_list{i});
+    % Check if we should process current image
+    if matching_images(current_image,...
+            [output_dir,'*_properties.mat'])
+        % skip this image since corresponding output exists
+        continue
+    elseif ~makelock([output_dir,current_image,'-in_progress.mat'])
+        % Looks like someone else is working on this image
+        continue
+    end   
+    
+    %%%% Main code
+    p=[];
+    p.gamma1=[];
+    p.alpha=[];
+    p.vect=[];
     
    % h=dir([input_dir,current_image,'*reformated.mat']);
     h=dir([input_dir,current_image,'*properties.mat']); %%%%%%%% TEMPORARY CHANGE, REVERT TO PREVIOUS LINE
@@ -122,28 +109,6 @@ for i=1:length(image_list)
     end
     
     
-
-% 	for j=1:length(indata.dotsReformated) % iterate over each group of connected dots
-% 
-% 		y=indata.dotsReformated{j}; % dots in original coord space
-% 
-% 		if ~isempty(y)
-% 
-% 			y=indata.dotsReformated{j}; % dots in reference coord space
-%             [dummy n]=size(y);
-%             if n>20
-% 			p.gamma1=[p.gamma1 y];
-%              ptrtree=BuildGLTree3D(y);
-% 			[alpha,vect]=extract_properties(y',ptrtree);
-%             DeleteGLTree3D(ptrtree);
-% 			p.alpha=[p.alpha alpha];
-% 			p.vect=[p.vect vect];
-%             end
-% 		end
-% 
-%     end
-    
-    
     y=p.gamma1;
       ptrtree=BuildGLTree3D(y);
 			[alpha,vect]=extract_properties(y',ptrtree);
@@ -151,31 +116,28 @@ for i=1:length(image_list)
             p.alpha=alpha
             p.vect=vect;
     
-
-	% This part removes any points outside of a mask that covers the
-	% central brain and all of its tracts. It also removes points with
-	% p.alpha (eigenvalue 1 -eigenvalue 2)/sum(eigenvalues)) below 0.25
-	% (by default) that are not part of a linear structure.
-
-	if ~isempty(mask)
-		indices=coord2ind(mask,maskiminfo.Delta,p.gamma1);
-
-		if isempty(alpha_thresh)
-			maskInd = mask(indices)>0;
-		else
-			maskInd = mask(indices)>0 & p.alpha>alpha_thresh;
-		end
-		
-		p.gamma2=p.gamma1(:,maskInd);
-		p.vect2=p.vect(:,maskInd);
-	elseif ~isempty(alpha_thresh)
-		p.gamma2=p.gamma1(:,p.alpha>alpha_thresh);
-		p.vect2=p.vect(:,p.alpha>alpha_thresh);
     end
+      
+    % This part removes any points outside of a mask that covers the
+    % central brain and all of its tracts. It also removes points with
+    % p.alpha (eigenvalue 1 -eigenvalue 2)/sum(eigenvalues)) below 0.25
+    % (by default) that are not part of a linear structure.
     
+    if ~isempty(mask)
+        indices=coord2ind(mask,maskiminfo.Delta,p.gamma1); 
+        if isempty(alpha_thresh)
+            maskInd = mask(indices)>0;
+        else
+            maskInd = mask(indices)>0 & p.alpha>alpha_thresh;
+        end 
+        p.gamma2=p.gamma1(:,maskInd);
+        p.vect2=p.vect(:,maskInd);       
+    elseif ~isempty(alpha_thresh)
+        p.gamma2=p.gamma1(:,p.alpha>alpha_thresh);
+        p.vect2=p.vect(:,p.alpha>alpha_thresh);
+    end   
     
     %%%% This part downsamples the resolution to 1 um
-    
     disp(current_image)
     coords=max(1,round(p.gamma2));
     m1=max(coords(1,:));
@@ -187,8 +149,7 @@ for i=1:length(image_list)
     
     p.gamma3 = uint16([i1' i2' i3']');
     p.vect3 = p.vect2(:, included_ind);
-    
-    
+
     % Will find the location of putative cell bodies if a directory with
     % the reformated images was specified
     if find_cell_bodies_flag
@@ -201,14 +162,9 @@ for i=1:length(image_list)
             
         end
     else
-        
         p.cell_body_coords = [];
-        
     end
-    
-    p
-	%%%%
-	save([output_dir,current_image,'_properties.mat'],'p','-v7');
-	removelock([output_dir,current_image,'-in_progress.mat']);
+    save([output_dir,current_image,'_properties.mat'],'p','-v7');
+    removelock([output_dir,current_image,'-in_progress.mat']);
 end
 end
