@@ -148,12 +148,10 @@ for i=1:length(image_list)
     m2=max(coords(2,:));
     m3=max(coords(3,:));
     ind = sub2ind([m1 m2 m3],coords(1,:),coords(2,:),coords(3,:));
-    [ind included_ind] = unique(ind);
-    [i1 i2 i3] = ind2sub([m1 m2 m3],ind);
-    
-    p.gamma3 = uint16([i1' i2' i3']');
+    [dummy included_ind] = unique(ind);
+    p.gamma3 = p.gamma2(:,included_ind);
     p.vect3 = p.vect2(:, included_ind);
-
+    
     % Will find the location of putative cell bodies if a directory with
     % the reformated images was specified
     if find_cell_bodies_flag
