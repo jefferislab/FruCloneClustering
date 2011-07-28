@@ -10,7 +10,7 @@ s=cell(1,length(fileNamesIN));
 
 for i=1:length(fileNamesIN)
     
-    h=dir([matched_dots_dir, fileNamesIN{i},'*matched_dots.mat']);
+    h=dir([matched_dots_dir, fileNamesIN{i},'_matched_dots.mat']); % chaned '*' to '_' NYM May 22,2011
     
     if neuronal_feature == 1
         load([matched_dots_dir h(1).name],'coords_cell_bodies','match1','matched_images');
@@ -81,7 +81,7 @@ for i=1:length(fileNamesIN)
     s{i}.y = uint8(y);
     s{i}.coords = uint16(coords);
     s{i}.vect = vect;
-    
+ 
     
     clear y
     
