@@ -1,0 +1,7 @@
+Source code to accompany:
+
+A mutual information approach to automate identification of neuronal clusters in Drosophila brain images
+Nicolas Y. Masse, Sebastian Cachero, Aaron D. Ostrovsky, Gregory S. X. E. Jefferis
+Division of Neurobiology, MRC Laboratory of Molecular Biology, Cambridge, CB2 0QH, UK.
+
+See src/Contents.m for details of Matlab code and how to install dependencies.
