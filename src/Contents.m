@@ -53,6 +53,9 @@
 %   see also http://octave-swig.sourceforge.net/octave-ann.html
 % 
 % b) ReadPic Matlab code - to read Biorad format images
+% 
+% c) GLTreePro for finding nearest neighbour points
+%   compile with TestMexFiles3D.m
 %
 % 2. CMTK Image Registration and Analysis
 %	http://www.nitrc.org/projects/cmtk/
