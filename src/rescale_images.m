@@ -51,8 +51,7 @@ for i=1:length(h)
 	disp(['Rescaling image ',infile])
 	
 	% run fiji script
-    % TODO: remove import * in jython script to avoid -Dpython.cachedir.skip=false in fiji call
-	cmd = sprintf('fiji --headless -Dpython.cachedir.skip=false -- %s -i %s -o %s -x %f -y %f -batch',...
+	cmd = sprintf('fiji --headless -- %s -i %s -o %s -x %f -y %f -batch',...
 		scriptfile, [input_dir infile], [output_dir outfile], scale(1), scale (2));
 	disp(cmd);
 	system(cmd);
