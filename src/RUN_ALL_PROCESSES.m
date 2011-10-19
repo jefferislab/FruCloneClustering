@@ -9,17 +9,17 @@ addpath('C:\Users\Public\scripts')
 
 root_dir = 'F:\FruCloneClustering\';
 
-original_images_dir=[root_dir 'Source_images/'];
+original_images_dir=fullfile(root_dir,'Source_images');
 
-processed_images_dir=[root_dir 'Processed_images/'];
+processed_images_dir=fullfile(root_dir,'Processed_images');
 
-segmented_images_dir=[root_dir 'Segmented_images/'];
+segmented_images_dir=fullfile(root_dir,'Segmented_images');
 
-dimension_reduced_dir=[root_dir 'dimension_reduced_images\']
+dimension_reduced_dir=fullfile(root_dir,'dimension_reduced_images');
 
-reformated_points_dir=[root_dir 'Reformated_points/'];
+reformated_points_dir=fullfile(root_dir,'Reformated_points');
 
-reformated_images_dir=[root_dir 'Reformated_images/'];
+reformated_images_dir=fullfile(root_dir,'Reformated_images');
 
 %properties_dir=[root_dir 'imageProperties/'];
 
@@ -48,7 +48,6 @@ RCode_dir='/Volumes/JData/JPeople/Greg/FruMARCMCode/';
 gregxform_dir='/Applications/IGSRegistrationTools/bin/';
 
 %%% Steps of the image data processing procedure
-
 
 
 command=['cat ',RCode_dir,'scripts/SebaStartup.R ',' convert_nrrd_to_pic.R | R --vanilla --args ',...
