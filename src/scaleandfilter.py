@@ -24,7 +24,7 @@ from ij.process import StackProcessor
 if sys.version_info > (2, 4):
 	import subprocess
 import os
-
+from features import TubenessProcessor
 def scaleandfilter(infile,outfile,scalex,scaley):
 	
 	print ("infile is: "+infile)
@@ -68,18 +68,21 @@ def scaleandfilter(infile,outfile,scalex,scaley):
 	imp = Opener().openImage(outtif)
 	imp.setCalibration(cal)
 	print("Running tubeness on tif: "+outtif)
-	IJ.run(imp,"Tubeness", "sigma=1")
-	IJ.run(imp, "8-bit","")
+	tp=TubenessProcessor(1.0,False)
+	result = tp.generateImage(imp)
+	IJ.run(result, "8-bit","")
 	# Save out file
 	fileName, fileExtension = os.path.splitext(outfile)
 	print("Saving as "+fileExtension+": "+outfile)
 	if fileExtension.lower()=='nrrd':
 		IJ.setKeyDown("alt") # this causes the nrrd to be compressed
-		IJ.run("Nrrd ... ", "nrrd=[" + outfile + "]")
+		IJ.run(result, "Nrrd ... ", "nrrd=[" + outfile + "]")
 		IJ.setKeyDown("none")
 	else:
 		# Save to PIC
-		IJ.run(imp,"Biorad ...", "biorad=["+outfile+"]")
+		IJ.run(result,"Biorad ...", "biorad=["+outfile+"]")
+	imp.close()
+	result.close()
 	
 def usage():
 	print __doc__
