@@ -70,11 +70,16 @@ def scaleandfilter(infile,outfile,scalex,scaley):
 	print("Running tubeness on tif: "+outtif)
 	IJ.run(imp,"Tubeness", "sigma=1")
 	IJ.run(imp, "8-bit","")
-
-	# Save to PIC
-	print("Saving as PIC: "+outfile)
-	# IJ.saveAs("tiff","outtif")
-	IJ.run(imp,"Biorad ...", "biorad="+outfile)
+	# Save out file
+	fileName, fileExtension = os.path.splitext(outfile)
+	print("Saving as "+fileExtension+": "+outfile)
+	if fileExtension.lower()=='nrrd':
+		IJ.setKeyDown("alt") # this causes the nrrd to be compressed
+		IJ.run("Nrrd ... ", "nrrd=[" + outfile + "]")
+		IJ.setKeyDown("none")
+	else:
+		# Save to PIC
+		IJ.run(imp,"Biorad ...", "biorad=["+outfile+"]")
 	
 def usage():
 	print __doc__

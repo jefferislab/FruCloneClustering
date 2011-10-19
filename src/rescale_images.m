@@ -1,13 +1,15 @@
 function rescale_images( input_dir, output_dir, suffix, scale)
-%RESCALE_IMAGES rescale all PIC images in input_dir
+%RESCALE_IMAGES rescale all PIC/nrrd images in input_dir
 %   
 % Usage rescale_images( input_dir, scale)
 %
 % input_dir  - directory containing PIC images
 % output_dir - output directory
-% suffix     - string which will be appended to output file stem
-%              e.g. for suffix='-4xd' file_01.pic -> file_01-4xd.PIC
 % scale      - 3-vector which will be multiplied by old size to get new size
+% suffix      - string which will be appended to output file stem
+%               e.g. for suffix='-4xd.nrrd' file_01.pic -> file_01-4xd.nrrd
+%               NB if suffix ends in nrrd, will be saved in NRRD format
+%               otherwise Biorad PIC.
 
 % Make sure that dirs have a trailing slash
 input_dir=fullfile(input_dir,filesep);
@@ -37,7 +39,7 @@ for i=1:length(h)
 	current_image=jlab_filestem(infile);
 	lockfile=[output_dir,current_image,'-in_progress.lock'];
 	[pathstr, outfile] = fileparts(infile);
-	outfile = [outfile suffix '.PIC'];
+	outfile = [outfile suffix];
 	
 	% Check if we should process current image
 	if ~CheckForNewerInput([input_dir infile],[output_dir outfile],true)
