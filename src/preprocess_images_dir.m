@@ -1,16 +1,27 @@
-function preprocess_images_dir(input_dir,output_dir)
+function preprocess_images_dir(input_dir,varargin)
 % PREPROCESS_IMAGES_DIR Preprocess a directory of PIC images using ImageJ/Fiji
-%   PREPROCESS_IMAGES_DIR(input_dir,output_dir)
+%   PREPROCESS_IMAGES_DIR(input_dir,output_dir,DryRun,Verbose,RemoveIntermediates)
 %
 %   input_dir:  Directory containing input .PIC, .pic, .PIC.gz, or .pic.gz files
+% Optional arguments
 %   output_dir: Directory in which tubed.PIC output files will be saved
 %   (defaults to input_dir)
-% 
+%	DryRun (default false)
+%	Verbose (default true)
+%	RemoveIntermediates (default true)
 % Note this is a translation of the original PreprocessImages.R script
-
-if nargin < 2
-	output_dir=input_dir;
+	
+numvarargs = find(~cellfun('isempty',varargin));
+if length(numvarargs) > 4
+	error('preprocess_image requires at most 3 optional inputs');
 end
+% set defaults for optional inputs
+optargs = {input_dir 0 1 1};
+% now put these defaults into the valuesToUse cell array,
+% and overwrite the ones specified in varargin.
+optargs(numvarargs) = varargin(numvarargs);
+% Place optional args in memorable variable names
+[output_dir, DryRun, Verbose, RemoveIntermediates] = optargs{:};
 
 % Make sure that dirs have a trailing slash
 input_dir=fullfile(input_dir,filesep);
@@ -52,28 +63,36 @@ for i=1:length(images)
 	
 	% Perform image processing
     disp(['processing image: ' current_image])
-	preprocess_image(fullfile(input_dir,images(i).name));
+	preprocess_image(fullfile(input_dir,images(i).name),...
+		fullfile(output_dir,[images(i).name,'.4xd-tubed.PIC']),...
+		DryRun, Verbose, RemoveIntermediates);
 	removelock(lockfile);
 
 end
 
 end
 
-function [ command ] = preprocess_image( infile, outfile )
+function [ command, status ] = preprocess_image( infile, varargin)
 %PREPROCESS_IMAGE Take an individual image and preprocess with fiji/cfd
-%   Detailed explanation goes here
-
-% PreprocessImage<-function(infile,outfile,Verbose=TRUE,DryRun=FALSE,RemoveIntermediates=TRUE){
-	% TODO add these options back
-	Verbose=1;
-	RemoveIntermediates=1;
-	DryRun=1;
+% PREPROCESS_IMAGE(infile, outfile, DryRun, Verbose, RemoveIntermediates)
+% infile - name of Biorad PIC format input file
+% Optional arguments
+%   outfile: file name of tubed.PIC output defaults to <infile>.4xd-tubed.PIC
+%	DryRun (default false)
+%	Verbose (default true)
+%	RemoveIntermediates (default true)
 	
-	if nargin < 2
-		outfile=[infile,'.4xd-tubed.PIC'];
+	numvarargs = find(~cellfun('isempty',varargin));
+	if length(numvarargs) > 4
+		error('preprocess_image requires at most 3 optional inputs');
 	end
-	
-	macro=[];
+	% set defaults for optional inputs
+	optargs = {[infile,'.4xd-tubed.PIC'] 0 1 1};
+	% now put these defaults into the valuesToUse cell array,
+	% and overwrite the ones specified in varargin.
+	optargs(numvarargs) = varargin(numvarargs);
+	% Place optional args in memorable variable names
+	[outfile, DryRun, Verbose, RemoveIntermediates] = optargs{:};
 	
 	% open file
 	macro=['open("',infile,'");'];
@@ -81,7 +100,7 @@ function [ command ] = preprocess_image( infile, outfile )
 	[outdir,~,~] = fileparts(outfile);
 	[indir,infilename,infileext] = fileparts(infile);
 	resampledfilename=[infilename,infileext,'.4xd.tif'];
-	resampledfilepath=fullfile(outdir,resampledfilename);
+	resampledfilepath=fullfile(indir,resampledfilename);
 	macro=[macro,'run("Scale...", "x=0.5 y=0.5 z=1.0 interpolation=Bicubic process title=Scaled");']
 	% Make sure that we select the right window
 	macro=[macro 'selectWindow("Scaled");'];
@@ -91,6 +110,7 @@ function [ command ] = preprocess_image( infile, outfile )
 	macro=[macro 'saveAs("Tiff", "',resampledfilepath,'");'];
 	% run anisofilter
 	filteredResampledfile=[infilename infileext,'.4xd-filtered.tif'];
+	filteredResampledfilepath=fullfile(indir,filteredResampledfile);
 	anisoOptions='-scanrange:10 -tau:2 -nsteps:2 -lambda:0.1 -ipflag:0 -anicoeff1:1 -anicoeff2:0 -anicoeff3:0';
 	macro=[macro 'exec("sh","-c",' '"cd ',indir,'; anisofilter ',anisoOptions,' ',resampledfilename,' ',filteredResampledfile,'");'];
 	% open the result
@@ -112,13 +132,15 @@ function [ command ] = preprocess_image( infile, outfile )
 	
 	command=['fiji -eval ''runMacro("',tmp,'");'' -batch'];
 	if DryRun
+		result=macro;
+		status=-1;
 		return
 	end
 	
-	system(command)
+	[status, result] = system(command);
 	delete(tmp);
 	if(RemoveIntermediates)
-		delete(resampledfile,filteredResampledfile);
+		delete(resampledfilepath,filteredResampledfilepath);
 	end
 	if ~Verbose
 		disp('+');
