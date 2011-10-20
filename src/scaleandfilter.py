@@ -8,6 +8,7 @@ Options:
   -y ..., --scaley=...	 scale factor in y
   -i ..., --in=...       input file
   -o ..., --out=...      output file
+  -a ..., --anisofilter=... location of anisofilter binary
 
   -h, --help			 show this help
 """
@@ -18,14 +19,15 @@ __license__ = "GPL >= v2"
 
 import sys
 import getopt
-from ij import *
-from ij.io import *
-from ij.process import *
+from ij import IJ, ImagePlus, ImageStack
+from ij.io import Opener, FileSaver
+from ij.process import StackProcessor
 if sys.version_info > (2, 4):
 	import subprocess
 import os
+from features import TubenessProcessor
 
-def scaleandfilter(infile,outfile,scalex,scaley):
+def scaleandfilter(infile,outfile,scalex,scaley,anisofilter):
 	
 	print ("infile is: "+infile)
 	
@@ -45,36 +47,44 @@ def scaleandfilter(infile,outfile,scalex,scaley):
 
 	IJ.run(imp, "8-bit","")
 	
-	intif=infile+".tif"
 	outtif=infile+"-filtered.tif"
-	print("saving input file as "+intif)
-	f=FileSaver(imp)
-	f.saveAsTiffStack(intif)
-	imp.close()
+	intif=infile+".tif"
+	if anisofilter.upper() != 'FALSE':
+		print("saving input file as "+intif)
+		f=FileSaver(imp)
+		f.saveAsTiffStack(intif)
+		imp.close()
+		# anisotropic filtering
+		anisopts="-scanrange:10 -tau:2 -nsteps:2 -lambda:0.1 -ipflag:0 -anicoeff1:1 -anicoeff2:0 -anicoeff3:0"
+		anisopts=anisopts+" -dx:%f -dy:%f -dz:%f" % (cal.pixelWidth,cal.pixelHeight,cal.pixelDepth)
 
-	# anisotropic filtering
-	anisopts="-scanrange:10 -tau:2 -nsteps:2 -lambda:0.1 -ipflag:0 -anicoeff1:1 -anicoeff2:0 -anicoeff3:0"
-	anisopts=anisopts+" -dx:%f -dy:%f -dz:%f" % (cal.pixelWidth,cal.pixelHeight,cal.pixelDepth)
-	
-	if sys.version_info > (2, 4):
-		#for testing
-		# subprocess.check_call(["cp",intif,outtif])
-		subprocess.check_call(["anisofilter"]+anisopts.split(' ')+[intif,outtif])
-	else:
-		os.system(" ".join(["anisofilter"]+anisopts.split(' ')+[intif,outtif]))
-
+		if sys.version_info > (2, 4):
+			#for testing
+			# subprocess.check_call(["cp",intif,outtif])
+			subprocess.check_call([anisofilter]+anisopts.split(' ')+[intif,outtif])
+		else:
+			os.system(" ".join([anisofilter]+anisopts.split(' ')+[intif,outtif]))
+		# Open anisofilter output back into Fiji
+		print("Opening output tif: "+outtif)
+		imp = Opener().openImage(outtif)
+		imp.setCalibration(cal)
 	# Hessian (tubeness)
-	print("Opening output tif: "+outtif)
-	imp = Opener().openImage(outtif)
-	imp.setCalibration(cal)
-	print("Running tubeness on tif: "+outtif)
-	IJ.run(imp,"Tubeness", "sigma=1")
-	IJ.run(imp, "8-bit","")
-
-	# Save to PIC
-	print("Saving as PIC: "+outfile)
-	# IJ.saveAs("tiff","outtif")
-	IJ.run(imp,"Biorad ...", "biorad="+outfile)
+	print("Running tubeness")
+	tp=TubenessProcessor(1.0,False)
+	result = tp.generateImage(imp)
+	IJ.run(result, "8-bit","")
+	# Save out file
+	fileName, fileExtension = os.path.splitext(outfile)
+	print("Saving as "+fileExtension+": "+outfile)
+	if fileExtension.lower()=='nrrd':
+		IJ.setKeyDown("alt") # this causes the nrrd to be compressed
+		IJ.run(result, "Nrrd ... ", "nrrd=[" + outfile + "]")
+		IJ.setKeyDown("none")
+	else:
+		# Save to PIC
+		IJ.run(result,"Biorad ...", "biorad=["+outfile+"]")
+	imp.close()
+	result.close()
 	
 def usage():
 	print __doc__
@@ -90,9 +100,11 @@ def main(argv):
 	scaley=0.5
 	infile=''
 	outfile=''
+	anisofilter='anisofilter'
 	
 	try:
-		opts, args = getopt.getopt(argv, "hx:y:i:o:", ["help", "scalex=", "scaley=","in=","out="])
+		opts, args = getopt.getopt(argv, "hx:y:i:o:a:", 
+		    ["help", "scalex=", "scaley=","in=","out=","anisofilter="])
 	except getopt.GetoptError:
 		usage()
 		sys.exit(2)
@@ -108,8 +120,10 @@ def main(argv):
 			infile = arg
 		elif opt in ("-o", "--out"):
 			outfile = arg
+		elif opt in ("-a", "--anisofilter"):
+			anisofilter = arg
 	
-	scaleandfilter(infile,outfile,scalex,scaley)
+	scaleandfilter(infile,outfile,scalex,scaley,anisofilter)
 	
 if __name__ == "__main__":
 	main(sys.argv[1:])

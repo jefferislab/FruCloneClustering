@@ -45,7 +45,7 @@ for i=1:length(input_files)
 	x=readpic(infile);
 	% FIXME permute image data array into standard form
 	iminfo=impicinfo(infile);
-	voxdims=iminfo.Delta;
+	voxdims=iminfo.Delta; %#ok<NASGU>
 
 	% Choose threshold level as mode + 10
 	if nargin < 3
@@ -53,7 +53,7 @@ for i=1:length(input_files)
 			error('Cannot handle images that are not uint8');
 		end
 		h=hist(x(:),0:255);
-		[maxcount,maxbinidx]=max(h);
+		[maxcount,maxbinidx]=max(h); %#ok<ASGLU>
 		% nb this is mode+10 since bins are 1-indexed but values start at 0
 		threshold = maxbinidx + 9;
 		disp(['Thresholding ' input_files(i).name ' at x=' num2str(threshold)])
@@ -63,7 +63,7 @@ for i=1:length(input_files)
 	u=zeros(size(x),'uint8');
 	u(x>=threshold)=1;
 	nPoints=sum(u(:));
-	disp(sprintf('there are %d points above threshold',nPoints));
+	sprintf('there are %d points above threshold',nPoints);
 	if nPoints>1e6
 		warning('more than 1e6 points could cause memory problems.  Increase threshold?');
 	end
@@ -71,7 +71,7 @@ for i=1:length(input_files)
 	if exist('bwlabeln','file')
 		% image processing toolbox is present
 		% Find connected components and give each island a unique index
-		[L,NUM]=bwlabeln(u,26);
+		[L,NUM]=bwlabeln(u,26); %#ok<ASGLU>
 
 		disp(['Segmented image ',input_files(i).name,'. Image has ',num2str(NUM),' components.'])
 	else
@@ -80,8 +80,8 @@ for i=1:length(input_files)
 		% now that image_dimension_reduction is O(n) speed will not really be 
 		% affected.
 		
-		L=double(u);
-		NUM = 1;
+		L=double(u); %#ok<NASGU>
+		NUM = 1; %#ok<NASGU>
 	end
 	save(fullfile(output_dir,[current_image,'_filtered2_tubed.mat']),'x','L','NUM','voxdims','threshold','-v7');
 	% delete lockfile
