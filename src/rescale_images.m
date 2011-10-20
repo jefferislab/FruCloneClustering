@@ -12,10 +12,10 @@ function rescale_images( input_dir, output_dir, suffix, scale, anisofilter, fiji
 %               NB if suffix ends in nrrd, will be saved in NRRD format
 %               otherwise Biorad PIC.
 % scale       - 3-vector which will be multiplied by old size to get new size
-% anisofilter - path to anisofilter -€“ defaults to 'anisofilter' when it
+% anisofilter - path to anisofilter - defaults to 'anisofilter' when it
 %               must be in system path.
 %               If set to '' then anisofilter will not be called by fiji
-% fiji        - path to fiji â€“ defaults to 'fiji' ie must be in system path
+% fiji        - path to fiji - defaults to 'fiji' ie must be in system path
 
 % Make sure that dirs have a trailing slash
 input_dir=fullfile(input_dir,filesep);
