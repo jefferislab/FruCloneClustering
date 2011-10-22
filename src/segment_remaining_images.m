@@ -1,9 +1,17 @@
 function segment_remaining_images(input_dir,output_dir,threshold)
-% SEGMENT_REMAINING_IMAGES Find connected regions with pixels > threshold
 %
-% This function takes tubed images, thresholds them, and then segments them
-% the input files are XXXtubed.PIC the and output files are XXXtubed.mat.
-% The segmentation threshold defaults to 10
+% segment_remaining_images.m
+%
+% This function takes tubed images, applies a threshold, and finds the
+% sets voxels that are connected.  If the threshold is not specified, it will default
+% to image mode + 10. 
+%
+% INPUTS:
+%   input_dir:  Directory in which the tubed image files (saved as *tubed.PIC) are located.
+%   output_dir: Directory in which the segmented image files (saved as *tubed.mat) will be saved to.
+%   threshold:  all voxel above this intensity level will form part of the
+%               image. Voxels with intensity levels below this threshold will be
+%               discarded.
 %
 % Note that this function will use bwlabeln to find sets of connected dots
 % If bwlabeln is missing (No Image Processing toolobox) it will just 
@@ -70,16 +78,16 @@ for i=1:length(input_files)
 
 	if exist('bwlabeln','file')
 		% image processing toolbox is present
-		% Find connected components and give each island a unique index
+	% Find connected components and give each island a unique index
 		[L,NUM]=bwlabeln(u,26); %#ok<ASGLU>
 
-		disp(['Segmented image ',input_files(i).name,'. Image has ',num2str(NUM),' components.'])
+	disp(['Segmented image ',input_files(i).name,'. Image has ',num2str(NUM),' components.'])
 	else
 		% no image processing toolbox, just threshold
 		% this means that the next steps will occupy more memory but 
 		% now that image_dimension_reduction is O(n) speed will not really be 
 		% affected.
-		
+
 		L=double(u); %#ok<NASGU>
 		NUM = 1; %#ok<NASGU>
 	end

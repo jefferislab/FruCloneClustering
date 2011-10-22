@@ -1,17 +1,19 @@
 function y=reformat_coords(coords,registration,gregxform_dir,return_nans)
-%REFORMAT_COORDS transform a 3 x N matrix using a CMTK registration file
+%
+% reformat_coords.m
+% Transform a 3 x N matrix using a CMTK registration file
 % 
-% Usage: y=reformat_coords(coords,registration,gregxform_dir,return_nans)
 %
-% Input:
-% coords        - 3 x N matrix of XYZ coordinates in original image space
-% registration  - path to CMTK registration file or .list dir containing it
-% gregxform_dir - location of registration binary
-%                 defaults to /Applications/IGSRegistration/bin/
-% return_nans   - return matrix containg NaNs for points that could not be
-%                 transformed (default false, ie omit these points)
+% INPUTS:
+%   coords:         3 x N matrix of XYZ coordinates in original image space.
+%   registration:   Path to CMTK registration file or .list dir containing it.
+%   gregxform_dir:  Location of registration binary.
+%                           be discarded. Defaults to 200; defaults to /Applications/IGSRegistration/bin/
+%   return_nans:    Return matrix containg NaNs for points that could not be transformed (default false, 
+%                   ie omit these points)
 %
-% Output: 3 x N matrix of points in the template registration space
+% OUTPUTS:
+%   y:              3 x N matrix of points in the template registration space
 
 if nargin<3
 	gregxform_dir = '/Applications/IGSRegistrationTools/bin/';

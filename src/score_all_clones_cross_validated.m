@@ -16,45 +16,40 @@ function score_all_clones_cross_validated(clone_file,matchedPoints_dir);
 
  % If cross_validation = 1, will loop through all images. If cross_validation = 0, will
  % loop trhough only those images containing the clone.
- full_cross_validation = 0 
+ full_cross_validation = 1 
 
-save_name='clone_classifier_Feb_21_partial.mat'
+save_name='clone_classifier_June6.mat'
 
 x={};
 
-root_dir = '/Volumes/JData/JPeople/Nick/FruCloneClustering/';
+% root_dir = '/Volumes/JData/JPeople/Nick/FruCloneClustering/';
 
-clone_file = [root_dir ,'all-clones.tab'];
+clone_file = 'F:\FruCloneClustering\all-clones.tab';
 
 clone=collect_clone_information(clone_file);
 
-matchedPoints_dir=[root_dir, 'Matched_dots/'];
+% matchedPoints_dir=[root_dir, 'Matched_dots/'];
+matchedPoints_dir='E:\imageProcessing\matched_points_June6\'
 
-load([root_dir,'final_image_list_feb_18.mat']);
+load(['F:\FruCloneClustering\final_image_list_feb_18.mat']);
 
 
 % To save time, we only use classified clones.
 ind_classified = [];
 
 
-% ind=[];
-% for i=1:length(present_clones)
-%     if num_images(i)>=4 & ~(strcmp(present_clones{i},'AL-f') | strcmp(present_clones{i},'P-e') | ...
-%             strcmp(present_clones{i},'P-h') | strcmp(present_clones{i},'P-s') | strcmp(present_clones{i},'SG-h') | ...
-%             strcmp(present_clones{i},'AMMC') | strcmp(present_clones{i},'MandibularNerve-a') | strcmp(present_clones{i},'MandibularNerve-b'))
-%         ind=[ind i];
-%     end
-% end
-
+ind=[];
 for i=1:length(clone)
-    if any(find(clone{i}.cloneName=='-')) & ~strcmp(clone{i}.cloneName,'P-Single') & ~strcmp(clone{i}.cloneName,'SG-single');
-        ind_classified=[ind_classified i];
-    elseif strcmp(clone{i}.cloneName,'AMMC') | strcmp(clone{i}.cloneName,'Mb')
-        ind_classified=[ind_classified i];
+    if length(clone{i}.image)>=4 ~(strcmp(clone{i}.cloneName,'AL-f') | strcmp(clone{i}.cloneName,'P-e') | ...
+            strcmp(clone{i}.cloneName,'P-h') | strcmp(clone{i}.cloneName,'P-s') | strcmp(clone{i}.cloneName,'SG-h') | ...
+            strcmp(clone{i}.cloneName,'AMMC') | strcmp(clone{i}.cloneName,'MandibularNerve-a') | strcmp(clone{i}.cloneName,'MandibularNerve-b'))
+        ind=[ind i];
     end
 end
 
-clone=clone(ind_classified);
+clone{i}.cloneName
+
+clone=clone(ind);
 
 
 
@@ -62,7 +57,7 @@ cloneIndex={};
 cloneIndexSize=zeros(1,length(clone));
 
 
-for i=1:length(clone)
+for i=3:length(clone)
     
     
     %for each clone, determine the index of which images containing the
@@ -128,7 +123,9 @@ for i=1:length(clone)
         % Leave one out cross-validation
         for j=1:length(image_list);
             
-            disp([i j])
+            if j/40 == round(j/40)
+                disp([i j])
+            end
             
             indIN=setdiff(cloneIndex{i},j);
             indOUT=setdiff(1:length(image_list),[j cloneIndex{i}]);
@@ -137,7 +134,7 @@ for i=1:length(clone)
             s2=build_MI_structure(matchedPoints_dir,image_list(indIN),image_list(indOUT),2);
             
             score1=classify_image(s1,j,1);
-            score2=classify_image(s2,j,2);
+            score2=classify_image(s2,j,1);
             
             if any(find(j==cloneIndex{i}))
                 score_clone1=[score_clone1 score1'];
@@ -155,7 +152,7 @@ for i=1:length(clone)
         indOUT=setdiff(1:length(image_list), cloneIndex{i});
         
         score_no_clone1=classify_image(x{i}.s1,indOUT,1)';
-        score_no_clone2=classify_image(x{i}.s2,indOUT,2)';
+        score_no_clone2=classify_image(x{i}.s2,indOUT,1)';
         
         for j=1:length(cloneIndex{i})
             
@@ -165,7 +162,7 @@ for i=1:length(clone)
             s2=build_MI_structure(matchedPoints_dir,image_list(indIN),image_list(indOUT),2);
             
             score1=classify_image(s1,cloneIndex{i}(j),1);
-            score2=classify_image(s2,cloneIndex{i}(j),2);
+            score2=classify_image(s2,cloneIndex{i}(j),1);
             
             score_clone1=[score_clone1 score1'];
             score_clone2=[score_clone2 score2'];
@@ -223,7 +220,7 @@ for i=1:length(clone)
     
     
     % removing matched dots matricies because of memory concerns
-    for j = 1:length(x{i}.s1)
+    for j = 1:length(x{i}.s2)
         
         x{i}.s1{j} = rmfield(x{i}.s1{j},'y');
         x{i}.s2{j} = rmfield(x{i}.s2{j},'y');
@@ -233,6 +230,8 @@ for i=1:length(clone)
     x{i}.note = 'Cell body threshold is 0.5 of maximum filtered value; cell bodies a match if within 20 um';
     
     save(save_name,'x','image_list','-v7.3')
+    
+    disp([clone{i}.cloneName,'   ',num2str(0),'   ',num2str(x{i}.AROC_P)])
     
     
 end

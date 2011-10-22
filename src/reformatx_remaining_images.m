@@ -1,5 +1,8 @@
 function reformatx_remaining_images(input_dir,output_dir,registration_dir,mask_image)
-% REFORMAT_REMAINING_IMAGES Transform images into template brain space
+%  
+% reformatx_remaining_images.m
+%
+% Transform images into template brain space
 %
 % Usage: reformatx_remaining_images(input_dir,output_dir,registration_dir,mask_image)
 % this script takes regular images and transforms them 

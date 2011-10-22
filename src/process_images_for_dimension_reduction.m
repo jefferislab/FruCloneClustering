@@ -1,13 +1,18 @@
 function process_images_for_dimension_reduction(input_dir,output_dir)
-% PROCESS_IMAGES_FOR_DIMENSION_REDUCTION Dimension reduction on all dots
 %
-% Usage: process_images_for_dimension_reduction(input_dir,output_dir)
+% process_images_for_dimension_reduction.m
 %
-% this function takes segmented images ie point collections
-% input files typically in Segmented_images directory end in *tubed.mat
-% output to Dimension_reduced_images directory
+% This function takes segmented images, which contain sets of 3D
+% coordinates and are saved as *tubed.mat files, and tries to fit them onto
+% tubular structures using a diemnsion reduction algorithm.
 %
-% See also image_dimension_reduction
+% INPUTS:
+%   input_dir:  Directory in which the segemented image files (saved as *tubed.mat) are located.
+%   output_dir: Directory in which the dimension-reduced files (*dimensionReduced.mat) will be saved to.
+%
+% Uses: image_dimension_reduction.m
+
+
 
 % Make sure that dirs have a trailing slash
 input_dir=fullfile(input_dir,filesep);
@@ -38,7 +43,7 @@ for i=randperm(length(segmented_data))
 	
 	% Perform dimension reduction
 	[dots,dim,Prob,lam,coords]=image_dimension_reduction(...
-	 [input_dir,segmented_data(i).name]); %#ok<*NASGU,ASGLU>
+	 [input_dir,segmented_data(i).name]); 
 	save([output_dir,current_image,'_dimension_reduced.mat'],...
 	 'dots','Prob','lam','dim','coords','-v7');
 	removelock([output_dir,current_image,'-in_progress.mat']);

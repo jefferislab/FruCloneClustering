@@ -45,23 +45,23 @@
 %   detectProb                             - TODO:Nick explain what this does!
 %
 % Dependencies:
-% ANN Nearest Neighbour library as wrapped for Matlab or Octave
-%   http://www.wisdom.weizmann.ac.il/~bagon
-%	See also git://flybrain.mrc-lmb.cam.ac.uk:MatlabSupport
-%
-%   http://octave-swig.sourceforge.net/octave-ann.html
+% 1. Matlab code from 
+%   git://github.com/jefferis/MatlabSupport.git
+% this includes 
+% a) ANN Nearest Neighbour library as wrapped for Matlab or Octave
+%   Original is from http://www.wisdom.weizmann.ac.il/~bagon
+%   see also http://octave-swig.sourceforge.net/octave-ann.html
 % 
-% ReadPic Matlab code
-%	git://flybrain.mrc-lmb.cam.ac.uk:MatlabSupport
+% b) ReadPic Matlab code - to read Biorad format images
+% 
+% c) GLTreePro for finding nearest neighbour points
+%   compile with TestMexFiles3D.m
 %
-% R
-%	http://cran.r-project.org/
-%
-% Greg Jefferis' R Analysis Suite
-%   git://flybrain.mrc-lmb.cam.ac.uk:AnalysisSuite
-%
-% CMTK Image Registration and Analysis
+% 2. CMTK Image Registration and Analysis
 %	http://www.nitrc.org/projects/cmtk/
+%
+% 3. Fiji
+% http://fiji.sc
 %
 % MATLAB INSTALL:
 % 1. Download or git clone MatlabSupport
