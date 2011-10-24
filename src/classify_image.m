@@ -1,4 +1,4 @@
-function [score,MI_threshold]=classify_image(s,test_image_ind,MI_multiplier)
+function [score,MI_threshold]=classify_image(s, test_images)
 
 % This function is used to determine whether an image contains a clone of
 % interest. It is assumed that the user has already created the neccessary
@@ -31,45 +31,25 @@ function [score,MI_threshold]=classify_image(s,test_image_ind,MI_multiplier)
 %
 
 
-MI_threshold=[0.0025:0.0025:0.1]*MI_multiplier;
+MI_threshold = 0.0025:0.0025:0.1;
 
-
-count=zeros(length(test_image_ind),40)+10^(-20);
-score=zeros(length(test_image_ind),40);
+count = zeros(length(test_images),40)+10^(-20);
+score = zeros(length(test_images),40);
 
 for i=1:length(s)
-
-
-
-	for k=1:length(test_image_ind)
-
-		
-
-			for j=1:40
-
-% 				if j<=20
-% 
-% 					ind=find(s{i}.MI>=MI_threshold(j));
-% 					count(k,j)=count(k,j)+length(ind);
-% 					score(k,j)=score(k,j)+sum(s{i}.y(ind,test_image_ind(k))); %#ok<*NODEF>
-% 
-% 				else
-
-					modified_MI=max(0,s{i}.MI'-MI_threshold(j));
-					count(k,j)=count(k,j)+sum(modified_MI);
-					score(k,j)=score(k,j)+sum(single(s{i}.y(:,test_image_ind(k))).*modified_MI);
-
-% 				end
-
-			end
-
-
-	end
-
-
+    if ~isempty(s{i})
+        for k=1:length(test_images)
+            test_image_logical = strcmp(test_images{k},s{i}.matched_images);
+            for j = 1:size(score,2)
+                if ~isempty(s{i}.MI)
+                    modified_MI=max(0,s{i}.MI'-MI_threshold(j));
+                    count(k,j)=count(k,j)+sum(modified_MI);
+                    score(k,j)=score(k,j)+sum(single(s{i}.match(:,test_image_logical)).*modified_MI);
+                end
+            end
+        end
+    end
 end
 
 score=score./count;
-
-end
 
