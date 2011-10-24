@@ -13,14 +13,14 @@ function [ind_first_image,ind_second_image]=compareImages_GLTree(coords1,coords2
 %   vect1:              Tangent vectors of all dots in the first image
 %   vect2:              Tangent vectors of all dots in the second image
 %   prtree:             Pointer created by BuildGLTree3D.m on the coordinates of second image.
-%   feature:            Scaler = 1 or 2. If feature = 1, function will only compare dot locations.
-%                       If feature = 2, function will only compare dot locations and tangent vectors.
+%   feature:            'cell_body' or 'projection' If feature = 'cell_body', function will only compare dot locations.
+%                       If feature =  'projection', function will only compare dot locations and tangent vectors.
 % OUTPUTS:
 %   ind_first_image:    Index of all dots in first image that matched a dot in the second image.
 %   ind_second_image:   Index of all dots in second image that matched a dot in the first image.
 
-if nargin < 6 | (feature~=1 & feature~=2)
-    error('You must specify a feature (1 or 2)');
+if ~exist('feature','var') || isempty(feature)
+    error('You must specify a  neuronal feature')
 end
 
 if nargin < 5
@@ -33,9 +33,9 @@ angle_threshold = 20; % in degrees
 
 [NNG1,distances] = KNNSearch3D(double(coords2),double(coords1),ptrtree,1);
 
-if feature == 1
+if strcmp(feature,'cell_body')
     ind1 = find(distances<20);       
-elseif feature == 2    
+elseif strcmp(feature,'projection')   
     ind = find(distances<distance_threshold);
     dot_prod = abs(vect1(1,ind).*vect2(1,NNG1(ind))+vect1(2,ind).*vect2(2,NNG1(ind))+vect1(3,ind).*vect2(3,NNG1(ind)));
     ind1 = ind(dot_prod>cosd(angle_threshold));
@@ -55,9 +55,9 @@ end
 
 [NNG2,distances] = KNNSearch3D(double(coords2),double(coords1),ptrtree,1);
 
-if feature == 1    
+if strcmp(feature,'cell_body')  
     ind2 = find(distances<20);
-elseif feature == 2    
+elseif strcmp(feature,'projection')  
     ind = find(distances<distance_threshold);
     dot_prod = abs(vect1(1,ind).*vect2(1,NNG2(ind))+vect1(2,ind).*vect2(2,NNG2(ind))+vect1(3,ind).*vect2(3,NNG2(ind)));
     ind2 = ind(dot_prod>cosd(angle_threshold));
