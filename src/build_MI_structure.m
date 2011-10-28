@@ -1,4 +1,4 @@
-function s = build_MI_structure(matched_dots_dir, file_names_with_clone, ...
+function [s, MI_percentile] = build_MI_structure(matched_dots_dir, file_names_with_clone, ...
     file_names_without_clone, neuronal_feature)
 
 %given a list of file names given by the cell fileNamesIN and fileNamesOUT, this function
@@ -19,6 +19,7 @@ end
     file_names_with_clone, file_names_without_clone);
 
 s = cell(1,length(images_with_clone_ind));
+MI = [];
 
 for i=1:length(images_with_clone_ind)
     
@@ -72,12 +73,17 @@ for i=1:length(images_with_clone_ind)
     s{i}.MI = single(s{i}.MI);
     s{i}.vect = vect;
     s{i}.matched_images = matched_images;
+    MI = [MI s{i}.MI];
    
     clear match
     
     end
 
 end
+
+% calculate the percentile scores of the mutual information in 0.1%
+% incremenets. These scores will be used for predicted clones froms traces.
+MI_percentile = prctile(MI, [0:0.1:99.9]);
 
 end
 
