@@ -52,9 +52,8 @@ if exist('mask_file','var') || isempty(mask_file)
     mask_temp = readpic(mask_file);
     mask = zeros(384,384,173);
     for i=1:173
-        %FIXME!!!!!!!!!!!!!!!!!!
-        % This orientation seems to work (10/24/2011)
-        mask(:,:,i)=mask_temp(:,:,i)';
+        % readpic now works with [-2 1 3] axis orientation
+        mask(:,:,i)=mask_temp(:,384:-1:1,i);
     end
     maskiminfo = impicinfo(mask_file);
 else
