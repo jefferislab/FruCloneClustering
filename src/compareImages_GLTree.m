@@ -49,7 +49,7 @@ end
 
 % flip first image
 coords1(1,:) = 315.13-coords1(1,:);
-if feature == 2
+if strcmp(feature,'projection')  
     vect1(1,:) = -vect1(1,:);
 end
 
