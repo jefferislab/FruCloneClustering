@@ -5,3 +5,7 @@ Nicolas Y. Masse, Sebastian Cachero, Aaron D. Ostrovsky, Gregory S. X. E. Jeffer
 Division of Neurobiology, MRC Laboratory of Molecular Biology, Cambridge, CB2 0QH, UK.
 
 See src/Contents.m for details of Matlab code and how to install dependencies.
+
+Examples:
+
+See `score_trace_wrapper.m` for an example of querying the database of fruitless clones with a traced neuron.
