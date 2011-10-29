@@ -17,6 +17,12 @@ imsize=size(img);
 if(length(imsize)) ~= 3
 	error('coords2ind only handles 3d data');
 end
+
+if isempty(coords)
+    warning('Coords are empty. Return empty indices');
+    indices = [];
+    return
+end
 	
 pixcoords=zeros(size(coords));
 
