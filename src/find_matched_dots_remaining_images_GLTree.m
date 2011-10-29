@@ -1,4 +1,4 @@
-function find_matched_dots_remaining_images_GLTree(input_dir,output_dir,neuronal_feature,image_list)
+function find_matched_dots_remaining_images_GLTree(input_dir,output_dir,neuronal_feature,clone_list)
 
 % find_matched_dots_remaining_images_GLTree.m
 %
@@ -32,7 +32,7 @@ if ~exist('neuronal_feature','var') || isempty(neuronal_feature)
     neuronal_feature = 'projection'; 
 end
 
-if ~exist('image_list','var') || isempty(image_list)
+if ~exist('clone_list','var') || isempty(clone_list)
     % remove the suffix after the '-',and then only use unique images
     properties_data = dir(fullfile(input_dir,'*_properties.mat'));
     image_list = {};
@@ -44,6 +44,8 @@ if ~exist('image_list','var') || isempty(image_list)
         end
     end
     image_list = unique(image_list);% remove duplicates  
+else
+    image_list = get_image_list(clone_list);
 end
 
 % Make sure that dirs have a trailing slash

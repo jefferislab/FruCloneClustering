@@ -1,5 +1,5 @@
 function calculate_properties_remaining_images(input_dir,output_dir,mask_file,alpha_thresh,...
-    cell_bodies_image_dir,image_list)
+    cell_bodies_image_dir,clone_list)
 %
 % calculate_properties_remaining_images.m
 %
@@ -21,7 +21,7 @@ function calculate_properties_remaining_images(input_dir,output_dir,mask_file,al
 %
 % Uses: extract_properties
 
-if ~exist('image_list','var') || isempty(image_list)
+if ~exist('clone_list','var') || isempty(clone_list)
     % remove the suffix after the '-',and then only use unique images
     reformated_data = dir(fullfile(input_dir,'*_reformated.mat'));
     image_list = {};
@@ -33,6 +33,8 @@ if ~exist('image_list','var') || isempty(image_list)
         end
     end
     image_list = unique(image_list);% remove duplicates  
+else
+    image_list = get_image_list(clone_list);
 end
 
 % If cell_bodies_image_dir has been specified, then calculate and save cell
@@ -52,8 +54,8 @@ if exist('mask_file','var') || isempty(mask_file)
     mask_temp = readpic(mask_file);
     mask = zeros(384,384,173);
     for i=1:173
-        % readpic now works with [-2 1 3] axis orientation
-        mask(:,:,i)=mask_temp(:,384:-1:1,i);
+        % readpic now works with [2 1 3] axis orientation
+        mask(:,:,i)=mask_temp(:,:,i)';
     end
     maskiminfo = impicinfo(mask_file);
 else
