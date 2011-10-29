@@ -124,6 +124,7 @@ elseif classifier.ARUC_cell_body > 0.99 && classifier.ARUC_cell_body > classifie
     weight_projection = 0;
 end
 
+% ensure the projection and cell body weights add to one
 total_weight = weight_cell_body + weight_projection;
 weight_cell_body = weight_cell_body/total_weight;
 weight_projection = weight_projection/total_weight;
