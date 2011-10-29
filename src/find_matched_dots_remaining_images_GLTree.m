@@ -33,22 +33,17 @@ if ~exist('neuronal_feature','var') || isempty(neuronal_feature)
 end
 
 if ~exist('image_list','var') || isempty(image_list)
-    %  remove the suffix after the '-', and then only use unique images
-    properties_data=dir(fullfile(input_dir,'*_properties.mat'));
-    image_list_temp={};
-    for i=1:length(properties_data)
-        image_list_temp{i}=jlab_filestem(properties.data(i).name,'-');
-    end
-    image_list_temp = sort(image_list_temp);
-    image_list={};
-    count=0;
-    for i=1:length(image_list_temp)
-        if i>1 & ~strcmp(image_list_temp{i-1},image_list_temp{i})
-            count=count+1;
-            image_list{count}=image_list_temp{i};
+    % remove the suffix after the '-',and then only use unique images
+    properties_data = dir(fullfile(input_dir,'*_properties.mat'));
+    image_list = {};
+    count = 0;
+    for i = 1:length(properties_data)
+        if properties_data(i).bytes > 9999 % something is wrong if size is less than 9999 bytes
+            count = count + 1;
+            image_list{count} = jlab_filestem(properties_data(i).name,'-');
         end
     end
-    
+    image_list = unique(image_list);% remove duplicates  
 end
 
 % Make sure that dirs have a trailing slash
@@ -185,6 +180,3 @@ for i=1:length(image_list)
         end 
     end     
 end
-
-                
-        
