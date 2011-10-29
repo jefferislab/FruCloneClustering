@@ -1,8 +1,7 @@
 This folder will contain some sample neuron traces. These can be used to search against the clone library. 
 
-See `src/score_trace_wrapper.m` matlab script for an example. This in turn depends on matlab functions:
+See `src/score_trace_wrapper.m` matlab script for an example. This in turn depends on matlab function:
 
 score_trace.m
-score_trace_w_cell_bodies.m
 
-Input files should be xyz coords  
+Input files should be swc trace files or whitespace separated xyz coords.
