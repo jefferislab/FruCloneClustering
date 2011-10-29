@@ -4,10 +4,19 @@
 % source images into a set of processed dots that are cross-matched
 % against dots in all other images.
 
-addpath('C:\Users\Public\scripts')
+% Ensure that both MatlabSupport code including ReadPIC, GLTreePro ...
+% are in your matlab path
+
+% In addition you need to ensure that any external command line tools are
+% either have symbolic links in the root_dir/bin directory or are present
+% in your _SYSTEM_ path. You can do this with the addsystempath command
+% e.g. addsystempath('/Applications/IGSRegistrationTools/bin/');
+
 %%%% Input and output directories
 
-root_dir = 'F:\FruCloneClustering\';
+src_dir = fileparts(which('RUN_ALL_PROCESSES'));
+
+root_dir = fileparts(src_dir);
 
 original_images_dir=fullfile(root_dir,'Source_images');
 
@@ -21,43 +30,27 @@ reformated_points_dir=fullfile(root_dir,'Reformated_points');
 
 reformated_images_dir=fullfile(root_dir,'Reformated_images');
 
-%properties_dir=[root_dir 'imageProperties/'];
+properties_dir=[root_dir 'image_properties'];
 
-Chiang_data_dir=['/Volumes/jefferis/projects/flycircuit/ChiangReg/reformatted/'];
+mask_dir = fullfile(root_dir,'masks');
 
-mask_image = 'F:\FruCloneClustering\Masks\IS2_nym_mask.pic';
+matched_dots_dir=fullfile(root_dir,'matched_points');
+
+% Directory with the warp registration data (ie directory containing IS2_SAKW9-1_01_warp_m0g80c8e1e-1x26r4.list)
+registration_dir=fullfile(root_dir,'Registration');
+
+% Directory of gregxform unix command to refomat the coordinates
+bin_dir=fullfile(root_dir,'bin');
 
 %%%%%
 
-
-properties_dir='E:\imageProcessing\image_properties_June6\';
-matched_dots_dir='E:\imageProcessing\matched_points_June6\';
-%
-% Loading set of images to use
-load([root_dir,'final_image_list_feb_18.mat']);
-
-%%%% Data directories
-
-% Directory with the warp registration data (ie directory containing IS2_SAKW9-1_01_warp_m0g80c8e1e-1x26r4.list)
-registration_dir='/Volumes/JData/JPeople/Sebastian/fruitless/Registration/IS2Reg/Registration/warp/';
-
-% Directory containing R script for initial image processing
-RCode_dir='/Volumes/JData/JPeople/Greg/FruMARCMCode/';
-
-% Directory of gregxform unix command to refomat the coordinates
-gregxform_dir='/Applications/IGSRegistrationTools/bin/';
+% Loading set of images to use, grouped by clone
+load(fullfile(root_dir,'data','clone_list.mat'));
 
 %%% Steps of the image data processing procedure
 
-
-command=['cat ',RCode_dir,'scripts/SebaStartup.R ',' convert_nrrd_to_pic.R | R --vanilla --args ',...
-	reformated_images_dir];
-system(command);
-
-% Anisotropic filtering and tubing using Fiji
-command=['cat ',RCode_dir,'scripts/SebaStartup.R ',' PreprocessImages.R | R --vanilla --args ',...
-	original_images_dir,' ',processed_images_dir];
-system(command);
+% Preprocess images to emphasise tubular structures
+preprocess_images_dir(original_images_dir, processed_images_dir);
 
 % Threshold and segment images - output is a mat file including voxdims
 segment_remaining_images(processed_images_dir,segmented_images_dir)
@@ -66,13 +59,24 @@ segment_remaining_images(processed_images_dir,segmented_images_dir)
 process_images_for_dimension_reduction(segmented_images_dir,dimension_reduced_dir);
 
 % Reformat onto template brain
+% 1. reformat dimension reduced coordinates onto template brain 
 reformat_remaining_images(dimension_reduced_dir,reformatted_dir,registration_dir,processed_images_dir,gregxform_dir);
-reformatx_remaining_images(original_images_dir,reformated_images_dir,registration_dir,templateimage)
+% 2. reformat original images onto template image in order to extract 
+%    candidate cell body locations (high intensity regions outside neuropil)
+reformatx_remaining_images(original_images_dir,reformated_images_dir,registration_dir,...
+	fullfile(mask_dir,'IS2_nym_mask_invert.nrrd'));
 
-% Calculate tangent vectors etc
-calculate_properties_remaining_images(dimension_reduced_dir,properties_dir,mask_image,.25,reformated_images_dir,image_list);
+%% Can use some sample preprocessed image data to feed in at this point
+% These are located in 2 directories:
+% .mat files in dimension_reduced_dir
+% .pic (or .nrrd FIXME) files in reformated_images_dir
+% Nick to select ~ 20 samples for each dir and upload
+% Greg to put these somewhere permanent and add docs
+
+% Calculate tangent vectors etc, note that this uses the neuropil mask file
+% 
+calculate_properties_remaining_images(dimension_reduced_dir,properties_dir,...
+	fullfile(mask_dir,'IS2_nym_mask.pic'),.25,reformated_images_dir,clone_list);
 
 % Find and store which dots in each image match dots in other images
-find_matched_dots_remaining_images_GLTree(properties_dir,matched_dots_dir, [1 1], image_list); 
-
-
+find_matched_dots_remaining_images_GLTree(properties_dir,matched_dots_dir, [1 1], clone_list);
