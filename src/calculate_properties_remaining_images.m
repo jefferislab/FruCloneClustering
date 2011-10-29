@@ -23,13 +23,13 @@ function calculate_properties_remaining_images(input_dir,output_dir,mask_file,al
 
 if ~exist('image_list','var') || isempty(image_list)
     % remove the suffix after the '-',and then only use unique images
-    properties_data = dir(fullfile(input_dir,'*_reformated.mat'));
+    reformated_data = dir(fullfile(input_dir,'*_reformated.mat'));
     image_list = {};
     count = 0;
-    for i = 1:length(properties_data)
-        if properties_data(i).bytes > 9999 % something is wrong if size is less than 9999 bytes
+    for i = 1:length(reformated_data)
+        if reformated_data(i).bytes > 9999 % something is wrong if size is less than 9999 bytes
             count = count + 1;
-            image_list{count} = jlab_filestem(properties_data(i).name,'-');
+            image_list{count} = jlab_filestem(reformated_data(i).name,'-');
         end
     end
     image_list = unique(image_list);% remove duplicates  
