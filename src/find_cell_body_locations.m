@@ -20,7 +20,6 @@ max_intensity = double(max(max(max(y))));
 
 ind = find(y > 0.5 * max_intensity);
 
-coords = ind2coord(image_size,ind,voxdims,[1 2 3]);
+coords = ind2coord(image_size,ind,voxdims,[-2 1 3]); % changed from [1 2 3] to [-2 1 3], NYM Oct 24, 2011
 
 cell_body_coords = uint16(coords);
-
