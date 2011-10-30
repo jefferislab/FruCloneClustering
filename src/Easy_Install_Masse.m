@@ -34,6 +34,8 @@ savepath
 disp(['Now compiling source files']);
 cd(fullfile(final_src_path,'src'));
 Easy_Compile_Masse;
+disp(['Now choose sample data to download - this could take a while!']);
+Download_Sample_Data;
 
 disp(['======================']);
 disp(['Finished Installation!']);
