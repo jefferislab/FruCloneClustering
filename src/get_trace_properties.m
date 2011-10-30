@@ -3,8 +3,11 @@ function [trace_coords, trace_vect] = get_trace_properties(trace_file)
 %   text files should be in white space separated columns
 % GREG FIXME
 
-% Find the number of header lines in the swc format file 
 fid = fopen(trace_file);
+if fid < 0
+	error(['Unable to open tracing:' trace_file]);
+end
+% Find the number of header lines in the swc format file
 headerLines=0;
 while 1
 	l=fgetl(fid);
