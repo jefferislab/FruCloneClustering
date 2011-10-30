@@ -95,7 +95,8 @@ for i=1:length(image_list)
     % Added '-' before '*', NYM May 22, 2011 
     [match_exists, first_matching_image] = matching_images(current_image, [input_dir,'*reformated.mat'],'-');  
     if ~match_exists
-        error([current_image,' is not in the input directory']);
+        disp([current_image,' is not in the input directory']);
+		continue
     else
         indata=load([input_dir, first_matching_image]);
     end 
