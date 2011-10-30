@@ -35,5 +35,7 @@ disp(['Now compiling source files']);
 cd(fullfile(final_src_path,'src'));
 Easy_Compile_Masse;
 
+disp(['======================']);
+disp(['Finished Installation!']);
 disp(['Now check and save your Matlab path...']);
 

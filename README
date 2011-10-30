@@ -12,6 +12,7 @@ Easy Installation
     urlwrite('https://raw.github.com/jefferis/FruCloneClustering/master/src/Easy_Install_Masse.m',tempscript);
     run(tempscript);
     delete(tempscript);
+    cd(fullfile(final_src_path,'src'));
 
 See src/Contents.m for details of Matlab code and how to install additional dependencies of the full image processing pipeline
 
