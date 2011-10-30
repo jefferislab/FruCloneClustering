@@ -5,18 +5,30 @@ Nicolas Y. Masse, Sebastian Cachero, Aaron D. Ostrovsky, Gregory S. X. E. Jeffer
 Division of Neurobiology, MRC Laboratory of Molecular Biology, Cambridge, CB2 0QH, UK.
 
 Easy Installation
-============
+=================
   Start Matlab and paste in the following code:
 
-`
-tempscript=[tempname() '_fccinstall.m'];
-urlwrite('https://raw.github.com/jefferis/FruCloneClustering/master/src/Easy_Install_Masse.m',tempscript);
-run(tempscript);
-delete(tempscript);
-`
+    tempscript=[tempname() '_fccinstall.m'];
+    urlwrite('https://raw.github.com/jefferis/FruCloneClustering/master/src/Easy_Install_Masse.m',tempscript);
+    run(tempscript);
+    delete(tempscript);
 
-See src/Contents.m for details of Matlab code and how to install dependencies.
+See src/Contents.m for details of Matlab code and how to install additional dependencies of the full image processing pipeline
 
-Examples:
+Developer Installation
+======================
+If you want to keep up to date with the codebase/contribute, then you need to install [git](http://git-scm.com/).
+
+In the shell:
+    cd /some/sensible/dir
+    git clone 
+    git clone
+
+In matlab:
+  Add FruCloneClustering/src and the whole of MatlabSupport to your path (IMPORTANT!)
+  Run FruCloneClustering/Easy_Compile_Masse.m
+
+Examples
+========
 
 See `score_trace_wrapper.m` for an example of querying the database of fruitless clones with a traced neuron.
