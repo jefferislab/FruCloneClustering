@@ -1,14 +1,22 @@
-function score_trace_wrapper(trace_file, clone_classifier)
+function [template_coords, template_coords_cell_body] = score_trace_wrapper(trace_file, clone_classifier)
 %SCORE_TRACE_WRAPPER Find best clones matching a tracing from a classifier
 %   trace_file - trace file in SWC format
 %	clone_classifier - classifier structure built by score_all_clones_cross_validated
 %					   where missing, the default fruitless clone
 %					   classifier is loaded using Load_Classifier script
-% 
+% Returns:
+% template_coords - position of informative dots from template images
+% template_coords_cell_body - position of informative cell body regions 
+%							  from template images
+%
 % Example:
 % Set_Masse_Dirs % to make sure that we can locate traces
-% score_trace_wrapper(fullfile(root_dir,'traces','Jai','N0065.swc'))
-% score_trace_wrapper(fullfile(root_dir,'traces','Jai','N0066.swc'))
+% score_trace_wrapper(fullfile(root_dir,'traces','Jai','N0065.swc'));
+% score_trace_wrapper(fullfile(root_dir,'traces','Jai','N0066.swc'));
+% [bestmatchxyz, bestmatchxyz_cb] =
+% score_trace_wrapper(fullfile(root_dir,'traces','Jai','N0066.swc'));
+% WritePointsToAM(fullfile(root_dir,'traces','66points.am'),bestmatchxyz)
+% WritePointsToAM(fullfile(root_dir,'traces','66pointscb.am'),bestmatchxyz_cb)
 
 if nargin<2
 	clone_classifier=evalin('base', 'classifier','[]');
