@@ -1,5 +1,5 @@
-function WritePointsToAM( outfile, points )
-%WritePointsToAM Write 3D points to a text file that can be opened in Amira
+function write_points_amira( outfile, points )
+%write_points_amira Write 3D points to a text file that can be opened in Amira
 % outfile - path to AmiraLandmarks output file
 % points  - 3xN 3D points (
 %           (NB 3xN is default matlab format. If points are Nx3, they will be transposed)

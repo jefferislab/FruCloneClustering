@@ -15,8 +15,8 @@ function [template_coords, template_coords_cell_body] = score_trace_wrapper(trac
 % score_trace_wrapper(fullfile(root_dir,'traces','Jai','N0066.swc'));
 % [bestmatchxyz, bestmatchxyz_cb] =
 % score_trace_wrapper(fullfile(root_dir,'traces','Jai','N0066.swc'));
-% WritePointsToAM(fullfile(root_dir,'traces','66points.am'),bestmatchxyz)
-% WritePointsToAM(fullfile(root_dir,'traces','66pointscb.am'),bestmatchxyz_cb)
+% write_points_amira(fullfile(root_dir,'traces','66points.am'),bestmatchxyz)
+% write_points_amira(fullfile(root_dir,'traces','66pointscb.am'),bestmatchxyz_cb)
 
 if nargin<2
 	clone_classifier=evalin('base', 'classifier','[]');

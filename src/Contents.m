@@ -39,7 +39,7 @@
 %   matching_images                        - see if any file has same image stem as filename
 %   removelock                             - Remove lockfile
 %   writedots                              - write out dots to amiramesh files
-%   WritePointsToAM                        - WritePointsToAM Write 3D points to a text file that can be opened in Amira
+%   write_points_amira                        - write_points_amira Write 3D points to a text file that can be opened in Amira
 %
 % Unknown Function
 %   detectProb                             - TODO:Nick explain what this does!
