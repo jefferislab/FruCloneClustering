@@ -1,0 +1,6 @@
+This directory contains two masks, 
+
+IS2_nym_mask.PIC(.gz) - a neuropil mask
+IS2_nym_mask_invert.nrrd - the inverse of this - to pick out cell bodies
+
+to use the pic file, it must be gunzipped.

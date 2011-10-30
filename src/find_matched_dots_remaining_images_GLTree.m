@@ -1,4 +1,4 @@
-function find_matched_dots_remaining_images_GLTree(input_dir,output_dir,neuronal_feature,image_list)
+function find_matched_dots_remaining_images_GLTree(input_dir,output_dir,neuronal_feature,clone_list)
 
 % find_matched_dots_remaining_images_GLTree.m
 %
@@ -14,10 +14,10 @@ function find_matched_dots_remaining_images_GLTree(input_dir,output_dir,neuronal
 % INPUTS:
 %   input_dir:          Directory in which the *properties.mat files are saved.
 %   output_dir:         Directory in which the *matched_dots.mat fils will be saved to.
-%   neuronal_feature:   1 X 2 binary vector used to specify the brain structures to compare. If the first 
-%                       element is 1, the function will compare cell bodies between brains. If the second 
-%                       element is 1, the function will compare neuronal projections between brains.
-%                       The deafault is [1 1]
+%   neuronal_feature:   a cell used to specify the brain structures to compare. Enter 'cell_body' to
+%                       only compare cell bodies between brains. Enter 'projection' to only compare 
+%                       neuronal projections between brains. Enter {'cell_body';'projection'} to compare 
+%                       both. The deafault is 'projection'.
 %   image_list:         Cell array containing names of image files to be processed. If an image list is not 
 %                       speicifed, the default will be to take all the *properties.mat files in the input directory. 
 %
@@ -28,27 +28,24 @@ function find_matched_dots_remaining_images_GLTree(input_dir,output_dir,neuronal
 % dots for an inital set of images, and have since added to the image list.
 check_existing_saved_files = 0;
 
-if nargin < 3
-    neuronal_feature = [1 1]; 
+if ~exist('neuronal_feature','var') || isempty(neuronal_feature)
+    neuronal_feature = 'projection'; 
 end
 
-if nargin < 4
-    %  remove the suffix after the '-', and then only use unique images
-    properties_data=dir(fullfile(input_dir,'*_properties.mat'));
-    image_list_temp={};
-    for i=1:length(properties_data)
-        image_list_temp{i}=jlab_filestem(properties.data(i).name,'-');
-    end
-    image_list_temp = sort(image_list_temp);
-    image_list={};
-    count=0;
-    for i=1:length(image_list_temp)
-        if i>1 & ~strcmp(image_list_temp{i-1},image_list_temp{i})
-            count=count+1;
-            image_list{count}=image_list_temp{i};
+if ~exist('clone_list','var') || isempty(clone_list)
+    % remove the suffix after the '-',and then only use unique images
+    properties_data = dir(fullfile(input_dir,'*_properties.mat'));
+    image_list = {};
+    count = 0;
+    for i = 1:length(properties_data)
+        if properties_data(i).bytes > 9999 % something is wrong if size is less than 9999 bytes
+            count = count + 1;
+            image_list{count} = jlab_filestem(properties_data(i).name,'-');
         end
     end
-    
+    image_list = unique(image_list);% remove duplicates  
+else
+    image_list = get_image_list(clone_list);
 end
 
 % Make sure that dirs have a trailing slash
@@ -74,13 +71,15 @@ for i=1:length(image_list)
     
     if check_existing_saved_files | ~match_exists
         
+        disp(['Calculating matched dots for image ',current_image])
+        
         if makelock(lockfile)
             
             if match_exists
-                load([output_dir first_matching_image],'matched_images','match1','match2','coords_cell_bodies','coords_projections');
+                load([output_dir first_matching_image],'matched_images','match_cell_body','match_projection','coords_cell_bodies','coords_projections');
             else
-                match1=[];
-                match2=[];
+                match_cell_body=[];
+                match_projection=[];
                 matched_images={};                
             end
             
@@ -99,14 +98,14 @@ for i=1:length(image_list)
                         else        
                             load([input_dir,matching_image],'p');
                             
-                            if neuronal_feature(1) == 1 
+                            if any(strcmp(neuronal_feature,'cell_body')) 
                                 coords_cell_bodies_1 = p.cell_body_coords;
                                 vect_cell_bodies_1 = [];
                             end
                             
-                            if neuronal_feature(2) == 1 
-                                coords_projections_1 = p.gamma3;
-                                vect_projections_1 = p.vect3;
+                            if any(strcmp(neuronal_feature,'projection')) 
+                                coords_projections_1 = p.projection_coords;
+                                vect_projections_1 = p.projection_tangent_vector;
                             end                      
                         end  
                     end
@@ -121,39 +120,39 @@ for i=1:length(image_list)
                         load([input_dir,matching_image],'p');
                         matched_images{end+1}=image_list{j};
                         
-                        if neuronal_feature(1) == 1 % compare cell bodies                  
+                        if any(strcmp(neuronal_feature,'cell_body'))  % compare cell bodies                  
                             coords_cell_bodies_2=p.cell_body_coords;
                             vect_cell_bodies_2=[];
                             
                             if size(coords_cell_bodies_1, 2) & size(coords_cell_bodies_2, 2) > 20 % something wrong with either image if it contains less than 20 points
-                                y1 = zeros(n1_1,1,'uint8');
-                                ptrtree = BuildGLTree3D(double(coords2_1));
+                                y1 = zeros(size(coords_cell_bodies_1, 2),1,'uint8');
+                                ptrtree = BuildGLTree3D(double(coords_cell_bodies_2));
                                 [ind_union] = compareImages_GLTree(coords_cell_bodies_1,coords_cell_bodies_2,...
-                                    vect_cell_bodies_1,vect_cell_bodies_2,ptrtree,2);
+                                    vect_cell_bodies_1,vect_cell_bodies_2,ptrtree,'cell_body');
                                 DeleteGLTree3D(ptrtree);
                                 y1(ind_union) = 1;
-                                match1 = [match1 y1];
+                                match_cell_body = [match_cell_body y1];
                             else
                                 y1 = zeros(n1_1,1,'uint8');
-                                match1 = [match1 y1];
+                                match_cell_body = [match_cell_body y1];
                             end
                         end
                         
-                        if neuronal_feature(2) == 1 % compare neural projections   
-                            coords_projections_2 = p.gamma3;
-                            vect_projections_2 = p.vect3;
+                         if any(strcmp(neuronal_feature,'projection'))  % compare neural projections   
+                            coords_projections_2 = p.projection_coords;
+                            vect_projections_2 = p.projection_tangent_vector;
                             
                             if size(coords_projections_1,2) > 20 & size(coords_projections_2,2 ) > 20 % something wrong with either image if it contains less than 20 points
-                                y1 = zeros(n1_2,1,'uint8');
-                                ptrtree = BuildGLTree3D(double(coords2_2));
+                                y1 = zeros(size(coords_projections_1,2),1,'uint8');
+                                ptrtree = BuildGLTree3D(double(coords_projections_2));
                                 [ind_union] = compareImages_GLTree(coords_projections_1,coords_projections_2,...
-                                    vect_projections_1,vect_projections_2,ptrtree,2);
+                                    vect_projections_1,vect_projections_2,ptrtree,'projection');
                                 DeleteGLTree3D(ptrtree);
                                 y1(ind_union) = 1;
-                                match2 = [match2 y1];
+                                match_projection = [match_projection y1];
                             else
                                 y1 = zeros(n1_2,1,'uint8');
-                                match2 = [match2 y1];
+                                match_projection = [match_projection y1];
                             end
                         end
                     end                   
@@ -161,13 +160,13 @@ for i=1:length(image_list)
             end
             
             if ~match_exists
-                if neuronal_feature(1) == 1
+                if any(strcmp(neuronal_feature,'cell_body'))
                     coords_cell_bodies = coords_cell_bodies_1;
                 else
                     coords_cell_bodies = [];
                 end
                 
-                if neuronal_feature(2) == 1
+                if any(strcmp(neuronal_feature,'projection'))
                     coords_projections = coords_projections_1;
                     vect_projections = vect_projections_1;
                 else
@@ -176,13 +175,10 @@ for i=1:length(image_list)
                 end
             end
              
-            save(fullfile(output_dir,[current_image,'_matched_dots.mat']),'match1','match2','coords_cell_bodies', ...
+            save(fullfile(output_dir,[current_image,'_matched_dots.mat']),'match_cell_body','match_projection','coords_cell_bodies', ...
                 'coords_projections','vect_projections','matched_images');
             % delete lockfile
             removelock(lockfile);
         end 
     end     
 end
-
-                
-        

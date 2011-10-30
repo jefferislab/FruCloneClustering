@@ -1,174 +1,140 @@
-function [top5scores,top5ind,score]=score_trace(trace_file, x);
+function [clone_score, trace_coords] = score_trace(clone_classifier, trace_coords_file, cell_body_info)
 
-% x is the clone classifier structure
-
-
-
-
-%disp('Location of traces');
-
-
-%load('/Volumes/JData/JPeople/Nick/FruCloneClustering/data/clone_classifier.mat')
-
-
-
-
-% addpath('C:\Users\Public\scripts\');
-%load clone_classifier_Jan_6
-
-clones={};
-
-num_template_images=0;
-clone_template=[0];
-
-for i=1:length(x)
-    clones{i}=x{i}.clone;
-    num_template_images=num_template_images+length(x{i}.s);
-    clone_template=[clone_template ones(1,length(x{i}.s))*i];
-end
-
-
-[s1 s2 s3 s4 s5 s6 s6]=textread(trace_file,'%s %s %s %s %s %s %s');
-x1=zeros(length(s1)-6,3);
-
-for i=7:length(s1);
-    if ~isempty(str2num(s3{i}))
-    x1(i-6,1)=str2num(s3{i});
-    x1(i-6,2)=str2num(s4{i});
-    x1(i-6,3)=str2num(s5{i});
+% cell_body_info can either be a list of coordinates, or a filename. If a
+% filename is given, then file must be opened, filtered and 
+if exist('cell_body_info','var') && ~isempty(cell_body_info)
+    if ischar(cell_body_info) %if cell_body_info is a fielname, load and process file
+        trace_cell_body_coords = get_trace_cell_body_coords(trace_image_file);
+    elseif isnumeric(cell_body_info) % use the list of cooridnates if given
+        trace_cell_body_coords = cell_body_info;
+    else
+        error('cell_body_info must either be the name of a .PIC file or a list of coordinates.')
     end
-    
+else
+    trace_cell_body_coords = [];
 end
 
+% extract the coordinates and calculate the tangent vectors for the trace
+[trace_coords, trace_vect] = get_trace_properties(trace_coords_file);
 
+%%%%%% TESTING PURPOSES ONLY, USING FIRST DOT AS CELL BODY
+trace_cell_body_coords = trace_coords(:,1);
+trace_coords = trace_coords(:,2:end);
+trace_vect = trace_vect(:,2:end);
+%%%%%%
 
-y=x1;
-clear x1
+% score this trace against all clones in the classifier
+clone_score = compare_trace_to_all_clones(trace_coords, trace_cell_body_coords, ...
+    trace_vect, clone_classifier);
 
-score=zeros(size(y,1),num_template_images+1);
+end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function clone_score = compare_trace_to_all_clones(trace_coords, ...
+    trace_cell_body_coords, trace_vect, clone_classifier)
 
+num_clones = length(clone_classifier);
+num_dots_in_trace = size(trace_coords,2);
+num_dots_in_trace_cell_body = size(trace_cell_body_coords,2);
+dot_score = zeros(num_clones, num_dots_in_trace);
+dot_score_cell_body = zeros(num_clones, num_dots_in_trace_cell_body);
+clone_score = zeros(1, num_clones);
+MI_percentile_threshold = 950; % a threshold of 950 corresponds to a 95th percentile cutoff
 
-
- ptrtree=BuildGLTree3D(y');
-[alpha,vect]=extract_properties(y,ptrtree);
-DeleteGLTree3D(ptrtree);
-
-p1.gamma2=y';
-p1.vect2=vect;
-
-count=1;
-
-
-
-for i=[1:6 7:length(x)]    
+for i = 1:num_clones % loop through all clones in classifier
     
-      
-for j=1:length(x{i}.s)
-     
-    p2.gamma2=x{i}.s{j}.coords(:,:);
-    p2.vect2=x{i}.s{j}.vect(:,:);
-    
-   
-    
-    ptrtree=BuildGLTree3D(p2.gamma2);
- 
-    [m1 n1]=size(p2.gamma2);
-    
-    y=zeros(n1,1,'uint8');
-    
-       
-    [matched_dots_in_trace,matched_dots_in_template]=compareImages_GLTree_old(p1,p2,ptrtree);
-    
-    DeleteGLTree3D(ptrtree);
-    
-    clear p2
-
-   
-    
-    count=count+1;
-    score(matched_dots_in_trace,count)=x{i}.s{j}.MI(matched_dots_in_template);
-    for k=matched_dots_in_trace
-        q=max(0,find(score(k,count)>=x{i}.MI_pct,1,'last')-500);
-         if isempty(q)
-              score(k,count)=0;
-         else
-            score(k,count)=q;
+    if isfield(clone_classifier{i},'s2')
+        num_template_images = length(clone_classifier{i}.s2);
+        template_score = zeros(num_template_images, num_dots_in_trace);
+        template_score_cell_body = zeros(num_template_images, num_dots_in_trace_cell_body);
+        
+        for j = 1:num_template_images % loop through each image for each clone in classifier
+            
+            template_coords = double(clone_classifier{i}.s2{j}.coords);
+            template_vect = clone_classifier{i}.s2{j}.vect;
+            % compare trace coords and tangent vector to image those template
+            ptrtree = BuildGLTree3D(template_coords);
+            [matched_dots_in_trace, matched_dots_in_template] = compareImages_GLTree(trace_coords, ...
+                template_coords, trace_vect, template_vect, ptrtree, 'projection');
+            DeleteGLTree3D(ptrtree);
+            
+            % for each template, calculate the percentile score for each dot
+            for k = 1:length(matched_dots_in_template)
+                pct_ind = find(clone_classifier{i}.s2{j}.MI(matched_dots_in_template(k)) > ...
+                    clone_classifier{i}.MI_percentile_projection ,1 ,'last');
+                if ~isempty(pct_ind)  % only score dot if its mutual information is above the percentile threshold
+                    template_score(j, matched_dots_in_trace(k)) = max(0, (pct_ind - MI_percentile_threshold));
+                end
+            end
+            
+            if ~isempty(trace_cell_body_coords)
+                template_coords_cell_body = double(clone_classifier{i}.s1{j}.coords);
+                % compare trace coords and tangent vector to image those template
+                ptrtree = BuildGLTree3D(template_coords_cell_body);
+                [matched_dots_in_trace_cell_body, matched_dots_in_template_cell_body] = compareImages_GLTree(trace_cell_body_coords, ...
+                    template_coords_cell_body, [], [], ptrtree, 'cell_body');
+                DeleteGLTree3D(ptrtree);
+                
+                % for each template, calculate the percentile score for each dot
+                for k = 1:length(matched_dots_in_template_cell_body)
+                    pct_ind = find(clone_classifier{i}.s1{j}.MI(matched_dots_in_template_cell_body(k)) > ...
+                        clone_classifier{i}.MI_percentile_cell_body ,1 ,'last');
+                    if ~isempty(pct_ind) % only score dot if its mutual information is above the percentile threshold
+                        template_score_cell_body(j, matched_dots_in_trace_cell_body(k)) =  max(0, (pct_ind - MI_percentile_threshold));
+                    end
+                end
+            end
         end
+        
+        % for each clone, caculate the mean percentile score for each dot
+        dot_score(i,:) = mean(template_score);
+        if ~isempty(trace_cell_body_coords)
+            dot_score_cell_body(i,:) = mean(template_score_cell_body);
+        end
+        
+        
     end
-   
-
-    
 end
-   
 
-
+clone_score = calculate_trace_score(clone_classifier, dot_score, dot_score_cell_body);
 
 end
 
-clone_score=zeros(size(score,1),length(x));
 
-for i=1:length(x)  
-    ix=find(clone_template==i);
-    clone_score(:,i)=mean(score(:,ix)')';
-   % score(:,ix)=repmat(mean(score(:,ix)),size(score,1),1);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function clone_score = calculate_trace_score(clone_classifier, dot_score, dot_score_cell_body)
+
+num_clones = size(dot_score,1);
+num_dots_trace = size(dot_score,2);
+num_dots_trace_cell_body = size(dot_score_cell_body,2);
+
+clone_score_with_cell_body = zeros(1, num_clones);
+clone_score_without_cell_body = zeros(1, num_clones);
+
+[ranked_clone_scores, ranked_clones] = sort(dot_score,'descend');
+[ranked_clone_scores_cell_body, ranked_clones_cell_body] = sort(dot_score_cell_body,'descend');
+
+for i = 1:num_clones
+    if isfield(clone_classifier{i},'weight_projection')
+        pct_top_scores = sum(ranked_clones(1,:) == i & ranked_clone_scores(1,:) > 0)/num_dots_trace;
+        pct_top_scores_cell_body = sum(ranked_clones_cell_body(1,:) == i  & ranked_clone_scores_cell_body(1,:) > 0)...
+            /num_dots_trace_cell_body;
+        % calculate scores both with and without the cell bodies
+         clone_score_with_cell_body(i) = clone_classifier{i}.weight_projection * pct_top_scores + ...
+            clone_classifier{i}.weight_cell_body * pct_top_scores_cell_body;
+         clone_score_without_cell_body(i) = pct_top_scores;   
+    end
 end
-clone_score(:,end+1)=.0001*ones(size(clone_score,1),1); % if all scores are zero, then maximum value won't correspond to AL-a (clone #1)
-  
-    [dummy ix]=sort(clone_score','descend');
-  
-  clear y
-  subplot(2,1,1),imagesc(clone_score);
-  subplot(2,1,2),hold off;plot((ix(1,:)));%hold on;plot((ix(2,:)),'r')
-  score1=zeros(1,max(clone_template));
-  for k=1:max(clone_template)
-     % score1(k)=length(find(clone_template(ix(1:2,:))==k))/length(ix);
-     score1(k)=length(find((ix(1,:))==k))/length(ix);
-  end
 
-  
+% For the final clone score, use the greater of the scores with and without
+% the cell body, provided that the score without the cell body is at least
+% greater than the median. 
+median_score_without_cell_body = median(clone_score_without_cell_body);
+clone_score_with_cell_body(clone_score_without_cell_body <= median_score_without_cell_body) = 0;
+clone_score = max([clone_score_with_cell_body; clone_score_without_cell_body]);
 
-  [dummy ind]=sort(score1,'descend');
-  
-  
-  disp('The top five clone scores...');
-  disp(' ')
-  
-  for i=1:5
-      
-      disp([clones{ind(i)},'  score = ',num2str(score1(ind(i)))]);
-      
-  end
-  
-  
+% remopve NaNs form clone_score
+clone_score(isnan(clone_score)) = 0;
 
-  figure;
-  hold off;
-  
-% ind(1)=47;
-
- for i=1:length(x{ind(1)}.s)
-   
-
-      ix=find(x{ind(1)}.s{i}.MI>.01);
-      
- 
-     plot3(x{ind(1)}.s{i}.coords(1,ix),x{ind(1)}.s{i}.coords(2,ix),x{ind(1)}.s{i}.coords(3,ix),'k.');
-     hold on;
-     plot3(315.13-x{ind(1)}.s{i}.coords(1,ix),x{ind(1)}.s{i}.coords(2,ix),x{ind(1)}.s{i}.coords(3,ix),'k.');
- end
- 
- plot3(p1.gamma2(1,:),p1.gamma2(2,:),p1.gamma2(3,:),'r.');
- title(['Red = Trace, Black = ',clones{ind(1)},'  Score = ',num2str(score1(ind(1)))]);
-  title(['Red = Trace, Black = ',clones{ind(1)},'  Score = ',num2str(score1(ind(1)))]);
- zlabel('Depth')
- xlabel('Medial/Lateral')
- ylabel('Anterior/Posterior')
- drawnow     
-
-  
-  top5ind=ind(1:5);
-  top5scores=score1(ind(1:5));
-  
-  
-
+end

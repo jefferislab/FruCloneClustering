@@ -4,87 +4,28 @@
 % source images into a set of processed dots that are cross-matched
 % against dots in all other images.
 
-addpath('C:\Users\Public\scripts')
-root_dir = '/lmb/home/jefferis/projects/FruCloneClustering/';
+% Ensure that both MatlabSupport code including ReadPIC, GLTreePro ...
+% are in your matlab path
 
-isOctave = exist('OCTAVE_VERSION','builtin') ~= 0;
-
-if isOctave && strcmp(program_name,'RUN_ALL_PROCESSES.m')
-    % We're running as a script
-    % get argv and take first element as root_dir
-    % NB if no argument besides scriptname is given then
-    % first argument is scriptname so gaurd against that
-    arg_list=argv();
-    if length(arg_list) > 0 && ~strcmp(arg_list{1},program_name())
-        root_dir = arg_list{1};
-        disp(['Setting root_dir to ' root_dir]);
-    end
-%     for i=1:length(arg_list)
-%         printf('%s ',arg_list{i});
-%     end
-%     printf('\n');
-end
-
-% make sure root_dir ends in slash
-root_dir=fullfile(root_dir,filesep);
+% In addition you need to ensure that any external command line tools are
+% either have symbolic links in the root_dir/bin directory or are present
+% in your _SYSTEM_ path. You can do this with the addsystempath command
+% e.g. addsystempath('/Applications/IGSRegistrationTools/bin/');
 
 %%%% Input and output directories
-
-root_dir = 'F:\FruCloneClustering\';
-
-original_images_dir=fullfile(root_dir,'Source_images');
-
-processed_images_dir=fullfile(root_dir,'Processed_images');
-
-segmented_images_dir=fullfile(root_dir,'Segmented_images');
-
-dimension_reduced_dir=fullfile(root_dir,'dimension_reduced_images');
-
-reformated_points_dir=fullfile(root_dir,'Reformated_points');
-
-reformated_images_dir=fullfile(root_dir,'Reformated_images');
-
-%properties_dir=[root_dir 'imageProperties/'];
-
-Chiang_data_dir=['/Volumes/jefferis/projects/flycircuit/ChiangReg/reformatted/'];
-
-mask_image = 'F:\FruCloneClustering\Masks\IS2_nym_mask.pic';
+Set_Masse_Dirs
 
 %%%%%
 % Check path
 
 addsystempath('/usr/local/bin');
-
-properties_dir='E:\imageProcessing\image_properties_June6\';
-matched_dots_dir='E:\imageProcessing\matched_points_June6\';
-%
-% Loading set of images to use
-load([root_dir,'final_image_list_feb_18.mat']);
-
-%%%% Data directories
-
-% Directory with the warp registration data (ie directory containing IS2_SAKW9-1_01_warp_m0g80c8e1e-1x26r4.list)
-registration_dir='/Volumes/JData/JPeople/Sebastian/fruitless/Registration/IS2Reg/Registration/warp/';
-% this should now work on hex; set up a symlink on JData
-registration_dir=[root_dir 'Registration/warp/'];
-
-% Directory containing R script for initial image processing
-RCode_dir='/Volumes/JData/JPeople/Greg/FruMARCMCode/';
-
-% Directory of gregxform unix command to refomat the coordinates
-gregxform_dir='/Applications/IGSRegistrationTools/bin/';
+% Loading set of images to use, grouped by clone
+load(fullfile(root_dir,'data','clone_list.mat'));
 
 %%% Steps of the image data processing procedure
 
-
-command=['cat ',RCode_dir,'scripts/SebaStartup.R ',' convert_nrrd_to_pic.R | R --vanilla --args ',...
-	reformated_images_dir];
-system(command);
-
-% Anisotropic filtering and tubing using Fiji
-command=['cat ',RCode_dir,'scripts/SebaStartup.R ',' PreprocessImages.R | R --vanilla --args ',...
-	original_images_dir,' ',processed_images_dir];
-system(command);
+% Preprocess images to emphasise tubular structures
+preprocess_images_dir(original_images_dir, processed_images_dir);
 
 % Threshold and segment images - output is a mat file including voxdims
 segment_remaining_images(processed_images_dir,segmented_images_dir)
@@ -93,13 +34,24 @@ segment_remaining_images(processed_images_dir,segmented_images_dir)
 process_images_for_dimension_reduction(segmented_images_dir,dimension_reduced_dir);
 
 % Reformat onto template brain
+% 1. reformat dimension reduced coordinates onto template brain 
 reformat_remaining_images(dimension_reduced_dir,reformatted_dir,registration_dir,processed_images_dir,gregxform_dir);
-reformatx_remaining_images(original_images_dir,reformated_images_dir,registration_dir,templateimage)
+% 2. reformat original images onto template image in order to extract 
+%    candidate cell body locations (high intensity regions outside neuropil)
+reformatx_remaining_images(original_images_dir,reformated_images_dir,registration_dir,...
+	fullfile(mask_dir,'IS2_nym_mask_invert.nrrd'));
 
-% Calculate tangent vectors etc
-calculate_properties_remaining_images(dimension_reduced_dir,properties_dir,mask_image,.25,reformated_images_dir,image_list);
+%% Can use some sample preprocessed image data to feed in at this point
+% These are located in 2 directories:
+% .mat files in dimension_reduced_dir
+% .pic (or .nrrd FIXME) files in reformated_images_dir
+% Nick to select ~ 20 samples for each dir and upload
+% Greg to put these somewhere permanent and add docs
+
+% Calculate tangent vectors etc, note that this uses the neuropil mask file
+% 
+calculate_properties_remaining_images(dimension_reduced_dir,properties_dir,...
+	fullfile(mask_dir,'IS2_nym_mask.pic'),.25,reformated_images_dir,clone_list);
 
 % Find and store which dots in each image match dots in other images
-find_matched_dots_remaining_images_GLTree(properties_dir,matched_dots_dir, [1 1], image_list); 
-
-
+find_matched_dots_remaining_images_GLTree(properties_dir,matched_dots_dir, [1 1], clone_list);
