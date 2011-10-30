@@ -108,9 +108,7 @@ for i=1:length(image_list)
             
             if num_dots > 20
                 p.projection_coords=[p.projection_coords single(y)];
-                ptrtree=BuildGLTree3D(y);
-                [alpha,vect]=extract_properties(y',ptrtree);
-                DeleteGLTree3D(ptrtree);
+                [alpha,vect]=extract_properties(y');
                 p.alpha=[p.alpha alpha];
                 p.projection_tangent_vector=[p.projection_tangent_vector vect];
             end

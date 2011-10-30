@@ -36,8 +36,6 @@ if length(trace_coords(1,:))==0
 end
 
 % Calculate the tangent vectors corresponding to trace
-ptrtree=BuildGLTree3D(trace_coords);
-[~, trace_vect]=extract_properties(trace_coords', ptrtree);
-DeleteGLTree3D(ptrtree);
+[~, trace_vect]=extract_properties(trace_coords');
 
 end
