@@ -1,7 +1,27 @@
-This folder will contain some sample neuron traces. These can be used to search against the clone library. 
+This folder contains some sample neuron traces. These can be used to search against the classifier built for the fruitless clone library.
 
-See `src/score_trace_wrapper.m` matlab script for an example. This in turn depends on matlab function:
+Traces
+======
+traces/Jai
+----------
+contains sample traces from the supplemental information of [yu2010]. Some traces were transformed from the T1 template space of [yu2010] into the IS2 template space of [yu2010] and then converted into the standard SWC format.  Each trace corresponds to a particular cell cluster identified by [yu2010], with tracing starting at the cell body.
 
-score_trace.m
+Example
+=======
+See `src/score_trace_wrapper.m` matlab script for detailed example. You should be able to do:
 
-Input files should be swc trace files or whitespace separated xyz coords.
+help score_trace_wrapper
+
+in the matlab command line. This in turn depends on matlab function score_trace.m. Input files should be swc trace files or whitespace separated xyz coords.
+
+References
+==========
+[yu2010] Cellular Organization of the Neural Circuit that Drives Drosophila Courtship Behavior
+Current Biology, Volume 20, Issue 18, 28 September 2010, Pages 1602-1614, 
+Jai Y. Yu, Makoto I. Kanai, Ebru Demir, Gregory S.X.E. Jefferis, Barry J. Dickson
+http://dx.doi.org/10.1016/j.cub.2010.08.025
+
+[cachero2010] Sexual Dimorphism in the Fly Brain
+Current Biology, Volume 20, Issue 18, 28 September 2010, Pages 1589-1601, 
+Sebastian Cachero, Aaron D. Ostrovsky, Jai Y. Yu, Barry J. Dickson, Gregory S.X.E. Jefferis
+http://dx.doi.org/10.1016/j.cub.2010.07.045
