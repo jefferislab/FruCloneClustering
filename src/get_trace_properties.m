@@ -3,18 +3,33 @@ function [trace_coords, trace_vect] = get_trace_properties(trace_file)
 %   text files should be in white space separated columns
 % GREG FIXME
 
-% Assuming trrace_file is in .swc format. The x,y,z coordinates are located
-% in the 3rd to 5th columns, and begin at line 7.
+% Find the number of header lines in the swc format file 
 fid = fopen(trace_file);
-coords_string = textscan(fid,'%s %s %s %s %s %s %s');
-num_dots = length(coords_string{3})-6;
-trace_coords = zeros(3, num_dots);
-for i=7:num_dots + 6;
-    if ~isempty(str2double(coords_string{3}{i}))
-        trace_coords(1, i-6)=str2double(coords_string{3}{i});
-        trace_coords(2, i-6)=str2double(coords_string{4}{i});
-        trace_coords(3, i-6)=str2double(coords_string{5}{i});
-    end
+headerLines=0;
+while 1
+	l=fgetl(fid);
+	if l<0
+		break % end of file
+	end
+	if ~ ( strncmp(l,'#',1) || strcmp(l,'') )
+		break % neither comment nor blank line
+	end
+	headerLines=headerLines+1;
+end
+fclose(fid);
+
+fid = fopen(trace_file);		
+rawcoords = textscan(fid,'%*s %*s %f %f %f %*s %*s',...
+	'TreatAsEmpty',{'NA','na'},'HeaderLines',headerLines);
+
+trace_coords = [rawcoords{1},rawcoords{2},rawcoords{3}]';
+% remove any NaNs
+goodcols=sum(isfinite(trace_coords))==3;
+trace_coords=trace_coords(:,goodcols);
+
+if length(trace_coords(1,:))==0
+	trace_vect=[];
+	return
 end
 
 % Calculate the tangent vectors corresponding to trace
