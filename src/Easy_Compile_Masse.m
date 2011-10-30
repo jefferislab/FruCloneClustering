@@ -24,4 +24,10 @@ run(fullfile(annpath,'ann_class_compile.m'));
 % mac/linux machines
 % see http://teem.sourceforge.net/ for details
 teempath=fullfile(fileparts(annpath),'teem');
-run(fullfile(teempath,'compilethis.m'));
+try
+	run(fullfile(teempath,'compilethis.m'));
+catch err
+	disp(['Failed to compile teem library -'... 
+		'you will not be able to load nrrd file.' ...
+		' See Easy_Compile_Masse for details']);
+end
