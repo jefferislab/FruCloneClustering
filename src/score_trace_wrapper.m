@@ -1,19 +1,32 @@
-function score_trace_warpper(clone_classifier, n)
+function score_trace_wrapper(trace_file, clone_classifier)
+%SCORE_TRACE_WRAPPER Find best clones matching a tracing from a classifier
+%   trace_file - trace file in SWC format
+%	clone_classifier - classifier structure built by score_all_clones_cross_validated
+%					   where missing, the default fruitless clone
+%					   classifier is loaded using Load_Classifier script
+% 
+% Example:
+% Set_Masse_Dirs % to make sure that we can locate traces
+% score_trace_wrapper(fullfile(root_dir,'traces','Jai','N0065.swc'))
+% score_trace_wrapper(fullfile(root_dir,'traces','Jai','N0066.swc'))
 
-trace_dir = 'C:\Users\Nicolas Masse\Projects\Tracing\IS2\';
-trace_files = dir([trace_dir '*.swc']);
+if nargin<2
+	clone_classifier=evalin('base', 'classifier','[]');
+	if isempty(clone_classifier)
+		Load_Classifier
+		assignin('base', 'classifier', classifier);
+		clone_classifier=evalin('base', 'classifier');
+	end
+end
 
-current_trace_file = [trace_dir trace_files(n).name];
-
-[clone_score, trace_coords] = score_trace(clone_classifier, current_trace_file, []);
+[clone_score, trace_coords] = score_trace(clone_classifier, trace_file, []);
 
 [ranked_score ranked_clone] = sort(clone_score,'descend');
 
-disp(['For trace ',trace_files(n).name,', the top 5 predicted clones are:'])
+disp(['For trace ',trace_file,', the top 5 predicted clones are:'])
 for i = 1:5 
     disp([clone_classifier{ranked_clone(i)}.clone_name,' score = ',num2str(ranked_score(i))])
 end
-
 
 % plot the trace coords along with informative dots from the template images from the
 % predicted clone
@@ -37,5 +50,5 @@ plot3(template_coords_cell_body(1,:),template_coords_cell_body(2,:),template_coo
 hold on
 plot3(315.13 - template_coords_cell_body(1,:),template_coords_cell_body(2,:),template_coords_cell_body(3,:),'g.')
 
-
 plot3(trace_coords(1,:),trace_coords(2,:),trace_coords(3,:),'r.');
+end
