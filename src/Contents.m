@@ -33,7 +33,7 @@
 %
 % Utility Functions
 %   addsystempath                          - adds a given path to the current system path
-%   CheckForNewerInput                     - Check if any input files are newer than outfile
+%   check_newer_input                     - Check if any input files are newer than outfile
 %   jlab_filestem                          - return stem of image name up to first underscore (by default)
 %   makelock                               - Make a lockfile (NFS safe in principle)
 %   matching_images                        - see if any file has same image stem as filename

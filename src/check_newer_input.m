@@ -1,7 +1,7 @@
-function [ result ] = CheckForNewerInput( infiles, outfile, verbose)
-% CHECKFORNEWERINPUT Check if any input files are newer than outfile
+function [ result ] = check_newer_input( infiles, outfile, verbose)
+% CHECK_NEWER_INPUT Check if any input files are newer than outfile
 %
-% Usage: CheckForNewerInput( infiles, outfile, [verbose])
+% Usage: check_newer_input( infiles, outfile, [verbose])
 % 
 % infiles - cell string array or string containing 1 or more inputs
 % outfile - string containing one output file
