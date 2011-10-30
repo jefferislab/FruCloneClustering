@@ -11,7 +11,7 @@ disp('Now compiling support code')
 % and does not run under Octave
 disp('Now compiling GLTreePro nearest neighbour library')
 glpath=fileparts(which('BuildGLTree3D'));
-run(fullfile(annpath,'compilethis3D.m'));
+run(fullfile(glpath,'compilethis3D.m'));
 
 % Now ANN nearest neighbour library
 % I prefer this, but have not translated all Nick's code to use it

@@ -32,7 +32,7 @@ addpath(genpath(final_support_path));
 savepath
 
 disp(['Now compiling source files']);
-cd(install_path);
+cd(fullfile(final_src_path,'src'));
 Easy_Compile_Masse;
 
 disp(['Now check and save your Matlab path...']);
