@@ -21,8 +21,8 @@ If you want to keep up to date with the codebase/contribute, then you need to in
 
 In the shell:
     cd /some/sensible/dir
-    git clone 
-    git clone
+    git clone git://github.com/jefferis/FruCloneClustering.git
+    git clone git://github.com/jefferis/MatlabSupport.git
 
 In matlab:
   Add FruCloneClustering/src and the whole of MatlabSupport to your path (IMPORTANT!)
