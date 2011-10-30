@@ -4,6 +4,17 @@ A mutual information approach to automate identification of neuronal clusters in
 Nicolas Y. Masse, Sebastian Cachero, Aaron D. Ostrovsky, Gregory S. X. E. Jefferis
 Division of Neurobiology, MRC Laboratory of Molecular Biology, Cambridge, CB2 0QH, UK.
 
+Easy Installation
+============
+  Start Matlab and paste in the following code:
+
+`
+tempscript=[tempname() '_fccinstall.m'];
+urlwrite('https://raw.github.com/jefferis/FruCloneClustering/master/src/Easy_Install_Masse.m',tempscript);
+run(tempscript);
+delete(tempscript);
+`
+
 See src/Contents.m for details of Matlab code and how to install dependencies.
 
 Examples:
