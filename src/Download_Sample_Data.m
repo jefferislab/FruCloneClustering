@@ -20,25 +20,25 @@ end
 % Registrations
 % Masks (part of git repo)
 % Traces (part of git repo?)
-ppimgdld=questdlg('Download raw sample images and registrations (190Mb, Optional)','Raw Image Download','No');
+ppimgdld=questdlg('Download 7 raw sample images and registrations (310Mb, Optional)','Raw Image Download','No');
 if strcmp(ppimgdld,'Cancel')
 	return
 end
 if strcmp(ppimgdld,'Yes')
 	% Raw Images (main input for the whole image processing pipeline)
-	unzip('https://data.mrc-lmb.cam.ac.uk/weblinks/?id=bc6dc48b743dc5d013b1abaebd2faed2&filename=dimension_reduced_images_testset.zip',...
-	dimension_reduced_dir);
+    unzip('http://flybrain.mrc-lmb.cam.ac.uk/Masse2011/FruCloneClustering/images.sel7.zip',...
+    original_images_dir);
 	% Registrations: calculated for the nc82 (neuropil) channel of the raw
 	% images and the IS2 template brain used in Cachero, Ostrovsky et al 2010
 	% This information is required to transform dot coordinates from the
 	% original image to the template (IS2) coordinate space
-	unzip('https://data.mrc-lmb.cam.ac.uk/weblinks/?id=f2fc990265c712c49d51a18a32b39f0c&filename=reformatted_images_testset.zip',...
-		reformated_images_dir);
+	unzip('http://flybrain.mrc-lmb.cam.ac.uk/Masse2011/FruCloneClustering/Registration.zip',...
+		registration_dir);
 end
 
 
 %% To start after image pre-processing (see RUN_ALL_PROCESSES)
-ppimgdld=questdlg('Download preprocessed sample images (580Mb, Optional)','Preprocessed Image Download','No');
+ppimgdld=questdlg('Download 34 preprocessed sample images (580Mb, Optional)','Preprocessed Image Download','No');
 if strcmp(ppimgdld,'Cancel')
 	return
 end
