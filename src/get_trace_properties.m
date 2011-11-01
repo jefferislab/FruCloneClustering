@@ -1,7 +1,9 @@
 function [trace_coords, trace_vect] = get_trace_properties(trace_file)
 %GET_TRACE_PROPERTIES Find dot properties from SWC or plain 3d coord file 
-%   text files should be in white space separated columns
-% GREG FIXME
+% Ignores a header containing a mix of blank lines or comments beginning with #
+% Reads in swc files with 8 cols where 3-5 are XYZ coords
+% Reads in csv (comma separated) files with 3 cols and no column names
+% otherwise reads in first 3 columns of white space separated numbers
 
 fid = fopen(trace_file);
 if fid < 0
@@ -21,8 +23,18 @@ while 1
 end
 fclose(fid);
 
-fid = fopen(trace_file);		
-rawcoords = textscan(fid,'%*s %*s %f %f %f %*s %*s',...
+[pathstr, name, ext] = fileparts(trace_file);
+switch lower(ext)
+	case '.swc'
+		formatspec = '%*s %*s %f %f %f %*s %*s';
+	case '.csv'
+		formatspec = '%f,%f,%f';
+	otherwise
+		formatspec = '%f %f %f';
+end
+
+fid = fopen(trace_file);
+rawcoords = textscan(fid,formatspec,...
 	'TreatAsEmpty',{'NA','na'},'HeaderLines',headerLines);
 
 trace_coords = [rawcoords{1},rawcoords{2},rawcoords{3}]';
