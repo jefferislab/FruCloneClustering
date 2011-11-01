@@ -9,14 +9,23 @@ function [template_coords, template_coords_cell_body] = score_trace_wrapper(trac
 % template_coords_cell_body - position of informative cell body regions 
 %							  from template images
 %
-% Example:
+% Examples:
 % Set_Masse_Dirs % to make sure that we can locate traces
 % score_trace_wrapper(fullfile(root_dir,'traces','Jai','N0065.swc'));
 % score_trace_wrapper(fullfile(root_dir,'traces','Jai','N0066.swc'));
+%
 % [bestmatchxyz, bestmatchxyz_cb] =
 % score_trace_wrapper(fullfile(root_dir,'traces','Jai','N0066.swc'));
 % write_points_amira(fullfile(root_dir,'traces','66points.am'),bestmatchxyz)
 % write_points_amira(fullfile(root_dir,'traces','66pointscb.am'),bestmatchxyz_cb)
+%
+% Specific clones:
+% mAL-a / aDT-b / aDT2
+% score_trace_wrapper(fullfile(root_dir,'traces','Jai','N0065.swc'));
+% mAL-PNs / aDT-a / aDT3
+% score_trace_wrapper(fullfile(root_dir,'traces','Jai','N0123.swc'));
+% AL-b / aSP-l / aSP7
+% score_trace_wrapper(fullfile(root_dir,'traces','Jai','N0729.swc'));
 
 if nargin<2
 	clone_classifier=evalin('base', 'classifier','[]');
