@@ -6,7 +6,7 @@ Division of Neurobiology, MRC Laboratory of Molecular Biology, Cambridge, CB2 0Q
 
 Easy Installation
 =================
-  Start Matlab and paste in the following code:
+Start Matlab and paste in the following code:
 
     tempscript=[tempname() '_fccinstall.m'];
     urlwrite('https://raw.github.com/jefferis/FruCloneClustering/master/src/Easy_Install_Masse.m',tempscript);
@@ -20,16 +20,20 @@ Developer Installation
 ======================
 If you want to keep up to date with the codebase/contribute, then you need to install [git](http://git-scm.com/).
 
-In the shell:
+Then in the shell:
+
     cd /some/sensible/dir
     git clone http://github.com/jefferis/FruCloneClustering.git
     git clone http://github.com/jefferis/MatlabSupport.git
 
-In matlab:
-  Add FruCloneClustering/src and the whole of MatlabSupport to your path (IMPORTANT!)
-  Run FruCloneClustering/Easy_Compile_Masse.m
+In Matlab:
+
+* Add FruCloneClustering/src and the whole of MatlabSupport to your path (IMPORTANT!)
+* Run FruCloneClustering/Easy_Compile_Masse.m
 
 Examples
 ========
 
-See `score_trace_wrapper.m` for an example of querying the database of fruitless clones with a traced neuron.
+See [`score_trace_wrapper.m`][stw] for examples of querying the database of fruitless clones with a traced neuron. These examples are part of the  function help that can be displayed by typing `help score_trace_wrapper` in Matlab.
+
+[stw]: https://github.com/jefferis/FruCloneClustering/blob/master/src/score_trace_wrapper.m
