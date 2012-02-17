@@ -14,7 +14,7 @@ Start Matlab and paste in the following code:
     delete(tempscript);
     cd(fullfile(final_src_path,'src'));
 
-See src/Contents.m for details of Matlab code and how to install additional dependencies of the full image processing pipeline
+See [`src/Contents.m`][contents] for details of Matlab code and how to install additional dependencies of the full image processing pipeline
 
 Developer Installation
 ======================
@@ -36,4 +36,5 @@ Examples
 
 See [`score_trace_wrapper.m`][stw] for examples of querying the database of fruitless clones with a traced neuron. These examples are part of the  function help that can be displayed by typing `help score_trace_wrapper` in Matlab.
 
+[contents]: https://github.com/jefferis/FruCloneClustering/blob/master/src/Contents.m
 [stw]: https://github.com/jefferis/FruCloneClustering/blob/master/src/score_trace_wrapper.m
