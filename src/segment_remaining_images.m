@@ -1,4 +1,4 @@
-function segment_remaining_images(input_dir,output_dir,threshold)
+function segment_remaining_images(input_dir,output_dir,threshold,fileglob)
 %
 % segment_remaining_images.m
 %
@@ -16,6 +16,10 @@ if nargin < 3
 	threshold = 10;
 end
 
+if nargin < 4
+	fileglob = '*-tubed.PIC';
+end
+
 % Make sure that dirs have a trailing slash
 input_dir=fullfile(input_dir,filesep);
 output_dir=fullfile(output_dir,filesep);
@@ -26,7 +30,7 @@ if ~exist(output_dir,'dir')
 end
 
 % Process all input files sequentually
-input_files=dir(fullfile(input_dir,'*-tubed.PIC'));
+input_files=dir(fullfile(input_dir,fileglob));
 for i=1:length(input_files)
 
 	% Trim input file name up to first underscore
@@ -47,10 +51,7 @@ for i=1:length(input_files)
 	
 	% read in image
 	infile=fullfile(input_dir,input_files(i).name);
-	x=readpic(infile);
-	% FIXME permute image data array into standard form
-	iminfo=impicinfo(infile);
-	voxdims=iminfo.Delta;
+	[x, voxdims] = read3dimage(infile);
 
 	% threshold at arbitrary low level
 	u=zeros(size(x),'uint8');
