@@ -31,10 +31,12 @@ end
 	
 pixcoords=zeros(size(coords));
 
-% first convert from physical coords to pixel coords
-pixcoords(1,:)=round(coords(1,:)/voxdims(1));
-pixcoords(2,:)=round(coords(2,:)/voxdims(2));
-pixcoords(3,:)=round(coords(3,:)/voxdims(3));
+% first convert from physical coords to pixel coords,
+% adding one to everything since spatial coord origin will be at (0,0,0)
+% whereas index origin will [1 1 1] since matlab is 1-indexed
+pixcoords(1,:)=round(coords(1,:)/voxdims(1))+1;
+pixcoords(2,:)=round(coords(2,:)/voxdims(2))+1;
+pixcoords(3,:)=round(coords(3,:)/voxdims(3))+1;
 
 % make sure no points are out of range
 pixcoords(1,:)=min(imsize(1),max(1,pixcoords(1,:)));
