@@ -17,12 +17,32 @@ function testc2i_bottom_right
 % 3,2,0 should correspond to index 7*6
 assertEqual(7*6,coord2ind([7 6 3], [0.5 0.4 1.0],[3;2;0]))
 
+function testc2i_bottom_right_with_null_axperm
+% 3,2,0 should correspond to index 7*6
+assertEqual(7*6,coord2ind([7 6 3], [0.5 0.4 1.0],[3;2.0;0],[1 2 3]))
+
 function testc2i_round_trip
 % arbitrary point on grid should survive round trip
 orig_point=[2.5;1.2;0];
-ind=coord2ind([7 6 3],[0.5 .4 1],orig_point);
-new_point=ind2coord([7 6 3], ind, [0.5;0.4;1]);
+axperm=[1 2 3];
+ind=coord2ind([7 6 3],[0.5 .4 1],orig_point,axperm);
+new_point=ind2coord([7 6 3], ind, [0.5;0.4;1],axperm);
 assertAlmostEqual(orig_point,new_point);
+
+function testc2i_round_trip_with_origin
+% arbitrary point on grid should survive round trip even with space origin
+origin=[2;4;5.5];
+orig_point=[2.5;1.2;0]+origin;
+axperm=[1 2 3];
+ind=coord2ind([7 6 3],[0.5 .4 1],orig_point,axperm,origin);
+new_point=ind2coord([7 6 3], ind, [0.5;0.4;1],axperm,origin);
+assertAlmostEqual(orig_point,new_point);
+
+% axperm=[2 1 3]
+% ind=coord2ind([6 7 3],[0.5 .4 1],orig_point,axperm,origin);
+% new_point=ind2coord([6 7 3], ind, [0.5;0.4;1],axperm,origin);
+% assertAlmostEqual(orig_point,new_point);
+
 
 function testc2i_round_trip_off_grid
 % arbitrary point off grid should NOT survive round trip
