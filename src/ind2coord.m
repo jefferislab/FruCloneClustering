@@ -34,23 +34,26 @@ end
 
 pixcoords=zeros(3,length(IND));
 
-% first convert from indices to pixel coords
+% first convert from indices to (1-indexed) pixel coords
 [pixcoords(1,:) pixcoords(2,:) pixcoords(3,:)] = ind2sub(siz,IND);
 
-if(nargin==4)
-	% flip and swap axes if required
-	for i=1:3
-		% NB (pix)coords are 0 indexed whereas subscripts are 1 indexed,
-		% so we subtract 1 implicitly or explixicitly below
-		if(axperm(i)<0)
-			% flip axis (NB siz(i)-1-pixcoords would give 1-indexed flip)
-			pixcoords(i,:)=siz(i)-pixcoords(i,:);
-		else
-			pixcoords(i,:)=pixcoords(i,:)-1;
-		end
-	end
-	pixcoords=pixcoords(abs(axperm),:);
+% specify default axis permutation if required.
+if(nargin<4)
+	axperm = [1 2 3];
 end
+
+% flip and swap axes if required
+for i=1:3
+	% NB want (pix)coords to be 0-indexed whereas subscripts are 1-indexed,
+	% so we subtract 1 implicitly or explixicitly below
+	if(axperm(i)<0)
+		% flip axis (NB siz(i)-1-pixcoords would give 1-indexed flip)
+		pixcoords(i,:)=siz(i)-pixcoords(i,:);
+	else
+		pixcoords(i,:)=pixcoords(i,:)-1;
+	end
+end
+pixcoords=pixcoords(abs(axperm),:);
 
 % then convert from pixel coords to physical coords
 coords(1,:)=pixcoords(1,:)*voxdims(1);
