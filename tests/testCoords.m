@@ -34,3 +34,19 @@ assertFalse(sum(abs(orig_point-new_point))<0.01);
 function testi2c_origin
 % origin (0,0,0) should correspond to position of voxel at index 1 
 assertEqual([0;0;0],ind2coord([7 6 3],1,[0.5 0.4 1.0]));
+
+function testi2c_non_zero_origin
+% origin should correspond to position of voxel at index 1 
+assertEqual([2;4;5.5],ind2coord([7 6 3],1,[0.5 0.4 1.0],[1 2 3],[2;4;5.5]));
+
+function testi2c_additivity_origin
+% point at given index should just be shifted by the position of the origin
+origin=[2;4;5.5];
+c1=ind2coord([7 6 3],50,[0.5 0.4 1.0],[1 2 3]);
+c2=ind2coord([7 6 3],50,[0.5 0.4 1.0],[1 2 3],origin);
+assertEqual(c1+origin,c2);
+
+function testi2c_point
+% test a specific index 
+assertAlmostEqual([2;1.2;0], ind2coord([7 6 3],26,[0.5 0.4 1.0]))
+assertAlmostEqual([2;1.2;1], ind2coord([7 6 3],26+42,[0.5 0.4 1.0]))

@@ -1,15 +1,24 @@
-function coords = ind2coord(siz, IND, voxdims, axperm)
+function coords = ind2coord(img, IND, voxdims, axperm, origin)
 % IND2COORD find XYZ coords corresponding to 1D indices into a 3D image
 % 
 % Usage: coords = ind2coord(siz, IND, voxdims, [axperm])
 %
 % Input:
-% siz     - size of 3d image array
+% img     - 3d image array (or its size)
 % IND     - 1D indices into the image array
 % voxdims - vector of 3 voxel dimensions (width, height, depth, dx,dy,dz)
 % axperm  - 3-vector containing reordering of axes, negatives imply flip
+% origin  - 3D position/centre of first voxel in image in physical coords
 %           
 % coords  - 3xN XYZ triples 
+%
+% Origin
+% ------
+% This is equivalent to the space origin definition of the nrrd format and
+% identifies the location (for voxels as point objects - aka node) or the
+% centre (for voxels considered to have physical extent = voxdims aka
+% cell). See http://teem.sourceforge.net/nrrd/format.html#spaceorigin for
+% details.
 %
 % Permutations and Flips:
 % -----------------------
@@ -26,10 +35,20 @@ function coords = ind2coord(siz, IND, voxdims, axperm)
 % which obeys the matlab convention for reading in image data blocks
 % so that imshow and friends behave as expected.
 %
-% See also coord2ind, ind2sub
+% See also coord2ind, ind2sub, size
 
-if(length(siz)) ~= 3
-	error('coords2ind only handles 3d data');
+siz=size(img);
+
+if length(siz) == 2 && siz(1)==1
+	siz=img;
+end
+
+if length(siz) ~= 3
+	error('ind2coord only handles 3d data');
+end
+
+if nargin < 5
+	origin = [0; 0 ;0];
 end
 
 pixcoords=zeros(3,length(IND));
@@ -56,8 +75,8 @@ end
 pixcoords=pixcoords(abs(axperm),:);
 
 % then convert from pixel coords to physical coords
-coords(1,:)=pixcoords(1,:)*voxdims(1);
-coords(2,:)=pixcoords(2,:)*voxdims(2);
-coords(3,:)=pixcoords(3,:)*voxdims(3);
+coords(1,:)=pixcoords(1,:)*voxdims(1)+origin(1);
+coords(2,:)=pixcoords(2,:)*voxdims(2)+origin(2);
+coords(3,:)=pixcoords(3,:)*voxdims(3)+origin(3);
 
 end
