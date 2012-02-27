@@ -10,7 +10,7 @@ function indices = coord2ind(img,voxdims,coords,aperm,origin)
 %
 % indices  - 1D indices into the image array
 % 
-% NB for the time being no reordering of image axes is done
+% NB can handle axis permutations but NOT flips
 %
 % Origin
 % ------
@@ -29,13 +29,21 @@ if length(imsize) == 2 && imsize(1)==1
 end
 
 if length(imsize) ~= 3
-	error('coords2ind only handles 3d data');
+	error('coord2ind only handles 3d data');
 end
 
 if isempty(coords)
     warning('Coords are empty. Return empty indices');
     indices = [];
     return
+end
+
+if nargin>=4
+	if any(aperm)<0
+		error('coord2indhandles axis permutations but NOT flips');
+	end
+else
+	aperm = [1 2 3]
 end
 
 if nargin<5
@@ -62,7 +70,7 @@ pixcoords(3,:)=min(imsize(3),max(1,pixcoords(3,:)));
 if nargin<4
 	indices=sub2ind(imsize,pixcoords(1,:),pixcoords(2,:),pixcoords(3,:));
 else
-	indices=sub2ind(imsize(aperm),pixcoords(aperm(1),:),...
+	indices=sub2ind(imsize,pixcoords(aperm(1),:),...
 		pixcoords(aperm(2),:),pixcoords(aperm(3),:));
 end
 end
