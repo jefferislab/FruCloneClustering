@@ -79,3 +79,8 @@ assertAlmostEqual([1;0;2], ind2coord(x,find(x==216),xvd,[2 1 3]));
 
 % now go the other way
 assertEqual(find(x==216), coord2ind(x,xvd,[1;0;2],[2 1 3]));
+% and test for a load of coords now
+pixelseq119=find(x==119);
+assertEqual(pixelseq119',coord2ind(x,xvd,ind2coord(x,pixelseq119,xvd,[2 1 3]),[2 1 3]));
+
+

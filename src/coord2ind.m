@@ -43,7 +43,7 @@ if nargin>=4
 		error('coord2indhandles axis permutations but NOT flips');
 	end
 else
-	aperm = [1 2 3]
+	aperm = [1 2 3];
 end
 
 if nargin<5
@@ -59,18 +59,13 @@ pixcoords(1,:)=round((coords(1,:)-origin(1))/voxdims(1))+1;
 pixcoords(2,:)=round((coords(2,:)-origin(2))/voxdims(2))+1;
 pixcoords(3,:)=round((coords(3,:)-origin(3))/voxdims(3))+1;
 
-% make sure no points are out of range
-pixcoords(1,:)=min(imsize(1),max(1,pixcoords(1,:)));
-pixcoords(2,:)=min(imsize(2),max(1,pixcoords(2,:)));
-pixcoords(3,:)=min(imsize(3),max(1,pixcoords(3,:)));
-% TODO: convert pixel coords to array subscripts by swapping X and Y axes
-% and flipping Y?  Either the image or these coords must be flipped
+for i = 1:3
+	% make sure no points are out of range
+	% nb imsize needs to be matched with permuted axis order
+	pixcoords(aperm(i),:)=min(imsize(i),max(1,pixcoords(aperm(i),:)));
+end
+
 
 % convert to 1d indices
-if nargin<4
-	indices=sub2ind(imsize,pixcoords(1,:),pixcoords(2,:),pixcoords(3,:));
-else
-	indices=sub2ind(imsize,pixcoords(aperm(1),:),...
-		pixcoords(aperm(2),:),pixcoords(aperm(3),:));
-end
-end
+indices=sub2ind(imsize,pixcoords(aperm(1),:),...
+	pixcoords(aperm(2),:),pixcoords(aperm(3),:));
