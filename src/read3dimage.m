@@ -1,4 +1,4 @@
-function [ data, voxdims ] = read3dimage( file )
+function [ data, voxdims, origin ] = read3dimage( file )
 %read3dimage Reads a pic or nrrd, returning both data and voxel dimensions
 % file - path to input image
 %
@@ -15,22 +15,21 @@ function [ data, voxdims ] = read3dimage( file )
 
 
 [pathstr, name, ext] = fileparts(file);
-
+origin=[0;0;0];
 switch lower(ext)
 	case {'.nrrd','.nhdr'}
 		data=nrrdLoad(file);
 		% reorder image data to look like something read in by matlab's imread
 		data = permute(data, [2 1 3]);
-		ni=nrrdLoadOrientation(file);
-		% FIXME - check if there are any off-diagonal terms
-		% TODO - actually implement off-diagonal terms!
-		voxdims=diag(ni)';
+		iminfo=imnrrdinfo(file);
 	case '.pic'
 		data=readpic(file);
 		iminfo=impicinfo(file);
-		voxdims=iminfo.Delta;
 	otherwise
       disp('Unknown file format.')
+	  return
 end
 
+voxdims=iminfo.Delta;
+origin=iminfo.Origin;
 end
