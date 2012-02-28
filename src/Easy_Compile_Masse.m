@@ -23,11 +23,13 @@ run(fullfile(annpath,'ann_class_compile.m'));
 % this will usually work if teem has previously been installed on
 % mac/linux machines
 % see http://teem.sourceforge.net/ for details
+% We also offer the pure matlab nrrdio for basic nrrd reading, so not a
+% disaster if we can't compile.
 teempath=fullfile(fileparts(annpath),'teem');
 try
 	run(fullfile(teempath,'compilethis.m'));
 catch err
 	disp(['Failed to compile teem library -'... 
-		'you will not be able to load nrrd file.' ...
+		'reading nrrd files will be slower and restricted to 3D images.' ...
 		' See Easy_Compile_Masse for details']);
 end
