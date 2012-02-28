@@ -1,8 +1,8 @@
 function find_matched_dots_remaining_images_GLTree(input_dir,output_dir,neuronal_feature,clone_list)
 
-% find_matched_dots_remaining_images_GLTree.m
+% Find matching dots for all pairwise combinations of property files in directory
 %
-% This function compares paris of images to determine what parts of the image match. If instructed to 
+% This function compares pairs of images to determine what parts of the image match. If instructed to 
 % compare cell bodies, the function will determine whether dots representing cell bodies in different 
 % images are within a certain distance (specified in compareImages_GLTree) to be considered a match. 
 % If instructed to compare neuronal projections, will determine whether dots representing projections 

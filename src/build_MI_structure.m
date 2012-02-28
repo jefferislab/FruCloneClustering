@@ -1,6 +1,7 @@
 function [s, MI_percentile] = build_MI_structure(matched_dots_dir, file_names_with_clone, ...
     file_names_without_clone, neuronal_feature)
-
+% Calculate mutual information for one clone type
+%
 %given a list of file names given by the cell fileNamesIN and fileNamesOUT, this function
 %computes the mutual information between matched dots and to which list the image
 %belong to. The general purpose is to feed in the file

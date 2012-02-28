@@ -1,7 +1,7 @@
 function calculate_properties_remaining_images(input_dir,output_dir,mask_file,alpha_thresh,...
     cell_bodies_image_dir,clone_list)
 %
-% calculate_properties_remaining_images.m
+% find local tangent vector and dimensionality (alpha)
 %
 % Function takes reformatted images and calculates: principal eigenvector (tangent vector) from momemnt
 % of inertia, cell body locations, and dots that fall within the image mask. Outputs are saved to a

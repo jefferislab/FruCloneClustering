@@ -1,6 +1,6 @@
 function process_images_for_dimension_reduction(input_dir,output_dir)
 %
-% process_images_for_dimension_reduction.m
+% Dimension reduction on all dots
 %
 % This function takes segmented images, which contain sets of 3D
 % coordinates and are saved as *tubed.mat files, and tries to fit them onto

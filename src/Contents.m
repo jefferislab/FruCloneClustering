@@ -6,28 +6,28 @@
 %   process_images_for_dimension_reduction - Dimension reduction on all dots
 %   reformat_remaining_images              - Transform points into template brain space
 %   calculate_properties_remaining_images  - find local tangent vector and dimensionality (alpha)
-%   find_matched_dots_remaining_images     - Find matching dots for all pairwise combinations of property files in directory
+
 %
 %   build_MI_structure                     - Calculate mutual information for one clone type
 %   create_image_classifier                - Make a classifier structure for all clones
-%   collect_clone_information              - Parse list of clone types and which images they are present in
+%   collect_clone_information              - Make cell containing name of each clone and brains containing each clone
 %
 % Top Level Functions (single image)
-%   classify_image                         - determine whether an image contains a clone of interest
+%   classify_image                         - Determine whether an image contains a clone of interest
 %   classify_image_not_in_database         - This function is used to determine whether an image contains a clone of
 %   compare_image_to_all_clones            - 
-%   predict_clone_from_trace               - Match tracing against clone image database
+
 %
 % Image Processing Functions
-%   reformat_coords                        - transform a 3 x N matrix using a CMTK registration file
+%   reformat_coords                        - Transform a 3 x N matrix using a CMTK registration file
 %   compareImages_ANNTree                  - Compare point sets derived from images by position and vector similarity
-%   compareImages_GLTree                   - Output will have the same length as p.gamma2
-%   extract_properties                     - extract_properties - find principal eigenvector and dimensionality of points
-%   image_dimension_reduction              - Attempts to captures tubular structure in dot collections
+%   compareImages_GLTree                   - Find matching dots in two images (for cell bodies or projections)
+%   extract_properties                     - Calculate tangent vector and local moment of inertia
+%   image_dimension_reduction              - (Further) enhance tubular structure in dot collections
 % 
 % Image Processing Support Functions
 %   ann_meta_wrapper                       - Meta wrapper for different methods of calling ANN nearest neighbours
-%   coord2ind                              - find 1D indices into 3D image of XYZ coordinates
+%   coord2ind                              - Find 1D indices into 3D image of XYZ coordinates
 %   ind2coord                              - find XYZ coords corresponding to 1D indices into a 3D image
 %   load3dtif                              - Loads 3d tif by loading each 2d plane into a 3d matrix
 %
@@ -42,7 +42,7 @@
 %   write_points_amira                        - write_points_amira Write 3D points to a text file that can be opened in Amira
 %
 % Unknown Function
-%   detectProb                             - TODO:Nick explain what this does!
+%   detectProb                             - TODO:Nick explain what this does! Or remove it!
 %
 % Dependencies:
 % 1. Matlab code from 
@@ -69,3 +69,4 @@
 % ann_wrapper/README.txt in cse of trouble)
 % 3. Add ann_wrapper and ReadPIC to your path
 % 4. Adjust the paths in RUN_ALL_PROCESSES to match your setup
+%   find_matched_dots_remaining_images_GLTree - Find matching dots for all pairwise combinations of property files in directory

@@ -1,6 +1,6 @@
 function [dots,dim,Prob,lam,coords]=image_dimension_reduction(file_name,min_points_per_region,no_iterations)
 %
-% image_dimension_reduction.m
+% (Further) enhance tubular structure in dot collections
 %
 % This implements the algorithm described in "Optimal Manifold Representation 
 % of Data: An Information Theoretic Approach", Denis Chigirev and William Bialek. 
