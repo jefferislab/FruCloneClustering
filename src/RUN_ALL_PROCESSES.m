@@ -33,7 +33,7 @@ process_images_for_dimension_reduction(segmented_images_dir,dimension_reduced_di
 
 % Reformat onto template brain
 % 1. reformat dimension reduced coordinates onto template brain 
-reformat_remaining_images(dimension_reduced_dir,reformatted_dir,registration_dir,processed_images_dir,gregxform_dir);
+reformat_remaining_images(dimension_reduced_dir,reformated_points_dir,registration_dir,processed_images_dir,bin_dir);
 % 2. reformat original images onto template image in order to extract 
 %    candidate cell body locations (high intensity regions outside neuropil)
 reformatx_remaining_images(original_images_dir,reformated_images_dir,registration_dir,...
