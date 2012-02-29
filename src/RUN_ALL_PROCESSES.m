@@ -49,7 +49,7 @@ reformatx_remaining_images(original_images_dir,reformated_images_dir,registratio
 % Calculate tangent vectors etc, note that this uses the neuropil mask file
 % 
 calculate_properties_remaining_images(dimension_reduced_dir,properties_dir,...
-	fullfile(mask_dir,'IS2_nym_mask.pic'),.25,reformated_images_dir,clone_list);
+	fullfile(mask_dir,'IS2_nym_mask.nrrd'),.25,reformated_images_dir,clone_list);
 
 % Find and store which dots in each image match dots in other images
 find_matched_dots_remaining_images_GLTree(properties_dir,matched_dots_dir, [1 1], clone_list);
