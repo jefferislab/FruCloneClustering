@@ -1,5 +1,6 @@
-function create_image_classifier_cross_validated(clone_file,matchedPoints_dir);
-
+function create_image_classifier_cross_validated(clone_file,matchedPoints_dir)
+% TODO - Decide whether to keep this since now marked out of date
+%
 % INPUTS: clone_file: file name of the .tab file from FileMaker containing
 %         the clone iforrmation
 %         matchedPoints_dir: directory of the XXXmatchedPOints.mat files
@@ -12,7 +13,8 @@ function create_image_classifier_cross_validated(clone_file,matchedPoints_dir);
 % contained a possible confused clone.
 % When calibrate = 1, the scripts determines the optimal mutual information
 % level for each clone; might be a bit slow.
-
+%
+% See also score_all_clones_cross_validated
 
 %%%%%% OUT OF DATE
 % Currently using score_all_clones_cross_validated to create clone

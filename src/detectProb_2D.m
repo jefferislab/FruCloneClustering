@@ -1,5 +1,6 @@
 function dp = detectProb_2D(x1,x2);
-
+% TODO - Nick explain what this does.
+%
 % x1 and x2 are Nx2 arrays
 % 
 

@@ -1,6 +1,7 @@
 function score_all_clones_cross_validated(matchedPoints_dir, clone_info_cell, ...
     cross_validate, calssifier_save_name)
-
+% Create clone classifer (and score using leave one out cross validation)
+%
 % INPUTS:
 %     clone_info_cell: file name of the .tab file from FileMaker containing
 %         the clone iforrmation

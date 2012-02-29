@@ -1,4 +1,3 @@
-% Download_Sample_Data.m
 % Script to download sample data from web
 
 % setup directories

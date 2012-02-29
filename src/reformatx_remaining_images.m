@@ -1,16 +1,20 @@
 function reformatx_remaining_images(input_dir,output_dir,registration_dir,mask_image)
 %  
-% reformatx_remaining_images.m
-%
-% Transform images into template brain space
+% Transform (cell body) images into template brain space
 %
 % Usage: reformatx_remaining_images(input_dir,output_dir,registration_dir,mask_image)
-% this script takes regular images and transforms them 
-% onto the IS2 template
-% the input files are XXX.PIC and output files are eg IS2_XXX.PIC
-% Must specify the directory for the registration data and the reformatx
-% command 
-% mask_image will determine the size of the output images
+% Input:
+% input_dir        - containing XXX.pic images
+% output_dir       - where XXX_masked.nrrd images will be generated
+% registration_dir - where .list registration folders for each brain live
+% mask_image       - defines regions to reformat (& determines output size)
+% 
+% Takes regular images and transforms them onto the template (IS2 for us).
+% This is currently used for the cell bodies only as neurites are processed
+% into dots before being reformatted.
+% 
+% See also reformat_remaining_images (for points)
+
 
 % Make sure that dirs have a trailing slash
 input_dir=fullfile(input_dir,filesep);

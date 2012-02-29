@@ -1,5 +1,4 @@
-% Set_Masse_Dirs.m
-% Quick script to set the location of directories that we will use elsewhere
+% Script to set standard location of directories used throughout project
 
 src_dir = fileparts(which('RUN_ALL_PROCESSES'));
 

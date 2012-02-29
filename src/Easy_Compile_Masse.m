@@ -1,5 +1,5 @@
-% Easy_Compile_Masse.m
 % Script to compile the support functions required for the source code.
+
 % The GLTreePro library is currently essential, while the ANN library
 % is used for some of the early data processing steps
 

@@ -1,5 +1,7 @@
 function image_list = get_image_list(clone_list)
-% given the cell array clone_list, which contains a list of images for each 
+% Find list of images to process from clone_list cell array
+% 
+% Given the cell array clone_list, which contains a list of images for each 
 % clone, returns the list of images to process
 
 image_list = [];

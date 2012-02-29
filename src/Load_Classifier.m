@@ -1,5 +1,5 @@
-% Load_Classifier
-% Quick script to load the default fruitless clone classifier
+% Script to load the default fruitless clone classifier
+
 if exist('classifier','var')
 	disp('Classifier already loaded. clear it if you want to reload it.');
 	return

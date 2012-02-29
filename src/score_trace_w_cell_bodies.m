@@ -1,5 +1,5 @@
 function [top5scores,top5ind,score]=score_trace_w_cell_bodies(trace_file,x);
-
+% TODO - Nick determine if this is still useful
 
 % x is the clone classifier structure
 

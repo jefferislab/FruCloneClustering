@@ -1,7 +1,11 @@
 function [clone_score, trace_coords] = score_trace(clone_classifier, trace_coords_file, cell_body_info)
-
+% Score single trace 
+%
 % cell_body_info can either be a list of coordinates, or a filename. If a
 % filename is given, then file must be opened, filtered and 
+%
+% See also score_trace_wrapper
+
 if exist('cell_body_info','var') && ~isempty(cell_body_info)
     if ischar(cell_body_info) %if cell_body_info is a fielname, load and process file
         trace_cell_body_coords = get_trace_cell_body_coords(trace_image_file);

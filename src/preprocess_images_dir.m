@@ -1,5 +1,6 @@
 function preprocess_images_dir(input_dir,varargin)
-% PREPROCESS_IMAGES_DIR Preprocess a directory of PIC images using ImageJ/Fiji
+% Preprocess PIC images with ImageJ/Fiji & anisofilter (emphasise neurites)
+%
 %   PREPROCESS_IMAGES_DIR(input_dir,output_dir,DryRun,Verbose,RemoveIntermediates)
 %
 %   input_dir:  Directory containing input .PIC, .pic, .PIC.gz, or .pic.gz files

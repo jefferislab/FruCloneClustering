@@ -1,10 +1,13 @@
 function [ data, voxdims, origin ] = read3dimage( file )
-%read3dimage Reads a pic or nrrd, returning both data and voxel dimensions
+%READ3DIMAGE Reads a pic or nrrd, returning both data and voxel dimensions
+% 
+% Input:
 % file - path to input image
 %
 % Returns:
 % data    - array of image data in matlab's standard form
 % voxdims - 1 x N array of voxel dimensions
+% origin  - 1 x N array of space origin (prob only sensible for nrrd
 %
 % data is returned with x and y axes swapped so that it is compatible
 % with matlab's imread/image/imshow functions
@@ -17,7 +20,7 @@ function [ data, voxdims, origin ] = read3dimage( file )
 % See also readpic, impicinfo, nrrdLoad, imread
 
 [pathstr, name, ext] = fileparts(file);
-origin=[0;0;0];
+
 switch lower(ext)
 	case {'.nrrd','.nhdr'}
 		if exist('nrrdLoad','file')

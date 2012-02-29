@@ -1,6 +1,4 @@
-% Easy_Install_Masse.m
-% Script for simple installation of Matlab code and dependencies for this
-% project
+% Script for simple installation of Matlab code and dependencies 
 
 % Install main source code
 disp('Please choose directory to install source code');
@@ -40,4 +38,3 @@ Download_Sample_Data;
 disp(['======================']);
 disp(['Finished Installation!']);
 disp(['Now check and save your Matlab path...']);
-

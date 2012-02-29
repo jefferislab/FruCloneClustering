@@ -1,9 +1,10 @@
 function [template_coords, template_coords_cell_body] = score_trace_wrapper(trace_file, clone_classifier)
 %SCORE_TRACE_WRAPPER Find best clones matching a tracing from a classifier
-%   trace_file - trace file in SWC format
+% 
+% trace_file       - trace file in SWC format
 %	clone_classifier - classifier structure built by score_all_clones_cross_validated
-%					   where missing, the default fruitless clone
-%					   classifier is loaded using Load_Classifier script
+%	                   where missing, the default fruitless clone
+%					           classifier is loaded using Load_Classifier script
 % Returns:
 % template_coords - position of informative dots from template images
 % template_coords_cell_body - position of informative cell body regions 
@@ -26,6 +27,8 @@ function [template_coords, template_coords_cell_body] = score_trace_wrapper(trac
 % score_trace_wrapper(fullfile(root_dir,'traces','Jai','N0123.swc'));
 % AL-b / aSP-l / aSP7
 % score_trace_wrapper(fullfile(root_dir,'traces','Jai','N0729.swc'));
+% 
+% See also score_trace
 
 if nargin<2
 	clone_classifier=evalin('base', 'classifier','[]');

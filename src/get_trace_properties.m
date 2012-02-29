@@ -1,5 +1,6 @@
 function [trace_coords, trace_vect] = get_trace_properties(trace_file)
-%GET_TRACE_PROPERTIES Find dot properties from SWC or plain 3d coord file 
+%GET_TRACE_PROPERTIES Find dot properties from SWC neuron or plain 3d coord file
+% 
 % Ignores a header containing a mix of blank lines or comments beginning with #
 % Reads in swc files with 8 cols where 3-5 are XYZ coords
 % Reads in csv (comma separated) files with 3 cols and no column names

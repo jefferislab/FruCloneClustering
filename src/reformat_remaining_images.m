@@ -14,6 +14,8 @@ function reformat_remaining_images(input_dir,output_dir,registration_dir,filtere
 %   registration_dir:   all voxel above this intensity level will form part of the
 %               image. Voxels with intensity levels below this threshold will be
 %               discarded.
+%
+% See also reformat_coords
 
 % Make sure that dirs have a trailing slash
 input_dir=fullfile(input_dir,filesep);
