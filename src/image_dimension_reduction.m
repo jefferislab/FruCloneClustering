@@ -1,6 +1,6 @@
 function [dots,dim,Prob,lam,coords]=image_dimension_reduction(file_name,min_points_per_region,no_iterations)
 %
-% image_dimension_reduction.m
+% (Further) enhance tubular structure in dot collections
 %
 % This implements the algorithm described in "Optimal Manifold Representation 
 % of Data: An Information Theoretic Approach", Denis Chigirev and William Bialek. 
@@ -10,16 +10,18 @@ function [dots,dim,Prob,lam,coords]=image_dimension_reduction(file_name,min_poin
 % INPUTS:
 %   file_name:              File name of the segementd image (saved as a *tubed.mat file).
 %   min_points_per_region:  Sets containing less than min_points_per_region coordinates will
-%                           be discarded. Defaults to 200.
-%   no_iterations:          Number of iteration to run the EM algorithm. Defaults to 45.
+%                           be discarded. Defaults to 200 (including when
+%                           passed []).
+%   no_iterations:          Number of iteration to run the EM algorithm.
+%                           Defaults to 45 (including when passed []).
 
 
 
-if nargin < 4
+if nargin < 4 || isempty(no_iterations)
 	no_iterations=45;
 end
 
-if nargin < 3
+if nargin < 3 || isempty(min_points_per_region)
 	min_points_per_region = 200;
 end
 

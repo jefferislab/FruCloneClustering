@@ -1,6 +1,6 @@
 function reformat_remaining_images(input_dir,output_dir,registration_dir,filtered_image_dir,gregxform_dir)
 % 
-% reformat_remaining_images.m
+% Transform points into template brain space
 %
 % This function takes the dimension reduced images and transforms them 
 % onto the IS2 template

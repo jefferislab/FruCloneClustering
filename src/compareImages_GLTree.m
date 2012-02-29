@@ -1,7 +1,6 @@
 function [ind_first_image,ind_second_image]=compareImages_GLTree(coords1,coords2,vect1,vect2,ptrtree,feature);
-
-
-% compareImages_GLTree.m
+%
+% Find matching dots in two images (for cell bodies or projections)
 %
 % This function determines whether dots from the first image match a dot
 % from the second image. Depending on feature, this function will compare

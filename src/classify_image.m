@@ -1,5 +1,6 @@
 function [score,MI_threshold]=classify_image(s, test_images)
-
+% Determine whether an image contains a clone of interest
+%
 % This function is used to determine whether an image contains a clone of
 % interest. It is assumed that the user has already created the neccessary
 % XXXmatchedPoints.mat files that compare existing images to the test image.

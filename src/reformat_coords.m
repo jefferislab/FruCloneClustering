@@ -1,6 +1,4 @@
 function y=reformat_coords(coords,registration,gregxform_dir,return_nans)
-%
-% reformat_coords.m
 % Transform a 3 x N matrix using a CMTK registration file
 % 
 %

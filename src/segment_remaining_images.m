@@ -1,6 +1,6 @@
 function segment_remaining_images(input_dir,output_dir,threshold,fileglob)
 %
-% segment_remaining_images.m
+% Find connected regions with pixels > threshold
 %
 % This function takes tubed images, applies a threshold, and finds the
 % sets voxels that are connected.  

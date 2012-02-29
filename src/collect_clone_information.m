@@ -1,7 +1,7 @@
 function clone=collect_clone_information(clone_file)
-
-% This function produces the cell clone which contains the name of each
-% clone and the brains that contain the clone. 
+% 
+% 
+% Make cell containing name of each clone and brains containing each clone
 %
 % Input: cluster_file, a .tab files, containing the image names in the
 %                      first column and the clone names in the second

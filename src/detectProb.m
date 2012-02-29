@@ -1,4 +1,5 @@
 function dp = detectProb(x2, x1)
+% TODO:Nick explain what this does! Or remove it!
 
 x1 = sort(x1(:));
 x2 = sort(x2(:));
