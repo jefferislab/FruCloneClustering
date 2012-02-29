@@ -40,8 +40,8 @@ end
 if nargin < 6
 	fiji = 'fiji';
 end
-[mfilepath, mfile]= fileparts(mfilename());
-scriptfile=fullfile(mfilepath, 'scaleandfilter.py');
+%[mfilepath, mfile]= fileparts(mfilename());
+scriptfile=which('scaleandfilter.py');
 if isempty(anisofilter)
 	anisofilter='FALSE'; % so fiji won't run this step
 end
