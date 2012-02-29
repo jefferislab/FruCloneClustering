@@ -10,7 +10,7 @@ function calculate_properties_remaining_images(input_dir,output_dir,mask_file,al
 % INPUTS:
 %   input_dir:              Directory containing the *_reformated.mat files
 %   output_dir:             Directory in which the *_properties.mat files will be saved to.
-%   mask_file:              PIC file used to mask points.
+%   mask_file:              PIC/NRRD file used to mask points.
 %   alpha_thresh:           Cutoff used to determine whether a projection is sufficiently one-dimensional.
 %                           Points above this threshold are saved to p.gamma2. Alpha=1  -> one-dimenionsal,
 %                           Alpha=0 -> isotropic). Default is 0.25
@@ -51,13 +51,12 @@ if ~exist('alpha_thresh','var') || isempty(alpha_thresh)
 end
 
 if exist('mask_file','var') || isempty(mask_file)
-    mask_temp = readpic(mask_file);
-    mask = zeros(384,384,173);
+    [mask_temp, maskvoxdims, maskorigin] = read3dimage(mask_file);
+    mask = zeros(size(mask_temp));
     for i=1:173
         % readpic now works with [2 1 3] axis orientation
         mask(:,:,i)=mask_temp(:,:,i)';
     end
-    maskiminfo = impicinfo(mask_file);
 else
     % Set default to empty array
     mask = [];
@@ -124,7 +123,7 @@ for i=1:length(image_list)
     % (by default) that are not part of a linear structure.
 
     if ~isempty(mask)
-        indices=coord2ind(mask,maskiminfo.Delta,p.projection_coords); 
+        indices=coord2ind(mask,maskvoxdims,p.projection_coords,maskorigin);
         if isempty(alpha_thresh)
             maskInd = mask(indices)>0;
         else
