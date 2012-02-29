@@ -52,6 +52,7 @@
 %   matching_images                           - see if any file has same image stem as filename
 %   get_image_list                            - Find list of images to process from clone_list cell array
 %   removelock                                - Remove lockfile
+%   plot_jai_trace                            - Plot points from a trace_file (or from coords array)
 %   write_points_amira                        - Write 3D points to a text file that can be opened in Amira
 %
 % Unknown / Deprecated Function
@@ -60,7 +61,6 @@
 %   create_image_classifier_cross_validated   - TODO - Decide whether to keep this since now marked out of date
 %   detectProb_2D                             - TODO - Nick explain what this does.
 %   score_trace_w_cell_bodies                 - TODO - Nick determine if this is still useful
-%   plot_jai_trace                            - 
 %   remove_isolated_points                    - Function was used to clean up isolated points that mask left behind. 
 %
 % Dependencies:
@@ -103,4 +103,4 @@
 % 
 % Fiji - it may be necessary to put the fiji command in the system path.
 % 
-% Neura/anisofilter should be in the path or plased in FruCloneClustering/bin
+% Neura/anisofilter should be in the path or placed in FruCloneClustering/bin
