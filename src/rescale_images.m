@@ -56,7 +56,7 @@ for i=1:length(h)
 	outfile = [outfile suffix];
 	
 	% Check if we should process current image
-	if ~CheckForNewerInput([input_dir infile],[output_dir outfile],true)
+	if ~check_newer_input([input_dir infile],[output_dir outfile],true)
 		% skip this image since output newer than input
 		continue
 	elseif ~makelock(lockfile,[],true)
