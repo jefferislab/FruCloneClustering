@@ -70,6 +70,10 @@ for i=1:length(h)
 	cmd = sprintf('%s --headless -- %s -i %s -o %s -x %f -y %f -z %f -a %s -batch',...
 		fiji, scriptfile, [input_dir infile], [output_dir outfile], ...
 		 scale(1), scale(2), scale(3), anisofilter);
+	if strcmp(computer(),'MACI64') && ~strcmp(anisofilter,'FALSE')
+		% Fix problem with anisofilter getting upset by old libtiff distributed with matlab
+		cmd = ['export DYLD_LIBRARY_PATH=""; ' cmd];
+	end
 	disp(cmd);
 	system(cmd);
 	removelock(lockfile);
