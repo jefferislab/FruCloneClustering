@@ -6,6 +6,7 @@ Usage: fiji --headless scaleandfilter.py
 Options:
   -x ..., --scalex=...	 scale factor in x
   -y ..., --scaley=...	 scale factor in y
+  -z ..., --scalez=...	 scale factor in z
   -i ..., --in=...       input file
   -o ..., --out=...      output file
   -a ..., --anisofilter=... location of anisofilter binary
@@ -27,13 +28,14 @@ if sys.version_info > (2, 4):
 import os
 from features import TubenessProcessor
 
-def scaleandfilter(infile,outfile,scalex,scaley,anisofilter):
+def scaleandfilter(infile,outfile,scalex,scaley,scalez,anisofilter):
 	
 	print ("infile is: "+infile)
 	
 	imp = Opener().openImage(infile)
 	print imp
-	print "scalex = %f; scaley = %f" % (scalex,scaley)
+	print "scalex = %f; scaley = %f ; scalez = %f" % (scalex,scaley,scalez)
+
 	# Rescale
 	ip = imp.getProcessor()
 	ip.setInterpolate(True)
@@ -98,13 +100,14 @@ def main(argv):
 	
 	scalex=0.5
 	scaley=0.5
+	scalez=1.0
 	infile=''
 	outfile=''
 	anisofilter='anisofilter'
 	
 	try:
-		opts, args = getopt.getopt(argv, "hx:y:i:o:a:", 
-		    ["help", "scalex=", "scaley=","in=","out=","anisofilter="])
+		opts, args = getopt.getopt(argv, "hx:y:z:i:o:a:", 
+		    ["help", "scalex=", "scaley=","scalez=","in=","out=","anisofilter="])
 	except getopt.GetoptError:
 		usage()
 		sys.exit(2)
@@ -116,6 +119,8 @@ def main(argv):
 			scalex = float(arg)
 		elif opt in ("-y", "--scaley"):
 			scaley = float(arg)
+		elif opt in ("-z", "--scalez"):
+			scalez = float(arg)
 		elif opt in ("-i", "--in"):
 			infile = arg
 		elif opt in ("-o", "--out"):
@@ -123,7 +128,7 @@ def main(argv):
 		elif opt in ("-a", "--anisofilter"):
 			anisofilter = arg
 	
-	scaleandfilter(infile,outfile,scalex,scaley,anisofilter)
+	scaleandfilter(infile,outfile,scalex,scaley,scalez,anisofilter)
 	
 if __name__ == "__main__":
 	main(sys.argv[1:])
