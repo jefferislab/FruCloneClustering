@@ -95,8 +95,8 @@ def scaleandfilter(infile,outfile,scalex,scaley,scalez,anisofilter):
 			os.system(" ".join([anisofilter]+anisopts.split(' ')+[intif,outtif]))
 		# Open anisofilter output back into Fiji
 		print("Opening output tif: "+outtif)
-		imp = Opener().openImage(outtif)
-		imp.setCalibration(cal)
+		scaled = Opener().openImage(outtif)
+		scaled.setCalibration(cal)
 	# Hessian (tubeness)
 	print("Running tubeness")
 	tp=TubenessProcessor(1.0,False)
@@ -112,7 +112,7 @@ def scaleandfilter(infile,outfile,scalex,scaley,scalez,anisofilter):
 	else:
 		# Save to PIC
 		IJ.run(result,"Biorad ...", "biorad=["+outfile+"]")
-	imp.close()
+	scaled.close()
 	result.close()
 	
 def usage():
