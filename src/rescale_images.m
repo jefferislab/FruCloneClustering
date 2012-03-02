@@ -46,7 +46,7 @@ if isempty(anisofilter)
 	anisofilter='FALSE'; % so fiji won't run this step
 end
 
-for i=1:length(h)
+for i=randperm(length(h))
 
 	% set up the file names we need
 	infile=h(i).name;
