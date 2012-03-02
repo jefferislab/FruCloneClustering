@@ -22,6 +22,7 @@ import sys
 import getopt
 from ij import IJ, ImagePlus, ImageStack
 from ij.io import Opener, FileSaver
+from io import Nrrd_Writer
 from ij.process import StackProcessor
 if sys.version_info > (2, 4):
 	import subprocess
@@ -78,10 +79,10 @@ def scaleandfilter(infile,outfile,scalex,scaley,scalez,anisofilter):
 	# Save out file
 	fileName, fileExtension = os.path.splitext(outfile)
 	print("Saving as "+fileExtension+": "+outfile)
-		IJ.setKeyDown("alt") # this causes the nrrd to be compressed
-		IJ.run(result, "Nrrd ... ", "nrrd=[" + outfile + "]")
-		IJ.setKeyDown("none")
 	if fileExtension.lower()=='.nrrd':
+		nw=Nrrd_Writer()
+		nw.setNrrdEncoding("gzip")
+		nw.save(result,outfile)
 	else:
 		# Save to PIC
 		IJ.run(result,"Biorad ...", "biorad=["+outfile+"]")
