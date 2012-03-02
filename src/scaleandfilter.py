@@ -78,10 +78,10 @@ def scaleandfilter(infile,outfile,scalex,scaley,scalez,anisofilter):
 	# Save out file
 	fileName, fileExtension = os.path.splitext(outfile)
 	print("Saving as "+fileExtension+": "+outfile)
-	if fileExtension.lower()=='nrrd':
 		IJ.setKeyDown("alt") # this causes the nrrd to be compressed
 		IJ.run(result, "Nrrd ... ", "nrrd=[" + outfile + "]")
 		IJ.setKeyDown("none")
+	if fileExtension.lower()=='.nrrd':
 	else:
 		# Save to PIC
 		IJ.run(result,"Biorad ...", "biorad=["+outfile+"]")
