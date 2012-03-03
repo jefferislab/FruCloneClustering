@@ -57,10 +57,21 @@ for i=randperm(length(input_files))
 	u=zeros(size(x),'uint8');
 	u(x>=threshold)=1;
 
-	% Find connected components and give each island a unique index
-	[L,NUM]=bwlabeln(u,26);
+	if exist('bwlabeln','file')
+		% image processing toolbox is present
+		% Find connected components and give each island a unique index
+		[L,NUM]=bwlabeln(u,26); %#ok<ASGLU>
 
-	disp(['Segmented image ',input_files(i).name,'. Image has ',num2str(NUM),' components.'])
+		disp(['Segmented image ',input_files(i).name,'. Image has ',num2str(NUM),' components.'])
+	else
+		% no image processing toolbox, just threshold
+		% this means that the next steps will occupy more memory but 
+		% now that image_dimension_reduction is O(n) speed will not really be 
+		% affected.
+		 
+		L=double(u); %#ok<NASGU>
+		NUM = 1; %#ok<NASGU>
+	end
 
 	save(fullfile(output_dir,[current_image,'_filtered2_tubed.mat']),'x','L','NUM','voxdims');
 	% delete lockfile
