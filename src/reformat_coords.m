@@ -1,14 +1,14 @@
-function y=reformat_coords(coords,registration,gregxform,return_nans)
+function y=reformat_coords(coords,registration,gregxform,omit_nans)
 % Transform a 3 x N matrix using a CMTK registration file
-% 
 %
+% reformat_coords(coords,registration,gregxform,omit_nans)
+% 
 % INPUTS:
 %   coords:        3 x N matrix of XYZ coordinates in original image space.
 %   registration:  Path to CMTK registration file or .list dir containing it.
 %   gregxform:     Full path to gregxform binary (part of CMTK).
 %                  Not necessary if CMTK bin directory is in path.
-%   return_nans:   Return matrix containg NaNs for points that could not be transformed (default false, 
-%                  ie omit these points)
+%   omit_nans:     Omit points that could not be transformed (default true)
 %
 % OUTPUTS:
 %   y:              3 x N matrix of points in the template registration space
@@ -22,7 +22,7 @@ else
 end
 
 if nargin<4
-	return_nans=false;
+	omit_nans=true;
 end
 
 if ~exist(registration,'file')
@@ -61,7 +61,7 @@ if ~status
 	fclose(fid);
 	
 	% omit points that could not be transformed
-	if ~return_nans
+	if ~omit_nans
 		nans=isnan(y(1,:));
 		num_nans=sum(nans);
 		if num_nans>0
