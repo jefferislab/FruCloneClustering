@@ -1,20 +1,24 @@
-function y=reformat_coords(coords,registration,gregxform_dir,return_nans)
+function y=reformat_coords(coords,registration,gregxform,return_nans)
 % Transform a 3 x N matrix using a CMTK registration file
 % 
 %
 % INPUTS:
-%   coords:         3 x N matrix of XYZ coordinates in original image space.
-%   registration:   Path to CMTK registration file or .list dir containing it.
-%   gregxform_dir:  Location of registration binary.
-%                           be discarded. Defaults to 200; defaults to /Applications/IGSRegistration/bin/
-%   return_nans:    Return matrix containg NaNs for points that could not be transformed (default false, 
-%                   ie omit these points)
+%   coords:        3 x N matrix of XYZ coordinates in original image space.
+%   registration:  Path to CMTK registration file or .list dir containing it.
+%   gregxform:     Full path to gregxform binary (part of CMTK).
+%                  Not necessary if CMTK bin directory is in path.
+%   return_nans:   Return matrix containg NaNs for points that could not be transformed (default false, 
+%                  ie omit these points)
 %
 % OUTPUTS:
 %   y:              3 x N matrix of points in the template registration space
 
-if nargin<3
-	gregxform_dir = '/Applications/IGSRegistrationTools/bin/';
+if nargin<3 || isempty(gregxform)
+	gregxform = 'gregxform'
+else
+	if isdir(gregxform)
+		gregxform = fullfile(gregxform, 'gregxform');
+	end
 end
 
 if nargin<4
@@ -38,8 +42,6 @@ outfile = [tempname '-output.txt'];
 fid = fopen(infile, 'w');
 fwrite(fid, coords, 'float');
 fclose(fid);
-
-gregxform = fullfile(gregxform_dir,'gregxform');
 
 if ~exist(gregxform,'file')
 	error ('Unable to locate gregxform binary at %s',gregxform);
