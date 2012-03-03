@@ -25,7 +25,7 @@ end
 
 segmented_data=dir(fullfile(input_dir,'*_tubed.mat'));
 
-for i=randperm(segmented_data))
+for i=randperm(length(segmented_data))
 
 	current_image=jlab_filestem(segmented_data(i).name);
 	
