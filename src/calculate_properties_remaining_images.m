@@ -14,7 +14,7 @@ function calculate_properties_remaining_images(input_dir,output_dir,mask_file,al
 %   alpha_thresh:           Cutoff used to determine whether a projection is sufficiently one-dimensional.
 %                           Points above this threshold are saved to p.gamma2. Alpha=1  -> one-dimenionsal,
 %                           Alpha=0 -> isotropic). Default is 0.25
-%   cell_bodies_image_dir:  Directory containing PIC files of the orignal images after reformating.
+%   cell_bodies_image_dir:  Directory containing PIC/nrrd files of the orignal images after reformating.
 %   image_list:             Cell array containing names of image files to be processed. If an image list is not
 %                           speicifed, the default will be to take all the *_reformated.mat files in the input
 %                           directory.

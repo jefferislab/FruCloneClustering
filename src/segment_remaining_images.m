@@ -6,7 +6,7 @@ function segment_remaining_images(input_dir,output_dir,threshold,fileglob)
 % sets voxels that are connected.  
 %
 % INPUTS:
-%   input_dir:  Directory in which the tubed image files (saved as *tubed.PIC) are located.
+%   input_dir:  Directory in which the tubed image files (default *tubed.nrrd/PIC) are located.
 %   output_dir: Directory in which the segmented image files (saved as *tubed.mat) will be saved to.
 %   threshold:  all voxel above this intensity level will form part of the
 %               image. Voxels with intensity levels below this threshold will be
@@ -17,7 +17,7 @@ if nargin < 3
 end
 
 if nargin < 4
-	fileglob = '*-tubed.PIC';
+	fileglob = '*tubed.nrrd';
 end
 
 % Make sure that dirs have a trailing slash
