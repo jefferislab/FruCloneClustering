@@ -1,9 +1,9 @@
-function rescale_images( input_dir, output_dir, suffix, scale, anisofilter, fiji)
+function rescale_images( input_dir, output_dir, suffix, scale, anisofilter, fiji, fijiopts)
 %RESCALE_IMAGES rescale all PIC/nrrd images in input_dir
 %   
 % Usage rescale_images( input_dir, output_dir, suffix, scale, anisofilter, fiji)
 %
-% Rescale, calculate Hessian and 
+% Rescale, 8 bit, anisotropic diffusion filtering & calculate Hessian
 %
 % input_dir   - directory containing PIC images
 % output_dir  - output directory
@@ -12,10 +12,12 @@ function rescale_images( input_dir, output_dir, suffix, scale, anisofilter, fiji
 %               NB if suffix ends in nrrd, will be saved in NRRD format
 %               otherwise Biorad PIC.
 % scale       - 3-vector which will be multiplied by old size to get new size
-% anisofilter - path to anisofilter - defaults to 'anisofilter' when it
-%               must be in system path.
-%               If set to '' then anisofilter will not be called by fiji
+% anisofilter - path to anisofilter - if set to true or omitted, defaults to 
+%               'anisofilter' when it must be in system path.
+%               If set to ''/false then anisofilter will not be called by fiji
 % fiji        - path to fiji - defaults to 'fiji' ie must be in system path
+% fijiopts    - additional options passed to fiji or the Java Runtime
+%               (e.g. --mem 2G to restrict how much memory fiji tries to take)
 
 % Make sure that dirs have a trailing slash
 input_dir=fullfile(input_dir,filesep);
@@ -34,17 +36,22 @@ h=dir([input_dir '*.nhdr']);
 if nargin < 4 || isempty(scale)
 	scale = [0.5 0.5 1];
 end
-if nargin < 5
+if nargin < 5 || (islogical(anisofilter) && anisofilter)
 	anisofilter = 'anisofilter';
-end
-if nargin < 6
-	fiji = 'fiji';
-end
-%[mfilepath, mfile]= fileparts(mfilename());
-scriptfile=which('scaleandfilter.py');
-if isempty(anisofilter)
+elseif isempty(anisofilter) || (islogical(anisofilter) && ~anisofilter)
 	anisofilter='FALSE'; % so fiji won't run this step
 end
+
+if nargin < 6 || isempty(fiji)
+	fiji = 'fiji';
+end
+
+if nargin < 7
+	fijiopts ='';
+end
+
+%[mfilepath, mfile]= fileparts(mfilename());
+scriptfile=which('scaleandfilter.py');
 
 for i=randperm(length(h))
 
@@ -67,8 +74,8 @@ for i=randperm(length(h))
 	disp(['Rescaling image ',infile])
 	
 	% run fiji script
-	cmd = sprintf('%s --headless -- %s -i %s -o %s -x %f -y %f -z %f -a %s -batch',...
-		fiji, scriptfile, [input_dir infile], [output_dir outfile], ...
+	cmd = sprintf('%s --headless %s -- %s -i %s -o %s -x %f -y %f -z %f -a %s -batch',...
+		fiji, fijiopts, scriptfile, [input_dir infile], [output_dir outfile], ...
 		 scale(1), scale(2), scale(3), anisofilter);
 	if strcmp(computer(),'MACI64') && ~strcmp(anisofilter,'FALSE')
 		% Fix problem with anisofilter getting upset by old libtiff distributed with matlab
