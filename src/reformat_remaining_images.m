@@ -35,7 +35,7 @@ end
 
 h=dir([input_dir,'*_dimension_reduced.mat']);
 
-for i=1:length(h)
+for i=randperm(length(h))
 
 	% set up the file names we need
 	current_image=jlab_filestem(h(i).name);

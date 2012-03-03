@@ -31,7 +31,7 @@ end
 
 % Process all input files sequentually
 input_files=dir(fullfile(input_dir,fileglob));
-for i=1:length(input_files)
+for i=randperm(length(input_files))
 
 	% Trim input file name up to first underscore
 	% Apparently there are some cases of multiple images with the same
