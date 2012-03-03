@@ -28,7 +28,7 @@ assignin('base','processed_images_dir',fullfile(root_dir,'Processed_images',subd
 
 assignin('base','segmented_images_dir',fullfile(root_dir,'Segmented_images',subdir));
 
-assignin('base','dimension_reduced_dir',fullfile(root_dir,'Dimension_reduced_images',subdir));
+assignin('base','dimension_reduced_dir',fullfile(root_dir,'Dimension_reduced_points',subdir));
 
 assignin('base','reformated_points_dir',fullfile(root_dir,'Reformated_points',subdir));
 
