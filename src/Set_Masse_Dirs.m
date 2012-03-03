@@ -1,5 +1,5 @@
 function Set_Masse_Dirs(subdir)
-% SET_MASSE_DIRS   Set up the directories used in later processing stages
+% SET_MASSE_DIRS  Set up the standard directory locations used in later processing stages
 % 
 % Usage: Set_Masse_Dirs(subdir)
 %

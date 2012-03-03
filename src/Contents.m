@@ -4,7 +4,7 @@
 %   Easy_Compile_Masse                        - Script to compile the support functions required for the source code.
 %   Easy_Install_Masse                        - Script for simple installation of Matlab code and dependencies 
 %   Load_Classifier                           - Script to load the default fruitless clone classifier
-%   Set_Masse_Dirs                            - Script to set standard location of directories used throughout project
+%   Set_Masse_Dirs                            - Set up the standard directory locations used in later processing stages
 %
 % Top Level Functions (directory processing)
 %   preprocess_images_dir                     - Preprocess PIC images with ImageJ/Fiji & anisofilter (emphasise neurites)
