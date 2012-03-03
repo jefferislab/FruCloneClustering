@@ -1,6 +1,8 @@
-function reformat_remaining_images(input_dir,output_dir,registration_dir,filtered_image_dir,gregxform_dir)
+function reformat_remaining_images(input_dir,output_dir,registration_dir,filtered_image_dir,gregxform)
 % 
 % Transform points into template brain space
+%
+% reformat_remaining_images(input_dir,output_dir,registration_dir,filtered_image_dir,gregxform)
 %
 % This function takes the dimension reduced images and transforms them 
 % onto the IS2 template
@@ -9,11 +11,10 @@ function reformat_remaining_images(input_dir,output_dir,registration_dir,filtere
 % command 
 %
 % INPUTS:
-%   input_dir:          Directory in which the tubed image files (saved as *tubed.PIC) are located.
-%   output_dir:         Directory in which the segmented image files (saved as *tubed.mat) will be saved to.
-%   registration_dir:   all voxel above this intensity level will form part of the
-%               image. Voxels with intensity levels below this threshold will be
-%               discarded.
+%   input_dir:        Directory in which the tubed image files (saved as *tubed.PIC) are located.
+%   output_dir:       Directory in which the segmented image files (saved as *tubed.mat) will be saved to.
+%   registration_dir: Directory in which CMTK registration files (*.list) are located
+%   gregxform:        Path to gregxform binary (optional if in $PATH)
 %
 % See also reformat_coords
 
@@ -22,6 +23,10 @@ input_dir=fullfile(input_dir,filesep);
 output_dir=fullfile(output_dir,filesep);
 registration_dir = fullfile(registration_dir,filesep);
 filtered_image_dir = fullfile(filtered_image_dir,filesep);
+
+if nargin<5
+	gregxform='';
+end
 
 % Make output dir if required
 if ~exist(output_dir,'dir')
@@ -57,7 +62,7 @@ for i=1:length(h)
 	for j=1:length(dots)
 		y=dots{j};
 		if ~isempty(y)
-			dotsReformatted{j}=reformat_coords(y,registration,gregxform_dir);
+			dotsReformatted{j}=reformat_coords(y,registration,gregxform);
 		end
 	end
 
