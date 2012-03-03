@@ -28,17 +28,17 @@ assignin('base','processed_images_dir',fullfile(root_dir,'Processed_images',subd
 
 assignin('base','segmented_images_dir',fullfile(root_dir,'Segmented_images',subdir));
 
-assignin('base','dimension_reduced_dir',fullfile(root_dir,'dimension_reduced_images',subdir));
+assignin('base','dimension_reduced_dir',fullfile(root_dir,'Dimension_reduced_images',subdir));
 
 assignin('base','reformated_points_dir',fullfile(root_dir,'Reformated_points',subdir));
 
 assignin('base','reformated_images_dir',fullfile(root_dir,'Reformated_images',subdir));
 
-assignin('base','properties_dir',fullfile(root_dir,'image_properties',subdir));
+assignin('base','properties_dir',fullfile(root_dir,'Image_properties',subdir));
 
 mask_dir = fullfile(root_dir,'masks');
 
-assignin('base','matched_dots_dir',fullfile(root_dir,'matched_points',subdir));
+assignin('base','matched_dots_dir',fullfile(root_dir,'Matched_points',subdir));
 
 % Directory with the warp registration data (ie directory containing IS2_SAKW9-1_01_warp_m0g80c8e1e-1x26r4.list)
 registration_dir=fullfile(root_dir,'Registration');
