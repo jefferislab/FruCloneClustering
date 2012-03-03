@@ -51,7 +51,7 @@ for i=randperm(length(input_files))
 	
 	% read in image
 	infile=fullfile(input_dir,input_files(i).name);
-	[x, voxdims] = read3dimage(infile);
+	[x, voxdims, origin] = read3dimage(infile);
 
 	% threshold at arbitrary low level
 	u=zeros(size(x),'uint8');
@@ -73,7 +73,7 @@ for i=randperm(length(input_files))
 		NUM = 1; %#ok<NASGU>
 	end
 
-	save(fullfile(output_dir,[current_image,'_filtered2_tubed.mat']),'x','L','NUM','voxdims');
+	save(fullfile(output_dir,[current_image,'_filtered2_tubed.mat']),'x','L','threshold','NUM','voxdims','origin','-v7');
 	% delete lockfile
 	removelock(lockfile);
 end
