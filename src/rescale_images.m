@@ -1,7 +1,7 @@
-function rescale_images( input_dir, output_dir, suffix, scale, anisofilter, fiji, fijiopts)
+function rescale_images( input_dir, output_dir, suffix, scale, anisofilter, tube, fiji, fijiopts)
 %RESCALE_IMAGES Rescale and preprocess input images to emphasise neurites
 %   
-% Usage rescale_images( input_dir, output_dir, suffix, scale, anisofilter, fiji)
+% Usage rescale_images( input_dir, output_dir, suffix, scale, tube, anisofilter, fiji, fijiopts)
 %
 % Rescale, 8 bit, anisotropic diffusion filtering & calculate Hessian
 %
@@ -15,9 +15,13 @@ function rescale_images( input_dir, output_dir, suffix, scale, anisofilter, fiji
 % anisofilter - path to anisofilter - if set to true or omitted, defaults to 
 %               'anisofilter' when it must be in system path.
 %               If set to ''/false then anisofilter will not be called by fiji
+% tube        - run tubeness algorithm in fiji (default true)
 % fiji        - path to fiji - defaults to 'fiji' ie must be in system path
 % fijiopts    - additional options passed to fiji or the Java Runtime
 %               (e.g. --mem 2G to restrict how much memory fiji tries to take)
+%
+% See scaleandfilter.py for the ImageJ jython script that does the processing.
+% 
 
 % Make sure that dirs have a trailing slash
 input_dir=fullfile(input_dir,filesep);
@@ -42,11 +46,17 @@ elseif isempty(anisofilter) || (islogical(anisofilter) && ~anisofilter)
 	anisofilter='FALSE'; % so fiji won't run this step
 end
 
-if nargin < 6 || isempty(fiji)
+if nargin < 6 || isempty(tube) || tube
+	tube = true;
+else
+	tube = false;
+end
+
+if nargin < 7 || isempty(fiji)
 	fiji = 'fiji';
 end
 
-if nargin < 7
+if nargin < 8
 	fijiopts ='';
 end
 
@@ -74,9 +84,15 @@ for i=randperm(length(h))
 	disp(['Rescaling image ',infile])
 	
 	% run fiji script
-	cmd = sprintf('%s --headless %s -- %s -i %s -o %s -x %f -y %f -z %f -a %s -batch',...
-		fiji, fijiopts, scriptfile, [input_dir infile], [output_dir outfile], ...
-		 scale(1), scale(2), scale(3), anisofilter);
+	scriptargs = sprintf('-i %s -o %s -x %f -y %f -z %f -a %s', ...
+		[input_dir infile], [output_dir outfile], scale(1), scale(2), scale(3),  ...
+		anisofilter);
+	if ~tube
+		scriptargs = [scriptargs ' --notube'];
+	end
+	
+	cmd = sprintf('%s --headless %s -- %s %s -batch',...
+		fiji, fijiopts, scriptfile, scriptargs);
 	if strcmp(computer(),'MACI64') && ~strcmp(anisofilter,'FALSE')
 		% Fix problem with anisofilter getting upset by old libtiff distributed with matlab
 		cmd = ['export DYLD_LIBRARY_PATH=""; ' cmd];
