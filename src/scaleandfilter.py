@@ -4,12 +4,13 @@
 Usage: fiji --headless scaleandfilter.py
 
 Options:
-  -x ..., --scalex=...	 scale factor in x
-  -y ..., --scaley=...	 scale factor in y
-  -z ..., --scalez=...	 scale factor in z
-  -i ..., --in=...       input file
-  -o ..., --out=...      output file
+  -x ..., --scalex=...      scale factor in x
+  -y ..., --scaley=...      scale factor in y
+  -z ..., --scalez=...      scale factor in z
+  -i ..., --in=...          input file
+  -o ..., --out=...         output file
   -a ..., --anisofilter=... location of anisofilter binary
+  -n ..., --notube         Don't run tubeness (Hessian) filtering
 
   -h, --help			 show this help
 """
@@ -33,7 +34,7 @@ from features import TubenessProcessor
 from script.imglib import ImgLib
 from script.imglib.algorithm import Scale3D
 
-def scaleandfilter(infile,outfile,scalex,scaley,scalez,anisofilter):
+def scaleandfilter(infile,outfile,scalex,scaley,scalez,anisofilter,runtube):
 	
 	print ("infile is: "+infile)
 	imp = Opener().openImage(infile)
@@ -97,11 +98,15 @@ def scaleandfilter(infile,outfile,scalex,scaley,scalez,anisofilter):
 		print("Opening output tif: "+outtif)
 		scaled = Opener().openImage(outtif)
 		scaled.setCalibration(cal)
+	
 	# Hessian (tubeness)
 	print("Running tubeness")
-	tp=TubenessProcessor(1.0,False)
-	result = tp.generateImage(scaled)
-	IJ.run(result, "8-bit","")
+	if(runtube):
+		tp=TubenessProcessor(1.0,False)
+		result = tp.generateImage(scaled)
+		IJ.run(result, "8-bit","")
+	else:
+		result=scaled
 	# Save out file
 	fileName, fileExtension = os.path.splitext(outfile)
 	print("Saving as "+fileExtension+": "+outfile)
@@ -131,10 +136,11 @@ def main(argv):
 	infile=''
 	outfile=''
 	anisofilter='anisofilter'
+	runtube=True
 	
 	try:
-		opts, args = getopt.getopt(argv, "hx:y:z:i:o:a:", 
-		    ["help", "scalex=", "scaley=","scalez=","in=","out=","anisofilter="])
+		opts, args = getopt.getopt(argv, "hnx:y:z:i:o:a:", 
+		    ["help", "notube","scalex=", "scaley=","scalez=","in=","out=","anisofilter="])
 	except getopt.GetoptError:
 		usage()
 		sys.exit(2)
@@ -142,6 +148,8 @@ def main(argv):
 		if opt in ("-h", "--help"):
 			usage()
 			sys.exit()
+		elif opt in ("-n", "--notube"):
+			runtube=False
 		elif opt in ("-x", "--scalex"):
 			scalex = float(arg)
 		elif opt in ("-y", "--scaley"):
@@ -155,7 +163,7 @@ def main(argv):
 		elif opt in ("-a", "--anisofilter"):
 			anisofilter = arg
 	
-	scaleandfilter(infile,outfile,scalex,scaley,scalez,anisofilter)
+	scaleandfilter(infile,outfile,scalex,scaley,scalez,anisofilter,runtube)
 	
 if __name__ == "__main__":
 	main(sys.argv[1:])

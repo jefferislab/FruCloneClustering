@@ -41,8 +41,8 @@ mask_dir = fullfile(root_dir,'masks');
 assignin('base','matched_dots_dir',fullfile(root_dir,'Matched_points',subdir));
 
 % Directory with the warp registration data (ie directory containing IS2_SAKW9-1_01_warp_m0g80c8e1e-1x26r4.list)
-registration_dir=fullfile(root_dir,'Registration');
+assignin('base','registration_dir',fullfile(root_dir,'Registration'));
 
 % Directory of gregxform unix command to refomat the coordinates
-bin_dir=fullfile(root_dir,'bin');
+assignin('base','bin_dir',fullfile(root_dir,'bin'));
 end %  function
