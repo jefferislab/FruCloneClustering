@@ -25,7 +25,9 @@ if nargin<4
 	omit_nans=true;
 end
 
-if ~exist(registration,'file')
+% Matlab returns true for a folder when exist(x,'file') is called but octave
+% (at least 3.2.4) does not
+if ~exist(registration,'file') && ~isdir(registration)
 	error('Unable to read registration %s',registration);
 end
 
