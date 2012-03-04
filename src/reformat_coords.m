@@ -19,6 +19,10 @@ else
 	if isdir(gregxform)
 		gregxform = fullfile(gregxform, 'gregxform');
 	end
+	% now check if we have something sensible
+	if ~exist(gregxform,'file')
+		error ('Unable to locate gregxform binary at %s',gregxform);
+	end
 end
 
 if nargin<4
@@ -44,10 +48,6 @@ outfile = [tempname '-output.txt'];
 fid = fopen(infile, 'w');
 fwrite(fid, coords, 'float');
 fclose(fid);
-
-if ~exist(gregxform,'file')
-	error ('Unable to locate gregxform binary at %s',gregxform);
-end
 
 command=[ gregxform ' --binary -i ' infile ' -o ' outfile ' ' registration ];
 % TODO: Check when gregxform returns non-zero and suppress error messages
