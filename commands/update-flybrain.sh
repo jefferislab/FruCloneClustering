@@ -8,7 +8,7 @@ echo $dirs
 for x in $dirs; do
   #statements
   echo $x
-  zip -u -0 "$x.zip" "$x"/*
+  zip -u -x "*.lock" -0 "$x.zip" "$x"/*
   rsync -avP "$x.zip" lmbfly:/var/www/html/Masse2011/FruCloneClustering/Reformated_points/
 done
 # rsync -avnP --include="*.zip" --exclude="*.*" Reformated_points lmbfly:/var/www/html/Masse2011
