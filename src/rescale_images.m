@@ -1,5 +1,5 @@
 function rescale_images( input_dir, output_dir, suffix, scale, anisofilter, fiji, fijiopts)
-%RESCALE_IMAGES rescale all PIC/nrrd images in input_dir
+%RESCALE_IMAGES Rescale and preprocess input images to emphasise neurites
 %   
 % Usage rescale_images( input_dir, output_dir, suffix, scale, anisofilter, fiji)
 %
