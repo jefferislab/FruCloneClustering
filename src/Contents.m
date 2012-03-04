@@ -8,6 +8,7 @@
 %
 % Top Level Functions (directory processing)
 %   preprocess_images_dir                     - Preprocess PIC images with ImageJ/Fiji & anisofilter (emphasise neurites)
+%   rescale_images                            - Rescale and preprocess input images to emphasise neurites
 %   segment_remaining_images                  - Find connected regions with pixels > threshold
 %   process_images_for_dimension_reduction    - Dimension reduction on all dots
 %   reformat_remaining_images                 - Transform points into template brain space
@@ -66,18 +67,20 @@
 % Dependencies:
 % 1. Matlab code from 
 %   git://github.com/jefferis/MatlabSupport.git
+% 
 % this includes 
 % a) ANN Nearest Neighbour library as wrapped for Matlab or Octave
 %   Original is from http://www.wisdom.weizmann.ac.il/~bagon
 %   see also http://octave-swig.sourceforge.net/octave-ann.html
 % 
 % b) GLTreePro for finding nearest neighbour points
-%   compile with TestMexFiles3D.m
-%
+% 
 % c) ReadPic Matlab code - to read Biorad format images
 % d) nrrdio Matlab code - to read Nrrd format images
 % e) teem compiled (mex) package to read nrrd images
 % 
+%
+% The full image processing pipeline has a number of external dependencies:
 %
 % 2. CMTK Image Registration and Analysis
 %	http://www.nitrc.org/projects/cmtk/
@@ -86,9 +89,10 @@
 % http://fiji.sc
 % 
 % 4. Neura/anisofilter for additional emphasis of tubular structures in
-% imaages.
-% See http://www.neura.org/ (includes source code)
-% Greg can provide updated source with fixes for macosx and recent linux.
+% images.
+% See http://www.neura.org/ (includes original source code)
+% and https://github.com/jefferis/neura
+% (updated source with fixes for macosx and recent linux by Greg)
 % 
 %
 % MATLAB INSTALL:
@@ -101,6 +105,6 @@
 % that is in the system path OR failing that, installed into
 % FruCloneClustering/bin
 % 
-% Fiji - it may be necessary to put the fiji command in the system path.
+% Fiji: it may be necessary to put the fiji command in the system path.
 % 
 % Neura/anisofilter should be in the path or placed in FruCloneClustering/bin
