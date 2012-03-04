@@ -40,9 +40,9 @@ h=dir([input_dir '*.nhdr']);
 if nargin < 4 || isempty(scale)
 	scale = [0.5 0.5 1];
 end
-if nargin < 5 || (islogical(anisofilter) && anisofilter)
+if nargin < 5 || isempty(anisofilter) || (islogical(anisofilter) && anisofilter)
 	anisofilter = 'anisofilter';
-elseif isempty(anisofilter) || (islogical(anisofilter) && ~anisofilter)
+elseif islogical(anisofilter) && ~anisofilter
 	anisofilter='FALSE'; % so fiji won't run this step
 end
 
