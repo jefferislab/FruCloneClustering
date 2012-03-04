@@ -1,7 +1,7 @@
 function rescale_images( input_dir, output_dir, suffix, scale, anisofilter, tube, fiji, fijiopts)
 %RESCALE_IMAGES Rescale and preprocess input images to emphasise neurites
 %   
-% Usage rescale_images( input_dir, output_dir, suffix, scale, tube, anisofilter, fiji, fijiopts)
+% Usage rescale_images( input_dir, output_dir, suffix, scale, anisofilter, tube, fiji, fijiopts)
 %
 % Rescale, 8 bit, anisotropic diffusion filtering & calculate Hessian
 %
@@ -18,7 +18,7 @@ function rescale_images( input_dir, output_dir, suffix, scale, anisofilter, tube
 % tube        - run tubeness algorithm in fiji (default true)
 % fiji        - path to fiji - defaults to 'fiji' ie must be in system path
 % fijiopts    - additional options passed to fiji or the Java Runtime
-%               (e.g. --mem 2G to restrict how much memory fiji tries to take)
+%               (e.g. --mem 2048M to restrict how much memory fiji tries to take)
 %
 % See scaleandfilter.py for the ImageJ jython script that does the processing.
 % 
