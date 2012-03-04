@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-        # Script to pre-process a set of images 
+# Script to pre-process a set of images 
+
+# Request at least 2G of memory /node (with the dimension reduction in mind,
+# otherwise shouldn't be that memory intensive)
+#$ -l h_vmem=2G
 
 octave <<EOF
 Set_Masse_Dirs('442')
