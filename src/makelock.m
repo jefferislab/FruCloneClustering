@@ -25,6 +25,12 @@ if nargin<2 || isempty(lockmsg)
 		jobid=getenv('JOB_ID');
 		if ~isempty(jobid)
 			lockmsg=strcat(strtrim(hostname),':',jobid);
+			% this is a sub identfiier for array jobs and is required to make
+			% them unique
+			taskid=getenv('SGE_TASK_ID');
+			if ~isempty(taskid)
+				lockmsg=[lockmsg '.' taskid];
+			end
 		else
 			% note strtrim removes trailing whitespace from hostname
 			lockmsg = strcat(strtrim(hostname),':',tempname);
