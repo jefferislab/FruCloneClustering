@@ -137,9 +137,17 @@ function [gamma,P,lambda,dimension] = chigirev_dim_reduction(xcoords,no_iteratio
 					% way around ie nearest neighbour distances (x axis)
 					% against log2 to log20 on y axis
 					% try a very simple solution
-					linfit=[ones(19,1) log(sqrt(nndist(2:20,i)))] \ log2to20;
-					% set dimensionality of this point to gradient
-					dimension(i)=linfit(2);
+					numzeros=sum(nndist(2:20,i)==0);
+					if numzeros>0
+						% some points are right on top of this one so let's say 
+						dimension(i)=0;
+						% also this can cause serious instability in fit below
+						% which in octave can result in an infinite loop
+					else
+						linfit=[ones(19,1) log(sqrt(nndist(2:20,i)))] \ log2to20;
+						% set dimensionality of this point to gradient
+						dimension(i)=linfit(2);
+					end
 				else
 					dimension(i)=0;
 				end
