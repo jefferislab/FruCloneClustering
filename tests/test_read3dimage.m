@@ -1,4 +1,4 @@
-function test_suite = testCoords
+function test_suite = read3dimage
 % unit test for reading 3d image
 
 initTestSuite;
