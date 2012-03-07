@@ -114,16 +114,11 @@ end
 function  classifier = calculate_combined_ARUC_scores(classifier)
 %  calculate score clones based on combined cell_body and projection scores
 
-if classifier.ARUC_projection < 0.99 && classifier.ARUC_cell_body < 0.99
-    weight_cell_body = (1 - cos(pi*(classifier.ARUC_cell_body - 0.5)));
-    weight_projection = (1 - cos(pi*(classifier.ARUC_projection - 0.5)));
-elseif classifier.ARUC_projection > 0.99 && classifier.ARUC_projection > classifier.ARUC_cell_body
-    weight_cell_body = 0;
-    weight_projection = 1;
-elseif classifier.ARUC_cell_body > 0.99 && classifier.ARUC_cell_body > classifier.ARUC_projection
-    weight_cell_body = 1;
-    weight_projection = 0;
-end
+% we set the maximum ARUC score to 0.9999 for numerical stability
+% weights are subtracted by since we want a weight of 0 if the ARUC score
+% equals 0.5
+weight_cell_body = 1/(1 - min(0.9999,classifier.ARUC_cell_body)) - 2 ;
+weight_projection = 1/(1 - min(0.9999,classifier.ARUC_projection)) - 2;
 
 % ensure the projection and cell body weights add to one
 total_weight = weight_cell_body + weight_projection;
