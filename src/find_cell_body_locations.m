@@ -20,6 +20,7 @@ function cell_body_coords = find_cell_body_locations(image_file, threshold)
 if nargin < 2
 	threshold = 0.5;
 end
+
 f = ones(2,2,2,'uint8');
 
 [x, voxdims] = read3dimage(image_file);
@@ -36,5 +37,5 @@ ind = find(y > threshold * max_intensity);
 % standard form (help ind2coord for details)
 coords = ind2coord(image_size,ind,voxdims,[2 1 3]);
 
-% TODO - Nick, why uint16 here?
+% convert to integers; need 16 bit since coordinates go above 255
 cell_body_coords = uint16(coords);
