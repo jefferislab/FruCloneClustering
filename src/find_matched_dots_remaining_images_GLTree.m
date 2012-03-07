@@ -124,24 +124,22 @@ for i=1:length(image_list)
                             coords_cell_bodies_2=p.cell_body_coords;
                             vect_cell_bodies_2=[];
                             
-                            if size(coords_cell_bodies_1, 2) & size(coords_cell_bodies_2, 2) > 20 % something wrong with either image if it contains less than 20 points
-                                y1 = zeros(size(coords_cell_bodies_1, 2),1,'uint8');
+                            y1 = zeros(size(coords_cell_bodies_1, 2),1,'uint8');
+                            if size(coords_cell_bodies_1, 2) > 20 & size(coords_cell_bodies_2, 2) > 20 % something wrong with either image if it contains less than 20 points
                                 ptrtree = BuildGLTree3D(double(coords_cell_bodies_2));
                                 [ind_union] = compareImages_GLTree(coords_cell_bodies_1,coords_cell_bodies_2,...
                                     vect_cell_bodies_1,vect_cell_bodies_2,ptrtree,'cell_body');
                                 DeleteGLTree3D(ptrtree);
                                 y1(ind_union) = 1;
-                                match_cell_body = [match_cell_body y1];
-                            else
-                                y1 = zeros(n1_1,1,'uint8');
-                                match_cell_body = [match_cell_body y1];
                             end
+                            match_cell_body = [match_cell_body y1];
                         end
                         
                          if any(strcmp(neuronal_feature,'projection'))  % compare neural projections   
                             coords_projections_2 = p.projection_coords;
                             vect_projections_2 = p.projection_tangent_vector;
                             
+                            y1 = zeros(size(coords_projections_1,2),1,'uint8');
                             if size(coords_projections_1,2) > 20 & size(coords_projections_2,2 ) > 20 % something wrong with either image if it contains less than 20 points
                                 y1 = zeros(size(coords_projections_1,2),1,'uint8');
                                 ptrtree = BuildGLTree3D(double(coords_projections_2));
@@ -149,11 +147,8 @@ for i=1:length(image_list)
                                     vect_projections_1,vect_projections_2,ptrtree,'projection');
                                 DeleteGLTree3D(ptrtree);
                                 y1(ind_union) = 1;
-                                match_projection = [match_projection y1];
-                            else
-                                y1 = zeros(n1_2,1,'uint8');
-                                match_projection = [match_projection y1];
                             end
+                            match_projection = [match_projection y1];
                         end
                     end                   
                 end
