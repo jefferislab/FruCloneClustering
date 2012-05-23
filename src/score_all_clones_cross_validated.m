@@ -32,8 +32,8 @@ all_images = get_all_images(clone_info_cell);
 
 for i=1:length(clone_info_cell)
     
-    disp(['Building classifier for clone ', clone_info_cell{i}.clone_name]);
-    classifier{i}.clone_name = clone_info_cell{i}.clone_name;
+    disp(['Building classifier for clone ', clone_info_cell{i}.cloneName]);
+    classifier{i}.clone_name = clone_info_cell{i}.cloneName;
     
     score_with_clone_cell_body = [];
     score_with_clone_projection = [];
@@ -45,9 +45,9 @@ for i=1:length(clone_info_cell)
     % ensure there are at least two images containing the clone
     if length(image_list_with_clone) > 1
         
-        [classifier{i}.s1, classifier{i}.MI_percentile_cell_body] = build_MI_structure(matchedPoints_dir, ...
+        [classifier{i}.cell_body_templates, classifier{i}.MI_percentile_cell_body] = build_MI_structure(matchedPoints_dir, ...
             image_list_with_clone, image_list_without_clone,'cell_body');
-        [classifier{i}.s2, classifier{i}.MI_percentile_projection] = build_MI_structure(matchedPoints_dir,image_list_with_clone,...
+        [classifier{i}.projection_templates, classifier{i}.MI_percentile_projection] = build_MI_structure(matchedPoints_dir,image_list_with_clone,...
             image_list_without_clone,'projection');
         
         if cross_validate
@@ -57,17 +57,17 @@ for i=1:length(clone_info_cell)
                 
                 % remove current image from with and without clone lists
                 [image_list_with_clone, image_list_without_clone, current_image_contains_clone] = get_image_list(clone_info_cell{i}, all_images, j);
-                
+                u=min(length(image_list_with_clone),5);
                 % build classifiers with current image removed
-                s1 = build_MI_structure(matchedPoints_dir, image_list_with_clone, ...
+                cell_body_templates = build_MI_structure(matchedPoints_dir, image_list_with_clone(1:u), ...
                     image_list_without_clone, 'cell_body');
-                s2 = build_MI_structure(matchedPoints_dir, image_list_with_clone, ...
+                projection_templates = build_MI_structure(matchedPoints_dir, image_list_with_clone(1:u), ...
                     image_list_without_clone, 'projection');
-                
+                    
                 
                 % score the current image against the classifiers
-                score_cell_body = classify_image(s1, all_images(j));
-                score_projection = classify_image(s2, all_images(j));
+                score_cell_body = classify_image(cell_body_templates, all_images(j));
+                score_projection = classify_image(projection_templates, all_images(j));
                 
                 if current_image_contains_clone
                     score_with_clone_cell_body=[score_with_clone_cell_body score_cell_body'];
@@ -79,11 +79,11 @@ for i=1:length(clone_info_cell)
             end
             
             % calculate ROC values from individual cell_bdoy and projection scores
-            classifier{i} = calculate_individual_ARUC_scores(classifier{i}, score_without_clone_cell_body, score_without_clone_projection, ...
+            classifier{i} = calculate_individual_AROC_scores(classifier{i}, score_without_clone_cell_body, score_without_clone_projection, ...
                 score_with_clone_cell_body, score_with_clone_projection);
             
             %  calculate ROC value from combined cell_body and projection scores
-            classifier{i} = calculate_combined_ARUC_scores(classifier{i});
+            classifier{i} = calculate_combined_AROC_scores(classifier{i});
             
             % removing matched dots matricies because of memory concerns
             classifier{i} = remove_match_subfileds(classifier{i});
@@ -94,31 +94,27 @@ for i=1:length(clone_info_cell)
 end
 save(calssifier_save_name,'classifier','-v7.3')
 
-end
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function classifier = remove_match_subfileds(classifier)
 % removing matched dots matricies because of memory concerns
-for j = 1:length(classifier.s2)
-    if ~isempty(classifier.s1{j})
-        classifier.s1{j} = rmfield(classifier.s1{j},'match');
+for j = 1:length(classifier.projection_templates)
+    if ~isempty(classifier.cell_body_templates{j})
+        classifier.cell_body_templates{j} = rmfield(classifier.cell_body_templates{j},'match');
     end
-    if ~isempty(classifier.s2{j})
-        classifier.s2{j} = rmfield(classifier.s2{j},'match');
+    if ~isempty(classifier.projection_templates{j})
+        classifier.projection_templates{j} = rmfield(classifier.projection_templates{j},'match');
     end
-end
-
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function  classifier = calculate_combined_ARUC_scores(classifier)
+function  classifier = calculate_combined_AROC_scores(classifier)
 %  calculate score clones based on combined cell_body and projection scores
 
-% we set the maximum ARUC score to 0.9999 for numerical stability
-% weights are subtracted by since we want a weight of 0 if the ARUC score
+% we set the maximum AROC score to 0.9999 for numerical stability
+% weights are subtracted by since we want a weight of 0 if the AROC score
 % equals 0.5
-weight_cell_body = 1/(1 - min(0.9999,classifier.ARUC_cell_body)) - 2 ;
-weight_projection = 1/(1 - min(0.9999,classifier.ARUC_projection)) - 2;
+weight_cell_body = 1/(1 - min(0.9999,classifier.AROC_cell_body)) - 2 ;
+weight_projection = 1/(1 - min(0.9999,classifier.AROC_projection)) - 2;
 
 % ensure the projection and cell body weights add to one
 total_weight = weight_cell_body + weight_projection;
@@ -130,11 +126,10 @@ clone_scores_cell_body = classifier.clone_score_distribution_cell_body(classifie
 null_score_projection = classifier.null_score_distribution_projection(classifier.threshold_projection,:);
 clone_scores_projection = classifier.clone_score_distribution_projection(classifier.threshold_projection,:);
 
-classifier.ARUC_combined = detectProb(weight_cell_body*null_scores_cell_body + weight_projection*null_score_projection, ...
+classifier.AROC_combined = detectProb(weight_cell_body*null_scores_cell_body + weight_projection*null_score_projection, ...
     weight_cell_body*clone_scores_cell_body + weight_projection*clone_scores_projection);
 classifier.weight_cell_body = weight_cell_body;
 classifier.weight_projection = weight_projection;
-end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -150,12 +145,11 @@ else
     current_image_contains_clone = false;
 end
 image_list_without_clone = setdiff(all_images([1:j-1 j+1:end]), image_list_with_clone);
-end
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function classifier = calculate_individual_ARUC_scores(classifier, score_without_clone_cell_body, score_without_clone_projection, ...
+function classifier = calculate_individual_AROC_scores(classifier, score_without_clone_cell_body, score_without_clone_projection, ...
     score_with_clone_cell_body, score_with_clone_projection)
 % calculate ROC values from cell_bdoy and projection scores
 
@@ -163,35 +157,42 @@ function classifier = calculate_individual_ARUC_scores(classifier, score_without
 % Used num_thresholds number of thresholds to calculate scores.
 % Will now calculate ROC values for all thresholds.
 num_thresholds = size(score_with_clone_projection,1);
-ARUC_cell_body = zeros(1,num_thresholds);
-ARUC_projection = zeros(1,num_thresholds);
+AROC_cell_body = zeros(1,num_thresholds);
+AROC_projection = zeros(1,num_thresholds);
 for j=1:num_thresholds
-    ARUC_cell_body(j)=detectProb(score_without_clone_cell_body(j,:)',score_with_clone_cell_body(j,:)');
-    ARUC_projection(j)=detectProb(score_without_clone_projection(j,:)',score_with_clone_projection(j,:)');
+    AROC_cell_body(j)=detectProb(score_without_clone_cell_body(j,:)',score_with_clone_cell_body(j,:)');
+    AROC_projection(j)=detectProb(score_without_clone_projection(j,:)',score_with_clone_projection(j,:)');
 end
 
-[~, t1]=max(ARUC_cell_body);
-[~, t2]=max(ARUC_projection);
+[~, t1]=max(AROC_cell_body);
+[~, t2]=max(AROC_projection);
 
-classifier.ARUC_cell_body = ARUC_cell_body(t1);
+classifier.AROC_cell_body = AROC_cell_body(t1);
 classifier.threshold_cell_body = t1;
 classifier.null_score_distribution_cell_body = score_without_clone_cell_body;
 classifier.clone_score_distribution_cell_body = score_with_clone_cell_body;
 
-classifier.ARUC_projection = ARUC_projection(t2);
+classifier.AROC_projection = AROC_projection(t2);
 classifier.threshold_projection = t2;
 classifier.null_score_distribution_projection = score_without_clone_projection;
 classifier.clone_score_distribution_projection = score_with_clone_projection;
 
-end
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function all_images = get_all_images(clone_info_cell)
 % get the list of all image files
-all_images = [];
-for i = 1:length(clone_info_cell)
-    all_images = [all_images clone_info_cell{i}.images];
-end
-all_images = unique(all_images);
+% Find list of images to process from clone_list cell array
+% 
+% Given the cell array clone_list, which contains a list of images for each 
+% clone, returns the list of images to process
 
+all_images = [];
+
+for i = 1:length(clone_info_cell)
+    if isfield(clone_info_cell{i},'images')
+        all_images = [all_images clone_info_cell{i}.images];
+    elseif isfield(clone_info_cell{i},'image')
+        all_images = [all_images clone_info_cell{i}.image];
+    end
 end
+
+all_images = unique(all_images);
