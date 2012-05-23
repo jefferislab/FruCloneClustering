@@ -8,7 +8,7 @@ function calculate_properties_remaining_images(input_dir,output_dir,mask_file,al
 % structure p in [image_name]_properties.mat
 %
 % INPUTS:
-%   input_dir:              Directory containing the *_reformated.mat files
+%   input_dir:              Directory containing the *_reformatted.mat files
 %   output_dir:             Directory in which the *_properties.mat files will be saved to.
 %   mask_file:              PIC/NRRD file used to mask points.
 %   alpha_thresh:           Cutoff used to determine whether a projection is sufficiently one-dimensional.
@@ -16,20 +16,20 @@ function calculate_properties_remaining_images(input_dir,output_dir,mask_file,al
 %                           Alpha=0 -> isotropic). Default is 0.25
 %   cell_bodies_image_dir:  Directory containing PIC/nrrd files of the orignal images after reformating.
 %   image_list:             Cell array containing names of image files to be processed. If an image list is not
-%                           speicifed, the default will be to take all the *_reformated.mat files in the input
+%                           speicifed, the default will be to take all the *_reformatted.mat files in the input
 %                           directory.
 %
 % Uses: extract_properties
 
 if ~exist('clone_list','var') || isempty(clone_list)
     % remove the suffix after the '-',and then only use unique images
-    reformated_data = dir(fullfile(input_dir,'*_reformated.mat'));
+    reformatted_data = dir(fullfile(input_dir,'*_reformatted.mat'));
     image_list = {};
     count = 0;
-    for i = 1:length(reformated_data)
-        if reformated_data(i).bytes > 9999 % something is wrong if size is less than 9999 bytes
+    for i = 1:length(reformatted_data)
+        if reformatted_data(i).bytes > 9999 % something is wrong if size is less than 9999 bytes
             count = count + 1;
-            image_list{count} = jlab_filestem(reformated_data(i).name,'-');
+            image_list{count} = jlab_filestem(reformatted_data(i).name,'-');
         end
     end
     image_list = unique(image_list);% remove duplicates  
@@ -73,7 +73,7 @@ end
 
 for i=1:length(image_list)
     % This contains just the image stem (everything up to first underscore)
-    % e.g. SAKW12-1_reformated.mat => SAKW12-1
+    % e.g. SAKW12-1_reformatted.mat => SAKW12-1
     current_image=jlab_filestem(image_list{i});
     % Check if we should process current image
     if matching_images(current_image,...
@@ -92,7 +92,7 @@ for i=1:length(image_list)
     p.projection_tangent_vector=[];
     
     % Added '-' before '*', NYM May 22, 2011 
-    [match_exists, first_matching_image] = matching_images(current_image, [input_dir,'*reformated.mat'],'-');  
+    [match_exists, first_matching_image] = matching_images(current_image, [input_dir,'*reformatted.mat'],'-');  
     if ~match_exists
         disp([current_image,' is not in the input directory']);
 		continue
@@ -100,8 +100,8 @@ for i=1:length(image_list)
         indata=load([input_dir, first_matching_image]);
     end 
     
-    for j=1:length(indata.dotsReformated) % iterate over each group of connected dots
-        y = indata.dotsReformated{j}; % dots in reference coord space
+    for j=1:length(indata.dotsReformatted) % iterate over each group of connected dots
+        y = indata.dotsReformatted{j}; % dots in reference coord space
         
         if ~isempty(y)
             [dummy num_dots]=size(y);
@@ -156,7 +156,7 @@ for i=1:length(image_list)
         p.alpha = p.alpha(:, included_ind);
 
         % Will find the location of putative cell bodies if a directory with
-        % the reformated images was specified
+        % the reformatted images was specified
         if find_cell_bodies_flag
     %        h = dir([cell_bodies_image_dir,current_image,'*.pic']);
             [match_exists, first_matching_image] = matching_images(current_image, [cell_bodies_image_dir,'*.pic'],'-');
