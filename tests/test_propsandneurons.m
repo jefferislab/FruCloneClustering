@@ -1,4 +1,4 @@
-function test_suite = testCoords
+function test_suite = test_propsandneurons
 % unit tests for reading neurons/dots and extracting properties
 
 initTestSuite;

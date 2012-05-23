@@ -5,7 +5,7 @@ function [nnidx, nndist] = ann_meta_wrapper (points, k, query, eps, ann_bin_dir)
 %
 % Vars:
 %     nnidx - indices of matching points:  (k)x(#points)
-%     nndst - square distance of the points
+%     nndst - **square** distance of the points
 %
 %     points - data point(s): a (d)x(#points) matrix
 %     k      - required k nearest neighbors
