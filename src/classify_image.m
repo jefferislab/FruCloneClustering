@@ -33,9 +33,10 @@ function [score,MI_threshold]=classify_image(s, test_images)
 
 
 MI_threshold = 0.0025:0.0025:0.1;
+num_thresholds = length(MI_threshold);
 
-count = zeros(length(test_images),40)+10^(-20);
-score = zeros(length(test_images),40);
+count = zeros(length(test_images),num_thresholds)+10^(-20);
+score = zeros(length(test_images),num_thresholds);
 
 for i=1:length(s)
     if ~isempty(s{i})
