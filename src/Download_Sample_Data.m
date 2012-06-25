@@ -10,7 +10,7 @@ if strcmp(classdld,'Cancel')
 	return
 end
 if strcmp(classdld,'Yes')
-	urlwrite('https://data.mrc-lmb.cam.ac.uk/weblinks/?id=89f0fd5c927d466d6ec9a21b9ac34ffa&filename=classifier_oct29.mat',...
+	urlwrite('https://data.mrc-lmb.cam.ac.uk/weblinks/?id=2bb232c0b13c774965ef8558f0fbd615&filename=classifier_final.mat',...
 		fullfile(root_dir,'data','classifier.mat'));
 end
 
