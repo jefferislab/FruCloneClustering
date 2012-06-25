@@ -47,15 +47,15 @@ MI_percentile_threshold = 950; % a threshold of 950 corresponds to a 95th percen
 
 for i = 1:num_clones % loop through all clones in classifier
     
-    if isfield(clone_classifier{i},'s2')
-        num_template_images = length(clone_classifier{i}.s2);
+    if isfield(clone_classifier{i},'projection_templates')
+        num_template_images = length(clone_classifier{i}.projection_templates);
         template_score = zeros(num_template_images, num_dots_in_trace);
         template_score_cell_body = zeros(num_template_images, num_dots_in_trace_cell_body);
         
         for j = 1:num_template_images % loop through each image for each clone in classifier
             
-            template_coords = double(clone_classifier{i}.s2{j}.coords);
-            template_vect = clone_classifier{i}.s2{j}.vect;
+            template_coords = double(clone_classifier{i}.projection_templates{j}.coords);
+            template_vect = clone_classifier{i}.projection_templates{j}.vect;
             % compare trace coords and tangent vector to image those template
             ptrtree = BuildGLTree3D(template_coords);
             [matched_dots_in_trace, matched_dots_in_template] = compareImages_GLTree(trace_coords, ...
@@ -64,7 +64,7 @@ for i = 1:num_clones % loop through all clones in classifier
             
             % for each template, calculate the percentile score for each dot
             for k = 1:length(matched_dots_in_template)
-                pct_ind = find(clone_classifier{i}.s2{j}.MI(matched_dots_in_template(k)) > ...
+                pct_ind = find(clone_classifier{i}.projection_templates{j}.MI(matched_dots_in_template(k)) > ...
                     clone_classifier{i}.MI_percentile_projection ,1 ,'last');
                 if ~isempty(pct_ind)  % only score dot if its mutual information is above the percentile threshold
                     template_score(j, matched_dots_in_trace(k)) = max(0, (pct_ind - MI_percentile_threshold));
@@ -72,7 +72,7 @@ for i = 1:num_clones % loop through all clones in classifier
             end
             
             if ~isempty(trace_cell_body_coords)
-                template_coords_cell_body = double(clone_classifier{i}.s1{j}.coords);
+                template_coords_cell_body = double(clone_classifier{i}.cell_body_templates{j}.coords);
                 % compare trace coords and tangent vector to image those template
                 ptrtree = BuildGLTree3D(template_coords_cell_body);
                 [matched_dots_in_trace_cell_body, matched_dots_in_template_cell_body] = compareImages_GLTree(trace_cell_body_coords, ...
@@ -81,7 +81,7 @@ for i = 1:num_clones % loop through all clones in classifier
                 
                 % for each template, calculate the percentile score for each dot
                 for k = 1:length(matched_dots_in_template_cell_body)
-                    pct_ind = find(clone_classifier{i}.s1{j}.MI(matched_dots_in_template_cell_body(k)) > ...
+                    pct_ind = find(clone_classifier{i}.cell_body_templates{j}.MI(matched_dots_in_template_cell_body(k)) > ...
                         clone_classifier{i}.MI_percentile_cell_body ,1 ,'last');
                     if ~isempty(pct_ind) % only score dot if its mutual information is above the percentile threshold
                         template_score_cell_body(j, matched_dots_in_trace_cell_body(k)) =  max(0, (pct_ind - MI_percentile_threshold));

@@ -7,6 +7,10 @@ function image_list = get_image_list(clone_list)
 image_list = [];
 
 for i = 1:length(clone_list)
-    image_list = [image_list clone_list{i}.images];
+    if isfield(clone_list{i},'images')
+        image_list = [image_list clone_list{i}.images];
+    elseif isfield(clone_list{i},'image')
+        image_list = [image_list clone_list{i}.image];
+    end
 end
 image_list = unique(image_list);

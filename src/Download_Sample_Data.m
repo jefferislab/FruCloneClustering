@@ -5,7 +5,7 @@ Set_Masse_Dirs
 
 %% For querying fruitless neuroblast clones dataset
 % Classifier
-classdld=questdlg('Download classifier data for fruitless clones (190Mb, Recommended)','Classifier Download','Yes');
+classdld=questdlg('Download classifier data for fruitless clones (115Mb, Recommended)','Classifier Download','Yes');
 if strcmp(classdld,'Cancel')
 	return
 end
