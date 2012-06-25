@@ -56,11 +56,11 @@ MI_threshold = clone_classifier{ranked_clone(clone_rank)}.MI_percentile_projecti
 MI_threshold_cell_body = clone_classifier{ranked_clone(clone_rank)}.MI_percentile_cell_body(950);
 template_coords = [];
 template_coords_cell_body = [];
-for i = 1:length(clone_classifier{ranked_clone(clone_rank)}.s2)
-    ind = find(clone_classifier{ranked_clone(clone_rank)}.s2{i}.MI > MI_threshold);
-    template_coords = [template_coords clone_classifier{ranked_clone(clone_rank)}.s2{i}.coords(:,ind)];
-    ind = find(clone_classifier{ranked_clone(clone_rank)}.s1{i}.MI > MI_threshold_cell_body);
-    template_coords_cell_body = [template_coords_cell_body clone_classifier{ranked_clone(clone_rank)}.s1{i}.coords(:,ind)];
+for i = 1:length(clone_classifier{ranked_clone(clone_rank)}.projection_templates)
+    ind = find(clone_classifier{ranked_clone(clone_rank)}.projection_templates{i}.MI > MI_threshold);
+    template_coords = [template_coords clone_classifier{ranked_clone(clone_rank)}.projection_templates{i}.coords(:,ind)];
+    ind = find(clone_classifier{ranked_clone(clone_rank)}.cell_body_templates{i}.MI > MI_threshold_cell_body);
+    template_coords_cell_body = [template_coords_cell_body clone_classifier{ranked_clone(clone_rank)}.cell_body_templates{i}.coords(:,ind)];
 end
 figure;
 plot3(template_coords(1,:),template_coords(2,:),template_coords(3,:),'k.')
