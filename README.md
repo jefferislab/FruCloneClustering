@@ -1,6 +1,6 @@
 Source code to accompany:
 
-[A mutual information approach to automate identification of neuronal clusters in Drosophila brain images]([http://dx.doi.org/10.3389/fninf.2012.00021])
+[A mutual information approach to automate identification of neuronal clusters in Drosophila brain images](http://dx.doi.org/10.3389/fninf.2012.00021)
 Nicolas Y. Masse, Sebastian Cachero, Aaron D. Ostrovsky, Gregory S. X. E. Jefferis
 Division of Neurobiology, MRC Laboratory of Molecular Biology, Cambridge, CB2 0QH, UK.
 
