@@ -9,7 +9,7 @@ disp(['Downloading FruCloneClustering ...']);
 unzip('https://github.com/jefferis/FruCloneClustering/zipball/master',install_path)
 downloaded_file=dir(fullfile(install_path,'jefferis-FruCloneClustering*'));
 if length(downloaded_file)~=1
-	error('Unable to dowload FruCloneClustering - or old versions left over')
+	error('Unable to download FruCloneClustering - or old versions left over')
 end
 final_src_path=fullfile(install_path,'FruCloneClustering');
 movefile(fullfile(install_path,downloaded_file.name),final_src_path);
@@ -20,7 +20,7 @@ disp(['Downloading MatlabSupport ...']);
 unzip('https://github.com/jefferis/MatlabSupport/zipball/master',install_path)
 downloaded_file=dir(fullfile(install_path,'jefferis-MatlabSupport*'));
 if length(downloaded_file)~=1
-	error('Unable to dowload MatlabSupport - or old versions left over')
+	error('Unable to download MatlabSupport - or old versions left over')
 end
 final_support_path=fullfile(install_path,'MatlabSupport');
 movefile(fullfile(install_path,downloaded_file.name),final_support_path);
