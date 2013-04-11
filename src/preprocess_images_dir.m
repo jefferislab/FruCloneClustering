@@ -38,7 +38,7 @@ end
 allfiles=dir(fullfile(input_dir));
 images=[];
 for i=1:length(allfiles)
-	if regexpi(allfiles(i).name,'.*02\.(pic|PIC)+(\.gz)*$')
+	if regexpi(allfiles(i).name,'.*02\.(pic|PIC|nrrd)+(\.gz)*$')
 		images=[images allfiles(i)];
 	end
 end
