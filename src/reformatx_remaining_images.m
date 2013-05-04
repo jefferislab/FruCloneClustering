@@ -26,7 +26,7 @@ if ~exist(output_dir,'dir')
 	mkdir(output_dir);
 end
 
-[pathstr, mask_name, ext, versn] = fileparts(jlab_filestem(mask_image));
+[pathstr, mask_name, ext] = fileparts(jlab_filestem(mask_image));
 h=dir([input_dir,'*.pic']);
 
 for i=1:length(h)
