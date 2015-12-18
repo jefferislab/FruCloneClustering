@@ -35,7 +35,7 @@ end
 % d1=dir([input_dir '*.pic']);
 % d2=dir([input_dir '*.PIC']);
 % h=[d1;d2];
-h=dir([input_dir '*.nhdr']);
+h=dir([input_dir '*.nrrd']);
 
 if nargin < 4 || isempty(scale)
 	scale = [0.5 0.5 1];
@@ -68,6 +68,8 @@ for i=randperm(length(h))
 	% set up the file names we need
 	infile=h(i).name;
 	current_image=jlab_filestem(infile);
+	disp('Current image: ');
+	disp(current_image);
 	lockfile=[output_dir,current_image,'-in_progress.lock'];
 	[pathstr, outfile] = fileparts(infile);
 	outfile = [outfile suffix];

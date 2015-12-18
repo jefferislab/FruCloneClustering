@@ -53,6 +53,9 @@ for i=randperm(length(input_files))
 	infile=fullfile(input_dir,input_files(i).name);
 	[x, voxdims, origin] = read3dimage(infile);
 
+	% Update threshold to be peak of intensity distribution, excluding zero
+	threshold = mode(x(x>0));
+
 	% threshold at arbitrary low level
 	u=zeros(size(x),'uint8');
 	u(x>=threshold)=1;

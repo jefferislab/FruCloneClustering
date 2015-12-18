@@ -13,7 +13,7 @@ function [match_exists, first_matching_image] = matching_images( filename, fileg
 if nargin < 3
     sep = '_';
 end
-%
+
 match_exists=0;
 first_matching_image=[];
 

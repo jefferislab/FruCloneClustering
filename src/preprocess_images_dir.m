@@ -13,16 +13,16 @@ function preprocess_images_dir(input_dir,varargin)
 % Note this is a translation of the original PreprocessImages.R script
 	
 numvarargs = find(~cellfun('isempty',varargin));
-if length(numvarargs) > 4
-	error('preprocess_image requires at most 3 optional inputs');
+if length(numvarargs) > 5
+	error('preprocess_image requires at most 4 optional inputs');
 end
 % set defaults for optional inputs
-optargs = {input_dir 0 1 1};
+optargs = {input_dir 0 1 1 [1 1 1]};
 % now put these defaults into the valuesToUse cell array,
 % and overwrite the ones specified in varargin.
 optargs(numvarargs) = varargin(numvarargs);
 % Place optional args in memorable variable names
-[output_dir, DryRun, Verbose, RemoveIntermediates] = optargs{:};
+[output_dir, DryRun, Verbose, RemoveIntermediates, ScalingFactors] = optargs{:};
 
 % Make sure that dirs have a trailing slash
 input_dir=fullfile(input_dir,filesep);
@@ -38,7 +38,7 @@ end
 allfiles=dir(fullfile(input_dir));
 images=[];
 for i=1:length(allfiles)
-	if regexpi(allfiles(i).name,'.*02\.(pic|PIC|nrrd)+(\.gz)*$')
+	if regexpi(allfiles(i).name,'.*_02_.*\.(pic|PIC|nrrd)+(\.gz)*$')
 		images=[images allfiles(i)];
 	end
 end
@@ -66,7 +66,7 @@ for i=1:length(images)
     disp(['processing image: ' current_image])
 	preprocess_image(fullfile(input_dir,images(i).name),...
 		fullfile(output_dir,[images(i).name,'.4xd-tubed.PIC']),...
-		DryRun, Verbose, RemoveIntermediates);
+		DryRun, Verbose, RemoveIntermediates, ScalingFactors);
 	removelock(lockfile);
 
 end
@@ -84,16 +84,16 @@ function [ command, status ] = preprocess_image( infile, varargin)
 %	RemoveIntermediates (default true)
 	
 	numvarargs = find(~cellfun('isempty',varargin));
-	if length(numvarargs) > 4
-		error('preprocess_image requires at most 3 optional inputs');
+	if length(numvarargs) > 5
+		error('preprocess_image requires at most 4 optional inputs');
 	end
 	% set defaults for optional inputs
-	optargs = {[infile,'.4xd-tubed.PIC'] 0 1 1};
+	optargs = {[infile,'.4xd-tubed.PIC'] 0 1 1 [1 1 1]};
 	% now put these defaults into the valuesToUse cell array,
 	% and overwrite the ones specified in varargin.
 	optargs(numvarargs) = varargin(numvarargs);
 	% Place optional args in memorable variable names
-	[outfile, DryRun, Verbose, RemoveIntermediates] = optargs{:};
+	[outfile, DryRun, Verbose, RemoveIntermediates, ScalingFactors] = optargs{:};
 	
 	% open file
 	macro=['open("',infile,'");'];
@@ -102,7 +102,8 @@ function [ command, status ] = preprocess_image( infile, varargin)
 	[indir,infilename,infileext] = fileparts(infile);
 	resampledfilename=[infilename,infileext,'.4xd.tif'];
 	resampledfilepath=fullfile(indir,resampledfilename);
-	macro=[macro,'run("Scale...", "x=0.5 y=0.5 z=1.0 interpolation=Bicubic process title=Scaled");']
+% 	macro=[macro,'run("Scale...", "x=0.5 y=0.5 z=1.0 interpolation=Bicubic process create title=Scaled");']
+    macro=[macro,horzcat('run("Scale...", "x=', num2str(ScalingFactors(1)), ' y=', num2str(ScalingFactors(2)), ' z=', num2str(ScalingFactors(3)), ' interpolation=Bicubic create process title=Scaled");')];
 	% Make sure that we select the right window
 	macro=[macro 'selectWindow("Scaled");'];
 	macro=[macro 'run("8-bit");'];
@@ -113,7 +114,7 @@ function [ command, status ] = preprocess_image( infile, varargin)
 	filteredResampledfile=[infilename infileext,'.4xd-filtered.tif'];
 	filteredResampledfilepath=fullfile(indir,filteredResampledfile);
 	anisoOptions='-scanrange:10 -tau:2 -nsteps:2 -lambda:0.1 -ipflag:0 -anicoeff1:1 -anicoeff2:0 -anicoeff3:0';
-	macro=[macro 'exec("sh","-c",' '"cd ',indir,'; anisofilter ',anisoOptions,' ',resampledfilename,' ',filteredResampledfile,'");'];
+	macro=[macro 'exec("sh","-c",' '"cd ',indir,'; anisofilter ',anisoOptions,' ',resampledfilename,' ',filteredResampledfile, ' > /tmp/aniso_log_', resampledfilename ,'.anisolog");'];
 	% open the result
 	macro=[macro 'open("',fullfile(indir,filteredResampledfile),'");'];
 	% fix voxel size
@@ -122,16 +123,19 @@ function [ command, status ] = preprocess_image( infile, varargin)
 	macro=[macro,'run("Tubeness", "sigma=1");'];
 	% this makes float output, so change to 8 bit
 	macro=[macro,'run("8-bit");'];
-	% save as Biorad PIC file for matlab to open
-	macro=[macro 'run("Biorad ...", "biorad=[',outfile,']");'];
-	
+% 	% save as Biorad PIC file for matlab to open
+% 	macro=[macro 'run("Biorad ...", "biorad=[',outfile,']");'];
+    % save as compressed nrrd file
+	macro=[macro, horzcat('setKeyDown("alt");	run("Nrrd ... " , "nrrd=["', outfile, '"]");setKeyDown("none");')]
+
+    
 	tmp=[tempname '.ijm'];
 	% think about whether we need to add line feeds
 	fid = fopen(tmp,'w');
 	fprintf(fid, '%s', macro);
 	fclose(fid);
 	
-	command=['fiji -eval ''runMacro("',tmp,'");'' -batch'];
+	command=['ImageJ -eval ''runMacro("',tmp,'");'' -batch'];
 	if DryRun
 		result=macro;
 		status=-1;
@@ -139,7 +143,7 @@ function [ command, status ] = preprocess_image( infile, varargin)
 	end
 	
 	[status, result] = system(command);
-	delete(tmp);
+% 	delete(tmp);
 	if(RemoveIntermediates)
 		delete(resampledfilepath,filteredResampledfilepath);
 	end

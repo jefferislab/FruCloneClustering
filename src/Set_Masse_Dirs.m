@@ -36,7 +36,7 @@ assignin('base','reformated_images_dir',fullfile(root_dir,'Reformated_images',su
 
 assignin('base','properties_dir',fullfile(root_dir,'Image_properties',subdir));
 
-mask_dir = fullfile(root_dir,'masks');
+assignin('base', 'mask_dir', fullfile(root_dir,'masks'));
 
 assignin('base','matched_dots_dir',fullfile(root_dir,'Matched_points',subdir));
 

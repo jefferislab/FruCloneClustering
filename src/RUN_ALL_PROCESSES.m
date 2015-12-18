@@ -16,28 +16,36 @@
 Set_Masse_Dirs
 
 %%%%%
-
 % Loading set of images to use, grouped by clone
-load(fullfile(root_dir,'data','clone_list.mat'));
+% load(fullfile(root_dir,'data','clone_list.mat'));
+disp('Loading image list');
+load(fullfile(root_dir,'data','clone_list_new.mat'));
+disp('DONE');
 
 %%% Steps of the image data processing procedure
 
 % Preprocess images to emphasise tubular structures
+disp('Tubular-enhancement preprocessing');
 preprocess_images_dir(original_images_dir, processed_images_dir);
+disp('DONE');
 
 % Threshold and segment images - output is a mat file including voxdims
+disp('Thresholding and segmentation');
 segment_remaining_images(processed_images_dir,segmented_images_dir)
+disp('DONE');
 
 % Dimension reduction - output are points in external coords
+disp('Dimension reduction ');
 process_images_for_dimension_reduction(segmented_images_dir,dimension_reduced_dir);
+disp('DONE');
 
 % Reformat onto template brain
 % 1. reformat dimension reduced coordinates onto template brain 
-reformat_remaining_images(dimension_reduced_dir,reformated_points_dir,registration_dir,processed_images_dir,bin_dir);
+% reformat_remaining_images(dimension_reduced_dir,reformated_points_dir,registration_dir,processed_images_dir,bin_dir);
 % 2. reformat original images onto template image in order to extract 
 %    candidate cell body locations (high intensity regions outside neuropil)
-reformatx_remaining_images(original_images_dir,reformated_images_dir,registration_dir,...
-	fullfile(mask_dir,'IS2_nym_mask_invert.nrrd'));
+% reformatx_remaining_images(original_images_dir,reformated_images_dir,registration_dir,...
+% 	fullfile(mask_dir,'IS2_nym_mask_invert.nrrd'));
 
 %% Can use some sample preprocessed image data to feed in at this point
 % These are located in 2 directories:
@@ -48,8 +56,12 @@ reformatx_remaining_images(original_images_dir,reformated_images_dir,registratio
 
 % Calculate tangent vectors etc, note that this uses the neuropil mask file
 % 
+disp('Calculating tangent vectors');
 calculate_properties_remaining_images(dimension_reduced_dir,properties_dir,...
 	fullfile(mask_dir,'IS2_nym_mask.nrrd'),.25,reformated_images_dir,clone_list);
+disp('DONE');
 
 % Find and store which dots in each image match dots in other images
+disp('Finding matching dots');
 find_matched_dots_remaining_images_GLTree(properties_dir,matched_dots_dir, [1 1], clone_list);
+disp('DONE');

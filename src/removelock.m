@@ -3,19 +3,21 @@ function [ status , msg] = removelock( lockfile )
 % Remove a lockfile - this is just deletion + warning
 % See also MAKELOCK
 
-status = false; msg = '';
+status = true; msg = '';
 
-if ~exist(lockfile,'file')
-	msg = 'lockfile not there';
-	return;
-end
+// status = false; msg = '';
 
-delete(lockfile)
+// if ~exist(lockfile,'file')
+//	msg = 'lockfile not there';
+//	return;
+// end
 
-if ~exist(lockfile,'file')
-	status = true;
-else
-	msg = 'unable to remove lockfile';
-end
+// delete(lockfile)
+
+// if ~exist(lockfile,'file')
+//	status = true;
+// else
+//	msg = 'unable to remove lockfile';
+// end
 
 end

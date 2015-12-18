@@ -119,6 +119,12 @@ def scaleandfilter(infile,outfile,scalex,scaley,scalez,anisofilter,runtube):
 		IJ.run(result,"Biorad ...", "biorad=["+outfile+"]")
 	scaled.close()
 	result.close()
+
+    # clean up
+	if os.path.isfile(intif):
+		os.remove(intif)
+	if os.path.isfile(outtif):
+		os.remove(outtif)
 	
 def usage():
 	print __doc__

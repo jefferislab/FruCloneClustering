@@ -19,11 +19,14 @@ input_dir=fullfile(input_dir,filesep);
 output_dir=fullfile(output_dir,filesep);
 
 % Make output dir if required
+disp('Checking for output dir.')
 if ~exist(output_dir,'dir')
 	mkdir(output_dir);
 end
 
 segmented_data=dir(fullfile(input_dir,'*_tubed.mat'));
+
+disp(horzcat('Number of segmented data files: ', length(segmented_data)))
 
 for i=randperm(length(segmented_data))
 
@@ -33,13 +36,16 @@ for i=randperm(length(segmented_data))
 	if matching_images(current_image,...
 			[output_dir,'*dimension_reduced.mat'])
 		% skip this image since corresponding output exists
+		disp(horzcat('Output exists for ', current_image))
 		continue
 	elseif ~makelock([output_dir,current_image,'-in_progress.mat'])
 		% skip since someone else is working on this image
+		disp(horzcat('Someone else is working on ', current_image))
 		continue
 	end
 	
 	% Perform dimension reduction
+	disp(horzcat('Starting dimension reduction for', current_image))
 	[dots,dim,Prob,lam,coords]=image_dimension_reduction(...
 	 [input_dir,segmented_data(i).name]); 
 	save([output_dir,current_image,'_dimension_reduced.mat'],...
